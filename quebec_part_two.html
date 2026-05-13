@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BT 700 Route Map</title>
+    <title>Quebec Part Two Route Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
@@ -12,17 +12,17 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f0f0f0;
         }
-        
+
         #map {
             width: 100%;
             height: 100vh;
         }
-        
+
         .info-panel {
             position: absolute;
             top: 10px;
@@ -35,18 +35,34 @@
             z-index: 1000;
             font-size: 14px;
         }
-        
+
         .info-panel h2 {
             margin: 0 0 10px 0;
             font-size: 16px;
             color: #333;
         }
-        
+
         .info-panel p {
             margin: 5px 0;
             color: #666;
         }
-        
+
+        .nav-links {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-links a {
+            color: #3388ff;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
         .loading {
             position: absolute;
             top: 50%;
@@ -62,49 +78,49 @@
 </head>
 <body>
     <div id="map"></div>
-    
+
     <div class="info-panel">
-        <h2>BT 700 Route</h2>
+        <h2>Quebec Part Two Route</h2>
         <p id="routeInfo">Loading route...</p>
-        <div class="nav-links" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
-            <a href="quebec_part_two.html" style="color: #3388ff; text-decoration: none; font-size: 13px;">View Quebec Part Two Route →</a>
+        <div class="nav-links">
+            <a href="index.html">← Back to BT 700 Route</a>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script src="https://unpkg.com/leaflet.awesome-markers/dist/leaflet.awesome-markers.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.awesome-markers/dist/leaflet.awesome-markers.css" />
-    
+
     <script>
-        // Initialize map centered on Ontario, Canada
-        const map = L.map('map').setView([44.4, -80.4], 9);
-        
+        // Initialize map centered on Eastern Quebec, Canada
+        const map = L.map('map').setView([47.9, -67.7], 8);
+
         // Add tile layer (OpenStreetMap)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors',
             maxZoom: 19
         }).addTo(map);
-        
+
         // Load and parse GPX file
-        fetch('BT_700_.gpx')
+        fetch('Quebec_Part_Two-2.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();
                 const gpxDoc = parser.parseFromString(gpxText, 'text/xml');
-                
+
                 // Extract track points
                 const trkpts = gpxDoc.querySelectorAll('trkpt');
                 const coordinates = [];
-                
+
                 trkpts.forEach(trkpt => {
                     const lat = parseFloat(trkpt.getAttribute('lat'));
                     const lon = parseFloat(trkpt.getAttribute('lon'));
                     coordinates.push([lat, lon]);
                 });
-                
+
                 // Extract waypoints
                 const waypoints = gpxDoc.querySelectorAll('wpt');
-                
+
                 // Draw track
                 if (coordinates.length > 0) {
                     L.polyline(coordinates, {
@@ -113,7 +129,7 @@
                         weight: 3,
                         lineCap: 'round'
                     }).addTo(map);
-                    
+
                     // Fit bounds to track
                     const latitudes = coordinates.map(c => c[0]);
                     const longitudes = coordinates.map(c => c[1]);
@@ -123,7 +139,7 @@
                     ];
                     map.fitBounds(bounds);
                 }
-                
+
                 // Add waypoint markers
                 waypoints.forEach((wpt, index) => {
                     const lat = parseFloat(wpt.getAttribute('lat'));
@@ -132,7 +148,7 @@
                     const desc = wpt.querySelector('desc')?.textContent || '';
                     const type = wpt.querySelector('type')?.textContent || 'generic';
                     const cmt = wpt.querySelector('cmt')?.textContent || '';
-                    
+
                     // Map POI types to Font Awesome icons
                     const iconMap = {
                         'campsite': { icon: 'fa-campground', color: 'green' },
@@ -152,9 +168,9 @@
                         'danger': { icon: 'fa-exclamation-triangle', color: 'red' },
                         'generic': { icon: 'fa-map-pin', color: 'blue' }
                     };
-                    
+
                     const iconConfig = iconMap[type] || iconMap['generic'];
-                    
+
                     // Create awesome marker
                     const marker = L.marker([lat, lon], {
                         icon: L.AwesomeMarkers.icon({
@@ -166,12 +182,12 @@
                     }).bindPopup(`<strong>${name}</strong><br><em>${type}</em><br>${desc}`)
                     .addTo(map);
                 });
-                
+
                 // Calculate distance and elevation
                 let totalDistance = 0;
                 let elevationGain = 0;
                 let lastElevation = null;
-                
+
                 trkpts.forEach(trkpt => {
                     const ele = parseFloat(trkpt.querySelector('ele')?.textContent || 0);
                     if (lastElevation !== null && ele > lastElevation) {
@@ -179,17 +195,17 @@
                     }
                     lastElevation = ele;
                 });
-                
+
                 for (let i = 1; i < coordinates.length; i++) {
                     const [lat1, lon1] = coordinates[i - 1];
                     const [lat2, lon2] = coordinates[i];
                     const distance = L.latLng(lat1, lon1).distanceTo(L.latLng(lat2, lon2));
                     totalDistance += distance;
                 }
-                
+
                 // Update info panel
                 document.getElementById('routeInfo').innerHTML = `
-                    <strong>Route Name:</strong> BT 700<br>
+                    <strong>Route Name:</strong> Quebec Part Two<br>
                     <strong>Distance:</strong> ${(totalDistance / 1000).toFixed(1)} km<br>
                     <strong>Elevation Gain:</strong> ${Math.round(elevationGain)}m<br>
                     <strong>Waypoints:</strong> ${waypoints.length}
