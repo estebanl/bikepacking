@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Brunswick Route Map</title>
+    <title>Prince Edward Island Route Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
@@ -83,12 +83,12 @@
     <div id="map"></div>
 
     <div class="info-panel">
-        <h2>New Brunswick Route</h2>
+        <h2>Prince Edward Island Route</h2>
         <p id="routeInfo">Loading route...</p>
         <div class="nav-links">
             <a href="index.html">← BT 700 Route</a>
             <a href="quebec_part_two.html">← Quebec Part Two Route</a>
-            <a href="prince_edward_island.html">View Prince Edward Island Route →</a>
+            <a href="new_brunswick.html">← New Brunswick Route</a>
         </div>
     </div>
 
@@ -97,8 +97,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.awesome-markers/dist/leaflet.awesome-markers.css" />
 
     <script>
-        // Initialize map centered on New Brunswick, Canada
-        const map = L.map('map').setView([46.7, -65.9], 8);
+        // Initialize map centered on Prince Edward Island, Canada
+        const map = L.map('map').setView([46.2, -63.3], 9);
 
         // Add tile layer (OpenStreetMap)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -107,7 +107,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('New_Brunswick_.gpx')
+        fetch('Prince_Edward_Island.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();
@@ -210,7 +210,7 @@
 
                 // Update info panel
                 document.getElementById('routeInfo').innerHTML = `
-                    <strong>Route Name:</strong> New Brunswick<br>
+                    <strong>Route Name:</strong> Prince Edward Island<br>
                     <strong>Distance:</strong> ${(totalDistance / 1000).toFixed(1)} km<br>
                     <strong>Elevation Gain:</strong> ${Math.round(elevationGain)}m<br>
                     <strong>Waypoints:</strong> ${waypoints.length}
