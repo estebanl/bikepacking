@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quebec Part Two Route Map</title>
+    <title>Newfoundland Viking Trail Route Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
@@ -51,6 +51,9 @@
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
         .nav-links a {
@@ -80,15 +83,15 @@
     <div id="map"></div>
 
     <div class="info-panel">
-        <h2>Quebec Part Two Route</h2>
+        <h2>Newfoundland Viking Trail Route</h2>
         <p id="routeInfo">Loading route...</p>
         <div class="nav-links">
             <a href="index.html">← BT 700 Route</a>
-            <a href="new_brunswick.html">View New Brunswick Route →</a>
-            <a href="prince_edward_island.html">View Prince Edward Island Route →</a>
-            <a href="nova_scotia.html">View Nova Scotia Route →</a>
-            <a href="newfoundland.html">View Newfoundland Route →</a>
-            <a href="newfoundland_viking_trail.html">View Newfoundland Viking Trail →</a>
+            <a href="quebec_part_two.html">← Quebec Part Two Route</a>
+            <a href="new_brunswick.html">← New Brunswick Route</a>
+            <a href="prince_edward_island.html">← Prince Edward Island Route</a>
+            <a href="nova_scotia.html">← Nova Scotia Route</a>
+            <a href="newfoundland.html">← Newfoundland Route</a>
         </div>
     </div>
 
@@ -97,8 +100,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.awesome-markers/dist/leaflet.awesome-markers.css" />
 
     <script>
-        // Initialize map centered on Eastern Quebec, Canada
-        const map = L.map('map').setView([47.9, -67.7], 8);
+        // Initialize map centered on western Newfoundland, Canada
+        const map = L.map('map').setView([49.2, -57.5], 8);
 
         // Add tile layer (OpenStreetMap)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -107,7 +110,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('Quebec_Part_Two-2.gpx')
+        fetch('Newfoundland_Viking_Trail.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();
@@ -210,7 +213,7 @@
 
                 // Update info panel
                 document.getElementById('routeInfo').innerHTML = `
-                    <strong>Route Name:</strong> Quebec Part Two<br>
+                    <strong>Route Name:</strong> Newfoundland Viking Trail<br>
                     <strong>Distance:</strong> ${(totalDistance / 1000).toFixed(1)} km<br>
                     <strong>Elevation Gain:</strong> ${Math.round(elevationGain)}m<br>
                     <strong>Waypoints:</strong> ${waypoints.length}
