@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BC Part One Route Map</title>
+    <title>Alberta Route Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
@@ -83,12 +83,12 @@
     <div id="map"></div>
 
     <div class="info-panel">
-        <h2>BC Part One Route</h2>
+        <h2>Alberta Route</h2>
         <p id="routeInfo">Loading route...</p>
         <div class="nav-links">
             <a href="index.html">← BT 700 Route</a>
-            <a href="bc_part_two.html">View BC Part Two →</a>
-            <a href="alberta.html">View Alberta Route →</a>
+            <a href="bc_part_one.html">← BC Part One Route</a>
+            <a href="bc_part_two.html">← BC Part Two Route</a>
             <a href="ontario_part_one.html">← Ontario Part One Route</a>
             <a href="ontario_part_two.html">← Ontario Part Two Route</a>
             <a href="quebec_part_two.html">← Quebec Part Two Route</a>
@@ -106,8 +106,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.awesome-markers/dist/leaflet.awesome-markers.css" />
 
     <script>
-        // Initialize map centered on British Columbia, Canada
-        const map = L.map('map').setView([49.5, -122.5], 7);
+        // Initialize map centered on Alberta, Canada
+        const map = L.map('map').setView([50.5, -112.5], 7);
 
         // Add tile layer (OpenStreetMap)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -116,7 +116,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('BC_Part_One_.gpx')
+        fetch('Alberta_.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();
@@ -219,7 +219,7 @@
 
                 // Update info panel
                 document.getElementById('routeInfo').innerHTML = `
-                    <strong>Route Name:</strong> BC Part One<br>
+                    <strong>Route Name:</strong> Alberta<br>
                     <strong>Distance:</strong> ${(totalDistance / 1000).toFixed(1)} km<br>
                     <strong>Elevation Gain:</strong> ${Math.round(elevationGain)}m<br>
                     <strong>Waypoints:</strong> ${waypoints.length}
