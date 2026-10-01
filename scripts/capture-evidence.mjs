@@ -71,7 +71,7 @@ function sendSession(method, params = {}) {
 
 await sendSession("Page.enable");
 await sendSession("Runtime.enable");
-await sleep(3500); // Wait for R3F canvas to initialize
+await sleep(6000); // Wait for Next.js hydration and R3F WebGL canvas to render first frame
 
 async function evaluate(expression) {
   const res = await sendSession("Runtime.evaluate", {

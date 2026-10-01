@@ -39,21 +39,22 @@ export function ConfiguratorCanvas() {
       >
         <CameraController />
 
-        {/* --- Lighting Setup --- */}
-        <ambientLight intensity={0.7} />
-        {/* Main Sun Key Light */}
+        {/* --- PBR Studio Lighting Setup --- */}
+        <hemisphereLight args={["#f8fafc", "#0f172a", 0.75]} />
+        <ambientLight intensity={0.4} />
+        {/* Main Sun Key Light with crisp contact shadow */}
         <directionalLight
           position={[4, 6, 4]}
-          intensity={1.4}
+          intensity={1.8}
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
           shadow-bias={-0.0001}
         />
-        {/* Rim Back Light */}
-        <directionalLight position={[-4, 3, -3]} intensity={0.6} color="#93c5fd" />
-        {/* Fill Under-Light */}
-        <directionalLight position={[0, -2, 2]} intensity={0.2} color="#f8fafc" />
+        {/* Rim Back Highlight Light (defines tubing and alloy rims) */}
+        <directionalLight position={[-4, 4, -4]} intensity={1.1} color="#93c5fd" />
+        {/* Front Soft Fill Light */}
+        <directionalLight position={[-2, 1, 3]} intensity={0.5} color="#e2e8f0" />
 
         <Suspense fallback={null}>
           <group position={[0, 0, 0]}>
