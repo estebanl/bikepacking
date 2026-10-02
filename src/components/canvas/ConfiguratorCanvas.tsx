@@ -17,12 +17,12 @@ export function ConfiguratorCanvas() {
   const socketMap = useMemo(
     () =>
       new Map(
-        getSocketAnchors(currentSizeConfig).map((anchor) => [
+        getSocketAnchors(currentSizeConfig, mountedBags).map((anchor) => [
           anchor.id,
           anchor,
         ]),
       ),
-    [currentSizeConfig],
+    [currentSizeConfig, mountedBags],
   );
 
   return (

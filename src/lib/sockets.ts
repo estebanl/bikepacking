@@ -4,13 +4,50 @@ import type {
   BikeSizeConfig,
   SocketAnchor,
 } from "../types/index.ts";
-export function getSocketAnchors(size: BikeSizeConfig): SocketAnchor[] {
-  return Object.values(size.sockets).flatMap((value) =>
+import { equipmentDimensions, rotateEquipmentPoint, getEquipmentPlacement } from "./equipmentGeometry.ts";
+export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, BagItem> = {}): SocketAnchor[] {
+  const anchors = Object.values(size.sockets).flatMap((value) =>
     Array.isArray(value) ? value : value ? [value] : [],
   );
+  // Shared illustrative attachment stack. Separate the fork, backplate and bag;
+  // local +X faces outboard on each side, never through the tire.
+  return anchors.map(anchor => {
+    if (anchor.id === "rackTop" && mounted.rearRack && mounted.rackTop) {
+      const rackAnchor = anchors.find(a=>a.id === "rearRack");
+      if (rackAnchor && mounted.rearRack.visualKind === "rack") {
+        const rack = getEquipmentPlacement(mounted.rearRack,rackAnchor);
+        const [,bagHeight] = equipmentDimensions(mounted.rackTop);
+        // Deck rail radius6mm; fixed connector underside is .499 of bag height.
+        const underside = /fixed connector/i.test(mounted.rackTop.name) ? .499 : .47;
+        return {...anchor,rotation:rack.rotation,position:[rack.position[0],rack.position[1]+rack.dimensions.height*.44+.006+bagHeight*underside,rack.position[2]]};
+      }
+    }
+    const match = /^(cage|cargoFoot|forkMount|fork)(Left|Right)(?:_0)?$/.exec(anchor.id);
+    if (!match) return anchor;
+    const [,kind,sideName] = match;
+    const side = sideName === "Left" ? 1 : -1;
+    const fork = anchors.find(a => a.id === `fork${sideName}_0`);
+    if (!fork) return anchor;
+    const cage = mounted[`cage${sideName}`];
+    const [cl,ch] = cage ? equipmentDimensions(cage) : [.035,.17,.072];
+    const rotation: [number,number,number] = [0,-side*Math.PI/2,0];
+    const center: [number,number,number] = [fork.position[0],fork.position[1],side*(.088+cl*.32)];
+    if (kind === "forkMount") return {...anchor,position:[fork.position[0],fork.position[1],side*.055],rotation};
+    if (kind === "cage") return {...anchor,position:center,rotation};
+    if (kind === "cargoFoot") {
+      const chip = mounted[anchor.id];
+      const chipLength = chip ? equipmentDimensions(chip)[0] : .03;
+      const delta = rotateEquipmentPoint([chipLength*.4-cl*.32,-ch*.47,0],rotation);
+      return {...anchor,rotation,position:center.map((v,i)=>v+delta[i]) as [number,number,number]};
+    }
+    const bag = mounted[anchor.id];
+    if (!bag) return {...anchor,rotation};
+    const [bl,bh] = equipmentDimensions(bag);
+    return {...anchor,rotation,position:[fork.position[0],fork.position[1]+(cage ? -ch*.47+bh*.44 : 0),side*(.106+bl*.5)]};
+  });
 }
-export const findSocket = (size: BikeSizeConfig, id: string) =>
-  getSocketAnchors(size).find((socket) => socket.id === id);
+export const findSocket = (size: BikeSizeConfig, id: string, mounted: Record<string, BagItem> = {}) =>
+  getSocketAnchors(size, mounted).find((socket) => socket.id === id);
 export const getWheelbaseMm = (bike: BikeModel, size: BikeSizeConfig) =>
   size.geometry.wheelbaseMm ?? bike.wheelbaseMm;
 export function hasMountCapability(
@@ -24,7 +61,7 @@ export function hasMountCapability(
       : id.toLowerCase().includes("right")
         ? "right"
         : null;
-  const scoped = ["cargo-cage", "fork-mount"].includes(required);
+  const scoped = ["cargo-cage", "fork-mount", "cargo-cage-load-chip-host"].includes(required);
   return Object.entries(mounted).some(
     ([id, item]) =>
       id !== socketId &&
@@ -70,7 +107,7 @@ export function validateMount(
   for (const required of [...(bag.requires ?? []), ...(socket.requires ?? [])])
     if (!hasMountCapability(mounted, socketId, required))
       reasons.push(
-        `Requires ${required}${["cargo-cage", "fork-mount"].includes(required) ? " on this side" : ""}.`,
+        `Requires ${required}${["cargo-cage", "fork-mount", "cargo-cage-load-chip-host"].includes(required) ? " on this side" : ""}.`,
       );
   if (
     (bag.excludes ?? []).some((id) => capabilities.has(id)) ||

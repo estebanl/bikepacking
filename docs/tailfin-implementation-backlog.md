@@ -2,8 +2,8 @@
 
 Source milestone: `5deac711c426727045fff546a28248ead74bf742`. The ALL-components request remains open. These are renderer planning classifications, not new manufacturer specifications or fit approvals.
 
-- mountable: 68 variants
-- implementation-pending: 84 variants
+- mountable: 71 variants
+- implementation-pending: 81 variants
 - unsupported-fit: 13 variants
 - nonvisual-spare: 17 variants
 - off-bike: 9 variants
@@ -18,7 +18,6 @@ Unknown source dimensions stay null. Future illustrative geometry must use the s
 | [CargoPack System · Carbon / Direct Mount / with pannier mounts ](https://www.tailfin.cc/ca/cargopack/) | unsupported-fit | Direct-mount frame eyelets are not confirmed for these Santa Cruz builds. |
 | [CargoPack System · Alloy / Direct Mount / without pannier mounts ](https://www.tailfin.cc/ca/cargopack/) | unsupported-fit | Direct-mount frame eyelets are not confirmed for these Santa Cruz builds. |
 | [CargoPack System · Alloy / Direct Mount / with pannier mounts ](https://www.tailfin.cc/ca/cargopack/) | unsupported-fit | Direct-mount frame eyelets are not confirmed for these Santa Cruz builds. |
-| [HydroMount ](https://www.tailfin.cc/ca/product/accessories/hydromount/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Long Top Tube Bag Accessory Pack ](https://www.tailfin.cc/ca/product/accessories/long-top-tube-bag-accessory-pack/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Bar Bag System Accessories ](https://www.tailfin.cc/ca/product/accessories/bar-bag-accessories/bar-bag-system-accessories/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Bar Cage Mount - Computer Mount ](https://www.tailfin.cc/ca/product/accessories/bar-cage-mount-cmk/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
@@ -34,7 +33,6 @@ Unknown source dimensions stay null. Future illustrative geometry must use the s
 | [Women's Logo T-Shirt - Black/White ](https://www.tailfin.cc/ca/product/hats-bottles-apparel/t-shirts/womens-logo-t-shirt-black-white/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Mens Logo T-Shirt - Black/Teal ](https://www.tailfin.cc/ca/product/hats-bottles-apparel/t-shirts/mens-logo-t-shirt-black-teal/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Mens Logo T-Shirt - Black/White ](https://www.tailfin.cc/ca/product/hats-bottles-apparel/t-shirts/mens-logo-t-shirt-black-white/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
-| [Bottle Dropper ](https://www.tailfin.cc/ca/product/accessories/bottle-dropper/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Packing Cubes · 6.5L ](https://www.tailfin.cc/ca/product/accessories/packing-cubes/packing-cubes/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Packing Cubes · 3.5L ](https://www.tailfin.cc/ca/product/accessories/packing-cubes/packing-cubes/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Packing Cubes · 2.5L ](https://www.tailfin.cc/ca/product/accessories/packing-cubes/packing-cubes/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
@@ -118,7 +116,6 @@ Unknown source dimensions stay null. Future illustrative geometry must use the s
 | [SL/UD 22L Pannier Inner Sleeve ](https://www.tailfin.cc/ca/product/spares/pannier-fork-bag-spares/pannier-inner-sleeve/) | nonvisual-spare | Internal structure, service kit or small fastener: no standalone exterior placement. This does not certify a replacement part's compatibility. |
 | [Security Torx Set ](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/security-torx-set/) | nonvisual-spare | Internal structure, service kit or small fastener: no standalone exterior placement. This does not certify a replacement part's compatibility. |
 | [Direct Frame Mount Set ](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/direct-frame-mount-set/) | unsupported-fit | Required frame-eyelet interface is not confirmed for these Santa Cruz builds. |
-| [Cargo Cage Load Chip ](https://www.tailfin.cc/ca/product/spares/cargo-cage-system-spares/cargo-cage-load-chip/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Salsa Dropout Domed Nut ](https://www.tailfin.cc/ca/product/axles/salsa-dropout-domed-nut/) | unsupported-fit | Salsa-specific dropout interface is not verified for these Santa Cruz builds. |
 | [Fast-Release Dropout Bushings ](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/fast-release-dropout-bushings/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [1.0mm Locking Nut ](https://www.tailfin.cc/ca/product/spares/axle-spares/1-0mm-locking-nut/) | nonvisual-spare | Internal structure, service kit or small fastener: no standalone exterior placement. This does not certify a replacement part's compatibility. |

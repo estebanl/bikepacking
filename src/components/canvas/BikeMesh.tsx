@@ -2,6 +2,7 @@
 import * as THREE from "three";
 import { useRigStore } from "@/store/useRigStore";
 import { getBikeGeometry, interpolate, topTubeRadius, type Point3 } from "@/lib/bikeGeometry";
+import { getReferenceBottlePose } from "@/lib/bottleMounts";
 import { WheelMesh } from "./WheelMesh";
 import { DrivetrainMesh } from "./DrivetrainMesh";
 import { CockpitMesh } from "./CockpitMesh";
@@ -11,7 +12,8 @@ export function BikeMesh() {
   const bike = useRigStore((s) => s.currentBike),
     size = useRigStore((s) => s.currentSizeConfig),
     compressed = useRigStore((s) => s.dropperPostCompressed),
-    bottles = useRigStore((s) => s.waterBottlesMounted);
+    bottles = useRigStore((s) => s.waterBottlesMounted),
+    mounted = useRigStore((s) => s.mountedBags);
   const g = getBikeGeometry(bike, size, compressed),
     {
       bb,
@@ -28,12 +30,14 @@ export function BikeMesh() {
   const lateral = (p: Point3, z: number): Point3 => [p[0], p[1], z];
   const topEnd = g.topTubeEnd,
     lowerHead: Point3 = [hb[0], hb[1] + 0.025, 0];
-  const bottleCenter = interpolate(bb, lowerHead, 0.43);
-  const downAngle = Math.atan2(lowerHead[1] - bb[1], lowerHead[0] - bb[0]);
-  bottleCenter[0] -= Math.sin(downAngle) * 0.069;
-  bottleCenter[1] += Math.cos(downAngle) * 0.069;
+  const referenceBottle = getReferenceBottlePose(bike, size, mounted);
   const pivot: Point3 = [bb[0] - 0.035, bb[1] + 0.08, 0],
     link: Point3 = [seat[0] - 0.018, seat[1] - 0.045, 0];
+  // Exposed travel plus an illustrative 15 mm seal allowance; frame landmarks stay unchanged.
+  const forkSpan = Math.hypot(hb[0]-front[0],hb[1]-front[1]);
+  const sealFraction = Math.min(.4, ((bike.suspension?.frontTravelMm ?? 120)/1000+.015)/forkSpan);
+  const shockFront = interpolate(topEnd, seat, .32);
+  const shockJoin = interpolate(link,shockFront,.43);
   return (
     <group name="bikeRigRoot">
       <CarbonSpar
@@ -84,13 +88,14 @@ export function BikeMesh() {
             <>
               <Rod
                 a={lateral(hb, side * 0.045)}
-                b={lateral(interpolate(hb, front, 0.5), side * 0.055)}
+                b={lateral(interpolate(hb, front, sealFraction+.035), side * 0.055)}
                 r={0.016}
-                color="#aa9770"
+                color="#676f70"
               />
+              <Rod a={lateral(interpolate(hb,front,sealFraction-.008),side*.055)} b={lateral(interpolate(hb,front,sealFraction+.008),side*.055)} r={.024} color="#151c1d"/>
               <CarbonSpar
                 points={[
-                  lateral(interpolate(hb, front, 0.37), side * 0.055),
+                  lateral(interpolate(hb, front, sealFraction), side * 0.055),
                   lateral(interpolate(hb, front, 0.72), side * 0.055),
                   lateral(front, side * 0.055),
                 ]}
@@ -128,17 +133,20 @@ export function BikeMesh() {
             color="#697275"
           />
           <Rod
-            a={link}
-            b={interpolate(topEnd, seat, 0.32)}
-            r={0.018}
+            a={shockJoin}
+            b={shockFront}
+            r={0.021}
             color="#202426"
           />
           <Rod
             a={link}
-            b={interpolate(link, interpolate(topEnd, seat, 0.32), 0.42)}
-            r={0.011}
+            b={shockJoin}
+            r={0.008}
             color="#b7bfc1"
           />
+          <Rod a={lateral(shockFront,-.028)} b={lateral(shockFront,.028)} r={.011} color="#7f898a"/>
+          <Rod a={interpolate(shockJoin,shockFront,.06)} b={interpolate(shockJoin,shockFront,.13)} r={.024} color="#424c4f"/>
+          <Rod a={lateral(link,-.039)} b={lateral(link,.039)} r={.010} color="#a0a8aa"/>
           <Rod a={lateral(hb, -0.055)} b={lateral(hb, 0.055)} r={0.022} />
           <Cable
             points={[
@@ -186,8 +194,8 @@ export function BikeMesh() {
       />
       {bottles && (
         <group
-          position={bottleCenter}
-          rotation={[0, 0, downAngle - Math.PI / 2]}
+          position={referenceBottle.position}
+          rotation={referenceBottle.rotation}
         >
           <mesh position={[0, 0.035, 0]}>
             <cylinderGeometry args={[0.032, 0.034, 0.17, 20]} />

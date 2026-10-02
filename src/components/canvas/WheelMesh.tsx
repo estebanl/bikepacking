@@ -2,6 +2,7 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 import { Rod } from "./BicycleParts";
+import { SprocketMesh } from "./SprocketMesh";
 export function WheelMesh({
   position,
   isRear = false,
@@ -111,20 +112,9 @@ export function WheelMesh({
       </group>
       {isRear &&
         Array.from({ length: 12 }, (_, i) => (
-          <mesh
-            key={i}
-            position={[0, 0, 0.031 + i * 0.003]}
-            rotation={[Math.PI / 2, 0, 0]}
-          >
-            <cylinderGeometry
-              args={[0.095 - i * 0.0065, 0.095 - i * 0.0065, 0.0018, 32]}
-            />
-            <meshStandardMaterial
-              color={i < 4 ? "#434b4d" : "#899293"}
-              metalness={0.7}
-              roughness={0.38}
-            />
-          </mesh>
+          <group key={i} position={[0,0,.031+i*.003]}>
+            <SprocketMesh radius={.095-i*.0065} teeth={Math.max(10,48-i*3)} color={i<4?"#596264":"#a5acad"}/>
+          </group>
         ))}
     </group>
   );

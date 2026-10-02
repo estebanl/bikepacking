@@ -1,0 +1,43 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { BIKES } from '../src/data/bikes.ts';
+import type { BagItem } from '../src/types/index.ts';
+import { getBottleHardwareSockets, getBottleMountPose, getReferenceBottlePose, getReferenceBottleEnvelope } from '../src/lib/bottleMounts.ts';
+import { sanitizeMountedBags, validateMount } from '../src/lib/sockets.ts';
+import { evaluateClearances } from '../src/lib/clearance.ts';
+const bike = BIKES.find(b => b.id === 'santa-cruz-stigmata-2027') ?? BIKES[0];
+const sourceSize = Object.values(bike.sizes)[0];
+const size = { ...sourceSize, sockets: { ...sourceSize.sockets, additional: getBottleHardwareSockets(bike, sourceSize) } };
+const adapter = (id: string): BagItem => ({id, name: id, brand:'Tailfin', category:'mount', productKind:'mount', visualKind:'mount', compatibleSockets:['bottleMountDown','bottleMountSeat'], volumeLiters:0, dryWeightGrams:null, dimensionsMm:{length:null,height:null,depth:null}, priceUsd:null, productUrl:'https://www.tailfin.cc/', fitStatus:'unverified'});
+const hydro = adapter('tailfin-959100-0');
+const dropper = adapter('tailfin-675800-0');
+test('bottle adapters use independent mutually exclusive tube slots, never fork slots', () => {
+  assert.equal(validateMount(hydro,'forkLeft_0',size,{}).allowed,false);
+  assert.equal(validateMount(hydro,'bottleMountDown',size,{}).allowed,true);
+  assert.equal(validateMount(dropper,'bottleMountSeat',size,{bottleMountDown:hydro}).allowed,true);
+  const replaced = sanitizeMountedBags({...{bottleMountDown:hydro}, bottleMountDown:dropper, bottleMountSeat:hydro},size);
+  assert.equal(Object.keys(replaced.mountedBags).length,2);
+  assert.equal(replaced.mountedBags.bottleMountDown.id,dropper.id);
+  assert.equal(replaced.removed.length,0);
+});
+test('reference bottle and advisory envelope share exactly 45 mm down and 5 mm outward Dropper offset', () => {
+  const plain = getReferenceBottlePose(bike,size,{});
+  const fitted = getReferenceBottlePose(bike,size,{bottleMountDown:dropper});
+  const geometry = getBottleMountPose(bike,size,'bottleMountDown');
+  const delta = fitted.position.map((v,i) => v-plain.position[i]);
+  const axial = delta[0]*Math.cos(geometry.angle)+delta[1]*Math.sin(geometry.angle);
+  const normal = delta.reduce((sum,v,i)=>sum+v*geometry.normal[i],0);
+  assert.ok(Math.abs(axial+.045)<1e-10);
+  assert.ok(Math.abs(normal-.005)<1e-10);
+  const a=getReferenceBottleEnvelope(bike,size,{}), b=getReferenceBottleEnvelope(bike,size,{bottleMountDown:dropper});
+  for(let i=0;i<3;i++) assert.ok(Math.abs(b.min[i]-a.min[i]-delta[i])<1e-10);
+  assert.deepEqual(getReferenceBottlePose(bike,size,{bottleMountSeat:dropper}),plain);
+  assert.deepEqual(getReferenceBottlePose(bike,size,{bottleMountDown:hydro}).position,plain.position);
+});
+test('unknown adapter fit remains advisory with reference bottles toggled off', () => {
+  const warnings=evaluateClearances({bike,sizeConfig:size,mountedBags:{bottleMountDown:hydro},dropperPostCompressed:false,waterBottlesMounted:false});
+  const note=warnings.find(w=>w.type==='fit_unverified');
+  assert.ok(note);
+  assert.equal(note.measuredMm,undefined);
+  assert.equal(warnings.some(w=>w.type==='frame_bottle'),false);
+});

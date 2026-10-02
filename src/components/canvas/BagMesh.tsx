@@ -6,6 +6,7 @@ import { useRigStore } from "@/store/useRigStore";
 import { getEquipmentPlacement, equipmentKind, rotateEquipmentPoint, type Point3 } from "@/lib/equipmentGeometry";
 import { EquipmentModel, RackSeatpostConnector, type BarSupportEndpoints } from "./equipment/EquipmentModel";
 
+import { getBottleMountPose } from "@/lib/bottleMounts";
 import { getBikeGeometry } from "@/lib/bikeGeometry";
 
 interface BagMeshProps {
@@ -26,6 +27,7 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
   const { length: l, height: h, depth: d } = placement.dimensions;
   const kind=equipmentKind(bag);
   const isRack=kind === "rack" || kind === "aeropack";
+  const tubeRadius=(socketId === "bottleMountDown" || socketId === "bottleMountSeat") ? getBottleMountPose(bike,size,socketId).radius : undefined;
   const g=getBikeGeometry(bike,size);
   const seatAngle=size.geometry.seatTubeAngleDeg*Math.PI/180;
   // Clamp the original fixed outer post. A dropper's moving stanchion is not a rack attachment.
@@ -58,7 +60,7 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
       name={`bag_${bag.id}_${socketId}`}
     >
       <group>
-        <EquipmentModel bag={bag} barSupport={barSupport} />
+        <EquipmentModel bag={bag} barSupport={barSupport} tubeRadius={tubeRadius} />
         {/* Warnings stay legible without changing opaque textile into glowing plastic. */}
         {affected.length > 0 && (
           <mesh position={[-l * 0.27, h * 0.21, d * 0.52]}>

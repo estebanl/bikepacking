@@ -1,4 +1,5 @@
 import type { BikeModel, SocketAnchor } from "../types/index.ts";
+import { getBottleHardwareSockets } from "./bottleMounts.ts";
 import { getBikeGeometry } from "./bikeGeometry.ts";
 /** Illustrative hardware locations. Listing an anchor does not approve an installation. */
 export function addHardwareSockets(bike: BikeModel) {
@@ -24,6 +25,7 @@ export function addHardwareSockets(bike: BikeModel) {
     });
     size.sockets.additional = [
       ...(size.sockets.additional ?? []),
+      ...getBottleHardwareSockets(bike, size),
       hardware("rearAxleHardware", "Rear axle hardware", g.rearAxle, ["mount"]),
       hardware(
         "rearUdhHardware",
@@ -42,6 +44,8 @@ export function addHardwareSockets(bike: BikeModel) {
           size.sockets[side === "Left" ? "forkLeft" : "forkRight"][0];
         if (!fork) return [];
         return [
+          hardware(`cargoFoot${side}`, `${side} optional cargo cage foot`, fork.position,
+            ["mount"], ["cargo-cage-load-chip-host"]),
           hardware(
             `forkMount${side}`,
             `${side} fork hardware`,

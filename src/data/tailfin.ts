@@ -2968,6 +2968,12 @@ const BAR_ROLL_REPLACEMENTS: Record<string, { handlebarType: "flat" | "drop"; di
 
 function placement(p: SourceProduct, v: SourceVariant): Placement {
   const base = referencePlacement(p.catalog_section === "spares");
+  if (p.id === "tailfin-48952")
+    return { category: "mount", productKind: "mount", visualKind: "mount",
+      sockets: ["cargoFootLeft", "cargoFootRight"], requires: ["cargo-cage-load-chip-host"] };
+  if (["tailfin-959100", "tailfin-675800"].includes(p.id))
+    return { category: "mount", productKind: "mount", visualKind: "mount",
+      sockets: ["bottleMountDown", "bottleMountSeat"] };
   if (BAR_ROLL_REPLACEMENTS[p.id])
     return {
       category: "handlebar_roll", productKind: "bag", visualKind: "bar_roll",
@@ -3093,7 +3099,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       visualKind: "cage",
       sockets: ["cageLeft", "cageRight"],
       requires: ["fork-mount"],
-      provides: ["cargo-cage"],
+      provides: ["cargo-cage", ...(p.id === "tailfin-32010" ? ["cargo-cage-load-chip-host"] : [])],
     };
   if (p.id === "tailfin-56316")
     return {
@@ -3225,6 +3231,10 @@ function visualEnvelope(
         ? envelope(130, 110, 220)
         : envelope(35, d?.length ?? 170, d?.width ?? 72);
     case "mount":
+      if (p.id === "tailfin-48952") return envelope(30, 20, 55);
+      if (p.id === "tailfin-959100") return envelope(28, 90, 35);
+      if (p.id === "tailfin-675800") return envelope(5, 160, 22);
+      if (p.id === "tailfin-42733") return envelope(63, 90, 48);
       if (p.id === "tailfin-710832") return envelope(80, 75, 115);
       return p.id === "tailfin-34167"
         ? envelope(18, 18, 180)
@@ -3278,8 +3288,12 @@ function normalize(
     v.weight_g !== null &&
     v.bar_clamp_weight_g !== undefined
       ? v.weight_g + v.bar_clamp_weight_g
-      : v.weight_g;
+      : p.id === "tailfin-675800" ? 25 : v.weight_g;
   const notes = [
+    p.id === "tailfin-48952" ? "Optional removable L foot for Small/Large Cargo Cages, not Mini Cage. Source pages conflict: spare page 10 g, cage page 11 g; mass remains unknown. Foot envelope is illustrative." : "",
+    p.id === "tailfin-675800" ? "Supplemental official product page checked 2026-10-02: adapter 25 g, 5 mm stack and up to ±45 mm cage adjustment. Preview uses 45 mm lower setting, not a required installation. Requires existing bottle bosses; cage and bottle excluded. Outer envelope and actual boss positions remain illustrative." : "",
+    p.id === "tailfin-959100" ? "Frame-tube strap adapter only; never offered on forks, stays or carbon rack arches. Official page: approximately 22–90 mm tube diameter and 64 mm cage spacing; 2 straps support 1 kg, 3 straps 1.5 kg. Preview illustrates two straps. 19 g body mass excludes straps/screws, so complete mass remains unknown. Bottle and cage excluded; verify tube shape, location and instructions." : "",
+
     p.id === "tailfin-894177"
       ? "Top bag plus fixed connector upgrade kit; requires an existing supported rack. This is not a complete SpeedPack system and does not add a second arch. Source spare-kit mass and normalized capacity are unknown; fixed connector geometry is illustrative. Verify rack generation and conversion instructions."
       : "",
@@ -3309,7 +3323,7 @@ function normalize(
       ? "Combined variants include cage and bag mass; cage-only and separate bag are an alternative, not extra required components."
       : "",
     p.id === "tailfin-32010"
-      ? "Published cage mass excludes optional 11 g Load Chip."
+      ? "Published cage mass excludes optional Load Chip; cage page lists 11 g while current spare page lists 10 g. Conflict remains unresolved."
       : "",
     p.id === "tailfin-655674"
       ? "Published Fork Pack mass includes its own pack mount. Approved fork attachment still required."

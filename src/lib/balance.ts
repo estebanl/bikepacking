@@ -14,7 +14,7 @@ export function calculateRigMetrics(
   const wheelbase = getWheelbaseMm(bike, size) / 1000,
     rear = -wheelbase / 2;
   const entries = Object.entries(mounted).filter(([id]) =>
-    findSocket(size, id),
+    findSocket(size, id, mounted),
   );
   const known = (value: number | null) =>
     typeof value === "number" && Number.isFinite(value) && value >= 0
@@ -34,7 +34,7 @@ export function calculateRigMetrics(
     moment +=
       (known(bag.dryWeightGrams) +
         (capacity ? (payload * known(bag.volumeLiters)) / capacity : 0)) *
-      (findSocket(size, id)!.position[0] - rear);
+      (findSocket(size, id, mounted)!.position[0] - rear);
   if (!capacity) moment += payload * wheelbase * 0.45;
   const total = bike.baseWeightGrams + dry + payload;
   const front = Math.round(moment / wheelbase),

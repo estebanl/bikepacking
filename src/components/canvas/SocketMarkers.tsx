@@ -14,8 +14,8 @@ export function SocketMarkers() {
   const selectedSocketId = useRigStore((s) => s.selectedSocketId);
 
   const allSockets = useMemo(
-    () => getSocketAnchors(currentSizeConfig),
-    [currentSizeConfig],
+    () => getSocketAnchors(currentSizeConfig, mountedBags),
+    [currentSizeConfig, mountedBags],
   );
 
   const markerRingMaterial = useMemo(

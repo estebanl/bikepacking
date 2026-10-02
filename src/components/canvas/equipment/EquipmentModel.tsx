@@ -50,6 +50,7 @@ const stitchMaterial = new THREE.LineBasicMaterial({
   opacity: 0.7,
 });
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
+const strapRing = new THREE.CylinderGeometry(1,1,1,24,1,true);
 const clampRing = new THREE.TorusGeometry(.018,.004,6,16);
 const unitTube = new THREE.CylinderGeometry(1, 1, 1, 8);
 
@@ -190,7 +191,7 @@ function PanelShell({
 
 export interface BarSupportEndpoints { clamps: [Point3,Point3]; ends: [Point3,Point3]; orientation: [number,number,number,number] }
 
-export function EquipmentModel({ bag, barSupport }: { bag: BagItem; barSupport?: BarSupportEndpoints }): ReactElement {
+export function EquipmentModel({ bag, barSupport, tubeRadius }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number }): ReactElement {
   const [l, h, d] = equipmentDimensions(bag),
     kind = equipmentKind(bag);
   const fabric = useMemo(
@@ -282,6 +283,40 @@ export function EquipmentModel({ bag, barSupport }: { bag: BagItem; barSupport?:
       </group>
     );
   if (kind === "rack") return <RackModel dimensions={[l, h, d]} />;
+  if (bag.id.startsWith("tailfin-42733-")) return <group name="illustrative-fork-collars">
+    {/* Shared socket places local X outboard from the fork leg to cage backplate. */}
+    {[-1,1].map(side=><group key={side}>
+      <mesh dispose={null} geometry={strapRing} material={bag.id.endsWith("v2") ? metal : buckle} position={[0,side*.032,0]} scale={[.024,.012,.024]} castShadow/>
+      <Rod a={[.022,side*.032,0]} b={[.033,side*.032,0]} radius={.005} material={metal}/>
+      <Rod a={[.033,side*.032,0]} b={[.039,side*.032,0]} radius={.0035} material={silver}/>
+    </group>)}
+    <Box position={[.033,0,0]} size={[.005,.090,.025]} material={metal}/>
+  </group>;
+  if (bag.id.startsWith("tailfin-959100-") && tubeRadius) return <group name="illustrative-hydromount">
+    <Box position={[.002,0,0]} size={[.006,h,d*.72]} material={buckle}/>
+    {[-1,1].map(side=><group key={side}>
+      <mesh dispose={null} geometry={strapRing} material={webbing} position={[-tubeRadius,side*h*.31,0]} scale={[tubeRadius+.002,.012,tubeRadius+.002]} castShadow/>
+      <Box position={[.006,side*h*.31,0]} size={[.011,.019,d*.86]} material={buckle}/>
+      <Rod a={[.010,side*.032,0]} b={[.015,side*.032,0]} radius={.0038} material={silver}/>
+    </group>)}
+  </group>;
+  if (bag.id.startsWith("tailfin-675800-")) return <group name="illustrative-bottle-dropper">
+    {/* Separate slotted low-profile rail and rubber backing; no cage is included. */}
+    <Box position={[0,0,0]} size={[.001,h,d]} material={webbing}/>
+    {[-1,1].map(side=><group key={side}>
+      <Box position={[.0025,0,side*d*.36]} size={[.004,h,d*.20]} material={metal}/>
+      <Box position={[.0025,side*h*.43,0]} size={[.004,h*.12,d*.82]} material={metal}/>
+      <Rod a={[.003,side*.032,0]} b={[.007,side*.032,0]} radius={.0038} material={silver}/>
+    </group>)}
+    <Box position={[.0025,0,0]} size={[.004,h*.10,d*.82]} material={metal}/>
+  </group>;
+  if (bag.id === "tailfin-48952-v1") return <group name="cargo-load-chip">
+    {/* Optional original L-shaped foot, separate from the cage and its mass. */}
+    <Box position={[-l*.4,0,0]} size={[l*.12,h,d*.68]} material={metal}/>
+    <Box position={[0,-h*.40,0]} size={[l,.004,d]} material={metal}/>
+    <Rod a={[-l*.49,h*.16,0]} b={[-l*.23,h*.16,0]} radius={.0035} material={silver}/>
+    <Box position={[l*.44,-h*.27,0]} size={[.003,h*.25,d*.76]} material={metal}/>
+  </group>;
   if (kind === "cage")
     return (
       <group>
@@ -314,11 +349,6 @@ export function EquipmentModel({ bag, barSupport }: { bag: BagItem; barSupport?:
             />
           </group>
         ))}
-        <Box
-          position={[0, -h * 0.47, 0]}
-          size={[l * 0.9, 0.005, d * 0.8]}
-          material={metal}
-        />
       </group>
     );
   if (bag.id === "tailfin-710832-v1" && barSupport) return <group name="illustrative-bar-support">

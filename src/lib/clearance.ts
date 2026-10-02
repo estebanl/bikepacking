@@ -5,6 +5,7 @@ import type {
   ClearanceWarning,
 } from "../types/index.ts";
 import { findSocket, hasMountCapability } from "./sockets.ts";
+import { getReferenceBottleEnvelope } from "./bottleMounts.ts";
 import { getEquipmentBounds } from "./equipmentGeometry.ts";
 export interface ClearanceCheckParams {
   bike: BikeModel;
@@ -31,7 +32,7 @@ export function evaluateClearances({
     ? Math.max(0, payloadEstimateGrams)
     : 0;
   for (const [id, bag] of Object.entries(mountedBags)) {
-    const socket = findSocket(sizeConfig, id);
+    const socket = findSocket(sizeConfig, id, mountedBags);
     if (!socket) continue;
     const add = (warning: Omit<ClearanceWarning, "affectedBagIds">) =>
       warnings.push({ ...warning, affectedBagIds: [bag.id] });
@@ -109,10 +110,14 @@ export function evaluateClearances({
     }
   }
   const frame = mountedBags.frameTriangle;
+  const frameSocket = findSocket(sizeConfig, "frameTriangle");
+  const frameBounds = frame && frameSocket ? getEquipmentBounds(frame, frameSocket, dropperPostCompressed) : null;
+  const bottleBounds = getReferenceBottleEnvelope(bike, sizeConfig, mountedBags);
+  const illustratedBottleOverlap = frameBounds && [0, 1, 2].every(axis => frameBounds.min[axis] < bottleBounds.max[axis] && frameBounds.max[axis] > bottleBounds.min[axis]);
   if (
     frame &&
     waterBottlesMounted &&
-    (frame.category === "frame_full" || (frame.volumeLiters ?? 0) > 4.2)
+    (illustratedBottleOverlap || frame.category === "frame_full" || (frame.volumeLiters ?? 0) > 4.2)
   )
     warnings.push({
       id: "frame_bottle_conflict",
@@ -120,7 +125,7 @@ export function evaluateClearances({
       severity: frame.category === "frame_full" ? "error" : "warning",
       affectedBagIds: [frame.id],
       message:
-        "Frame luggage may obstruct bottles and the storage hatch. Check cage access and remove bottles when necessary.",
+        "Frame luggage may obstruct the reference bottle/cage or storage hatch. The advisory bottle envelope follows the adapter preview position; real bottle dimensions, boss locations and loaded clearance remain unverified. Check cage access on the actual bike.",
     });
   const equipment = Object.entries(mountedBags)
     .filter(
@@ -132,10 +137,10 @@ export function evaluateClearances({
     .map(([id, bag]) => ({
       id,
       bag,
-      bounds: findSocket(sizeConfig, id)
+      bounds: findSocket(sizeConfig, id, mountedBags)
         ? getEquipmentBounds(
             bag,
-            findSocket(sizeConfig, id)!,
+            findSocket(sizeConfig, id, mountedBags)!,
             dropperPostCompressed,
             { allowEstimate: false },
           )
