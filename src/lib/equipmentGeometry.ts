@@ -72,7 +72,7 @@ export function equipmentLocalCenter(bag: BagItem): Point3 {
     case "seat_pack":
       return [-l / 2, h * 0.18, 0];
     case "top_tube":
-      return [0, h / 2, 0];
+      return [0, h * 0.46, 0]; // Shell underside is at -0.46h; anchor touches tube surface.
     case "bar_roll":
     case "bar_bag":
       return [l / 2 + 0.025, -h / 2, 0];

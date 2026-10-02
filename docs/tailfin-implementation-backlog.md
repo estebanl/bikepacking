@@ -2,8 +2,8 @@
 
 Source milestone: `5deac711c426727045fff546a28248ead74bf742`. The ALL-components request remains open. These are renderer planning classifications, not new manufacturer specifications or fit approvals.
 
-- mountable: 62 variants
-- implementation-pending: 90 variants
+- mountable: 68 variants
+- implementation-pending: 84 variants
 - unsupported-fit: 13 variants
 - nonvisual-spare: 17 variants
 - off-bike: 9 variants
@@ -57,7 +57,6 @@ Unknown source dimensions stay null. Future illustrative geometry must use the s
 | [Bar Cage Barrel Nuts and Screws ](https://www.tailfin.cc/ca/product/spares/bar-system-spares/bar-cage-barrel-nut-screws/) | nonvisual-spare | Internal structure, service kit or small fastener: no standalone exterior placement. This does not certify a replacement part's compatibility. |
 | [Spare Bar Cage ](https://www.tailfin.cc/ca/product/spares/bar-system-spares/spare-bar-cage/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [SRAM Universal Derailleur Hanger (UDH) ](https://www.tailfin.cc/ca/product/spares/axle-spares/sram-udh/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [SpeedPack Top Bag + Fixed Connector Kit ](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/speedpack-fixed-system/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Fixed CargoPack Connector Parts v2 ](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/cargopack-fixed-connector-v2/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Tailfin Washers ](https://www.tailfin.cc/ca/product/spares/pannier-fork-bag-spares/tailfin-washers/) | nonvisual-spare | Internal structure, service kit or small fastener: no standalone exterior placement. This does not certify a replacement part's compatibility. |
 | [T-Hook Straps ](https://www.tailfin.cc/ca/product/spares/cargo-cage-system-spares/t-hook-straps/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
@@ -66,13 +65,8 @@ Unknown source dimensions stay null. Future illustrative geometry must use the s
 | [Buckle Replacement Kits ](https://www.tailfin.cc/ca/product/spares/pannier-fork-bag-spares/buckle-replacement-kits/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Frame Mount Adaptor Set ](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/frame-mount-adaptor-set/) | unsupported-fit | Required frame-eyelet interface is not confirmed for these Santa Cruz builds. |
 | [Extended Seat Post Connector V1 ](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/extended-seat-post-connector/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Large MTB Bar Bag Roll (Bag Only) ](https://www.tailfin.cc/ca/product/spares/bar-system-spares/mtb-bar-bag-roll-large/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Small MTB Bar Bag Roll (Bag Only) ](https://www.tailfin.cc/ca/product/spares/bar-system-spares/mtb-bar-bag-roll/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Bar Bag Mounting Kit ](https://www.tailfin.cc/ca/product/spares/bar-system-spares/bar-bag-mounting-kit/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Removable CargoPack Connector Parts v2 ](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/cargopack-removable-connector/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Rear Top Tube Seat Post Strap ](https://www.tailfin.cc/ca/product/spares/top-tube-bag-spares/seat-post-strap/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Large Dropbar Bar Bag Roll (Bag Only) ](https://www.tailfin.cc/ca/product/spares/bar-system-spares/dropbar-bar-bag-roll/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Small Dropbar Bar Bag Roll (Bag Only) ](https://www.tailfin.cc/ca/product/spares/bar-system-spares/dropbar-bar-bag-roll-small/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Mini Pannier / Fork Pack Conversion Kit ](https://www.tailfin.cc/ca/product/pannier-rack-top-bags/rear-pannier-bags/mini-pannier-fork-pack-conversion-kit/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Rear Top Tube V-Mount Cover ](https://www.tailfin.cc/ca/product/spares/top-tube-bag-spares/rear-top-tube-v-mount-cover/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Frame Bag V-Mount ](https://www.tailfin.cc/ca/product/spares/frame-bag-spares/frame-bag-v-mount/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |

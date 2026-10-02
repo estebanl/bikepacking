@@ -1,7 +1,7 @@
 "use client";
 import * as THREE from "three";
 import { useRigStore } from "@/store/useRigStore";
-import { getBikeGeometry, interpolate, type Point3 } from "@/lib/bikeGeometry";
+import { getBikeGeometry, interpolate, topTubeRadius, type Point3 } from "@/lib/bikeGeometry";
 import { WheelMesh } from "./WheelMesh";
 import { DrivetrainMesh } from "./DrivetrainMesh";
 import { CockpitMesh } from "./CockpitMesh";
@@ -26,7 +26,7 @@ export function BikeMesh() {
   const full = !!bike.suspension?.rearTravelMm,
     color = bike.colorHex;
   const lateral = (p: Point3, z: number): Point3 => [p[0], p[1], z];
-  const topEnd: Point3 = [ht[0], ht[1] - 0.018, 0],
+  const topEnd = g.topTubeEnd,
     lowerHead: Point3 = [hb[0], hb[1] + 0.025, 0];
   const bottleCenter = interpolate(bb, lowerHead, 0.43);
   const downAngle = Math.atan2(lowerHead[1] - bb[1], lowerHead[0] - bb[0]);
@@ -38,7 +38,7 @@ export function BikeMesh() {
     <group name="bikeRigRoot">
       <CarbonSpar
         points={[seat, interpolate(seat, topEnd, 0.5), topEnd]}
-        radii={[0.022, 0.018, 0.032]}
+        radii={[0, 0.5, 1].map(topTubeRadius)}
         color={color}
         depth={0.75}
       />

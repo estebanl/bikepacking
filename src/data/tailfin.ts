@@ -2957,8 +2957,33 @@ const referencePlacement = (spare: boolean): Placement => ({
   sockets: [],
 });
 
+// Replacement rolls include bag hardware, but require the separate bike-side mounting kit.
+// Do not copy sibling system weights or capacity into unnormalized spare specifications.
+const BAR_ROLL_REPLACEMENTS: Record<string, { handlebarType: "flat" | "drop"; diameter: number; width: number }> = {
+  "tailfin-710818": { handlebarType: "flat", diameter: 180, width: 480 },
+  "tailfin-710817": { handlebarType: "flat", diameter: 160, width: 430 },
+  "tailfin-710830": { handlebarType: "drop", diameter: 180, width: 380 },
+  "tailfin-710820": { handlebarType: "drop", diameter: 160, width: 320 },
+};
+
 function placement(p: SourceProduct, v: SourceVariant): Placement {
   const base = referencePlacement(p.catalog_section === "spares");
+  if (BAR_ROLL_REPLACEMENTS[p.id])
+    return {
+      category: "handlebar_roll", productKind: "bag", visualKind: "bar_roll",
+      sockets: ["handlebar"], requires: ["bar-bag-mount"],
+    };
+  if (p.id === "tailfin-710832")
+    return {
+      category: "mount", productKind: "mount", visualKind: "mount",
+      sockets: ["barMount"], provides: ["bar-bag-mount"],
+    };
+
+  if (p.id === "tailfin-894177")
+    return {
+      category: "seat_pack", productKind: "bag", visualKind: "trunk",
+      sockets: ["rackTop"], requires: ["rack-top"],
+    };
   // Specific complete hardware kits are selectable even though their source section is Spares.
   if (p.id === "tailfin-34167")
     return {
@@ -3002,7 +3027,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       productKind: "bag",
       visualKind: "bar_roll",
       sockets: ["handlebar"],
-      excludes: ["bar-cage"],
+      excludes: ["bar-cage", "bar-bag-mount"],
     };
   if (p.id === "tailfin-825745") {
     if (v.label === "Cage only")
@@ -3018,7 +3043,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       productKind: "bag",
       visualKind: "bar_roll",
       sockets: ["handlebar"],
-      excludes: ["bar-cage"],
+      excludes: ["bar-cage", "bar-bag-mount"],
     };
   }
   if (p.id === "tailfin-851925")
@@ -3181,6 +3206,8 @@ function visualEnvelope(
             scale(p.name.startsWith("Long") ? 2.2 : 1.1),
           );
     case "bar_roll": {
+      const replacement = BAR_ROLL_REPLACEMENTS[p.id];
+      if (replacement) return envelope(replacement.diameter, replacement.diameter, replacement.width);
       const diameter =
         d?.diameter ?? (capacity <= 8 ? 135 : capacity <= 11 ? 165 : 180);
       const width =
@@ -3198,6 +3225,7 @@ function visualEnvelope(
         ? envelope(130, 110, 220)
         : envelope(35, d?.length ?? 170, d?.width ?? 72);
     case "mount":
+      if (p.id === "tailfin-710832") return envelope(80, 75, 115);
       return p.id === "tailfin-34167"
         ? envelope(18, 18, 180)
         : envelope(35, 45, 35);
@@ -3252,6 +3280,15 @@ function normalize(
       ? v.weight_g + v.bar_clamp_weight_g
       : v.weight_g;
   const notes = [
+    p.id === "tailfin-894177"
+      ? "Top bag plus fixed connector upgrade kit; requires an existing supported rack. This is not a complete SpeedPack system and does not add a second arch. Source spare-kit mass and normalized capacity are unknown; fixed connector geometry is illustrative. Verify rack generation and conversion instructions."
+      : "",
+    BAR_ROLL_REPLACEMENTS[p.id]
+      ? "Replacement bag includes bag-side hardware, not the separate bike-side Bar Bag Mounting Kit. Listed spare mass/capacity remain unknown; sibling complete-system specifications are not substituted. Rendered bag-size differences are illustration estimates."
+      : "",
+    p.id === "tailfin-710832"
+      ? "Bike-side mounting kit for a separate replacement Bar Bag Roll. Do not add to a complete Bar Bag System: its clamp mass is already counted. Spare-kit mass is not normalized in the source."
+      : "",
     "Exploratory placement; no model, size or loaded-clearance fit certification.",
     unknownDimensions
       ? "Complete packed dimensions unavailable; rendered envelope is an explicit illustration estimate."
@@ -3315,7 +3352,7 @@ function normalize(
         ? /^Flat bar/i.test(v.label)
           ? "flat"
           : "drop"
-        : undefined,
+        : BAR_ROLL_REPLACEMENTS[p.id]?.handlebarType,
     volumeLiters: v.capacity_l,
     dryWeightGrams: combinedBarWeight,
     dimensionsMm: dimensions,

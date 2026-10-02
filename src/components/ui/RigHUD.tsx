@@ -8,6 +8,7 @@ export function RigHUD() {
   const metrics = useRigStore((s) => s.metrics);
   const clearanceWarnings = useRigStore((s) => s.clearanceWarnings);
   const dropperCompressed = useRigStore((s) => s.dropperPostCompressed);
+  const rigidPost = useRigStore((s) => s.currentBike.seatpostType === "rigid");
   const toggleDropper = useRigStore((s) => s.toggleDropper);
   const waterBottlesMounted = useRigStore((s) => s.waterBottlesMounted);
   const toggleBottles = useRigStore((s) => s.toggleBottles);
@@ -213,13 +214,14 @@ export function RigHUD() {
           <button
             aria-pressed={dropperCompressed}
             onClick={toggleDropper}
+            disabled={rigidPost}
             className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium transition-colors ${
               dropperCompressed
                 ? "bg-rose-500/20 text-rose-300 border-rose-500/40"
                 : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"
             }`}
           >
-            Dropper: {dropperCompressed ? "Compressed (preview)" : "Extended"}
+            {rigidPost ? "Rigid seatpost" : `Dropper: ${dropperCompressed ? "120 mm lower (preview)" : "Extended"}`}
           </button>
 
           <button

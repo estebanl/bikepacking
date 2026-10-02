@@ -77,9 +77,9 @@ function sockets(
         "Saddle rails",
         [g.saddleBase[0] - 0.15, g.saddleBase[1] - 0.065, 0],
         ["seat_pack"],
-        "Dropper travel and rear tire clearance must be checked at full compression.",
+        bike.seatpostType === "rigid" ? "Rigid seatpost reference build; rear tire clearance remains unverified." : "Dropper preview moves 120 mm, not the full manufacturer stroke. Check actual full travel and rear tire clearance.",
       ),
-      dropperOffset: [
+      dropperOffset: bike.seatpostType === "rigid" ? [0, 0, 0] : [
         Math.cos((size.geometry.seatTubeAngleDeg * Math.PI) / 180) * 0.12,
         -Math.sin((size.geometry.seatTubeAngleDeg * Math.PI) / 180) * 0.12,
         0,
@@ -172,6 +172,7 @@ const blur: BikeModel = {
   handlebarType: "flat",
   colorHex: "#344246",
   suspension: { frontTravelMm: 120, rearTravelMm: 120 },
+  seatpostType: "dropper",
   sourceUrl: "https://www.santacruzbicycles.com/collections/blur",
   geometrySourceUrl: "https://www.santacruzbicycles.com/collections/blur",
   referenceNotes:
@@ -223,6 +224,7 @@ const stigmata: BikeModel = {
   tireWidthMm: 45,
   handlebarType: "drop",
   colorHex: "#82788e",
+  seatpostType: "rigid",
   sourceUrl:
     "https://www.santacruzbicycles.com/collections/stigmata/products/stigmata-apex-2027",
   geometrySourceUrl: "https://www.santacruzbicycles.com/collections/stigmata",

@@ -47,7 +47,7 @@ export function getBikeGeometry(
   ];
   const postExtension =
     Math.max(0.12, 0.72 - g.seatTubeLengthMm / 1000) -
-    (dropperCompressed ? 0.12 : 0);
+    (dropperCompressed && bike.seatpostType !== "rigid" ? 0.12 : 0);
   const saddleBase: Point3 = [
     seatCluster[0] - Math.cos(sa) * postExtension,
     seatCluster[1] + Math.sin(sa) * postExtension,
@@ -58,7 +58,9 @@ export function getBikeGeometry(
     headTubeTop[1] + 0.028,
     0,
   ];
+  const topTubeEnd: Point3 = [headTubeTop[0], headTubeTop[1] - 0.018, 0];
   return {
+    topTubeEnd,
     bb,
     rearAxle,
     frontAxle,
@@ -71,4 +73,12 @@ export function getBikeGeometry(
     wheelbase,
     tireWidth: (bike.tireWidthMm ?? 45) / 1000,
   };
+}
+
+/** Shared original tube profile for visible surfaces and attachment anchors. */
+export function topTubeRadius(t: number) {
+  const radii = [0.022, 0.018, 0.032];
+  const at = Math.max(0, Math.min(1, t)) * 2;
+  const k = Math.min(Math.floor(at), 1);
+  return radii[k] + (radii[k + 1] - radii[k]) * (at - k);
 }

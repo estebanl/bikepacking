@@ -109,6 +109,7 @@ export const useRigStore = create<RigState>((set, get) => {
     bottles = get().waterBottlesMounted,
   ) => {
     const sizeConfig = bike.sizes[sizeKey];
+    if (bike.seatpostType === "rigid") dropper = false;
     const clean = sanitizeMountedBags(bags, sizeConfig);
     const safePayload = clampPayloadGrams(payload);
     set({
@@ -225,6 +226,7 @@ export const useRigStore = create<RigState>((set, get) => {
     },
 
     toggleDropper: () => {
+      if (get().currentBike.seatpostType === "rigid") return;
       const nextDropper = !get().dropperPostCompressed;
       const computed = computeState(
         get().currentBike,

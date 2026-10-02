@@ -79,6 +79,7 @@ export interface BikeModel {
   wheelRadiusMm?: number;
   tireWidthMm?: number;
   suspension?: { frontTravelMm: number; rearTravelMm: number };
+  seatpostType?: "rigid" | "dropper";
   sizes: {
     [sizeKey: string]: BikeSizeConfig;
   };

@@ -82,3 +82,13 @@ PNG files: `blur-desktop.png`, `blur-mobile.png`, `blur-side.png`, `blur-iso.png
 Actual visual inspection of the final side/loaded/mobile frames confirms distinct mountain/gravel silhouettes, improved Blur frame contrast, visible dropbar/rigid-fork versus suspension-fork differences, readable frames on mobile, and modeled rear bag/hardware. These are original illustrative meshes, not photorealistic manufacturer CAD. The loaded sample retains explicit unknown-mass and unverified-fit notices. Numerical or browser passes do not establish real physical compatibility. Hardware touch performance has not been tested; Chromium software rendering is not a phone GPU benchmark.
 
 Transport JPEG previews are captured separately at quality 75 by `scripts/independent-validation-jpeg.cjs`; names follow `{blur,stigmata}[-loaded]-{desktop,mobile}-review.jpg`. Files are local evidence, not confirmed Library uploads.
+
+## Component and attachment follow-up
+
+The next slice has 68 mounting previews and 84 visible components still pending, plus 13 unsupported-fit variants, 17 internal/service spares and 9 off-bike variants. It adds four replacement handlebar rolls, the separate bike-side mounting kit, and a SpeedPack top-bag/fixed-connector kit. Their unknown source specs remain null; integrated-system masses are not reused.
+
+Corrected top-tube surface anchors and underside straps, added an illustrative rack-to-fixed-seatpost connector, and aligned bar-kit supports to the actual bar and bag. Stigmata's rigid seatpost now ignores imported/toggled dropper requests. Blur's control explicitly describes a 120 mm preview, not full manufacturer travel. Hardware without storage no longer produces unknown-capacity warnings.
+
+44 tests, TypeScript and production build pass. Production port 3005 browser checks at 1440/390 px confirm no overflow or JavaScript errors, disabled rigid-post control and working Blur preview. Evidence: `/workspace/bikepacking-evidence/realism-final/refinements-{1440,390}.png`, `equipment-connectors-{desktop,mobile}.png`, `equipment-kit-aligned-cockpit.png`. Additional hardware stays illustrative and is not included in certified physical clearance bounds.
+
+Earlier tool-output base64 chunks were not accessible to the parent; those transfers were not completed. No Library file IDs were obtained. Site publishing ownership was subsequently explicitly transferred to this cloud executor for direct private publication and screenshot delivery.

@@ -55,7 +55,7 @@ export function calculateRigMetrics(
       .filter(([, b]) => b.dryWeightGrams === null)
       .map(([, b]) => b.id),
     unknownCapacityItemIds: entries
-      .filter(([, b]) => b.volumeLiters === null)
+      .filter(([, b]) => b.volumeLiters === null && !["mount", "cargo_cage"].includes(b.category) && b.visualKind !== "rack")
       .map(([, b]) => b.id),
   };
 }

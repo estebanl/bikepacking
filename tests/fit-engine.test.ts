@@ -571,3 +571,22 @@ test("all indexed Tailfin variants have unique identities and explicit source/un
       );
   }
 });
+
+test("rigid Stigmata saddle and equipment cannot move under a dropper request", () => {
+  const model = SANTA_CRUZ_BIKES.find((item) => item.id.includes("stigmata"))!;
+  assert.equal(model.seatpostType, "rigid");
+  for (const config of Object.values(model.sizes)) {
+    assert.deepEqual(getBikeGeometry(model, config, true).saddleBase, getBikeGeometry(model, config).saddleBase);
+    assert.deepEqual(config.sockets.seatpost.dropperOffset, [0, 0, 0]);
+  }
+});
+
+test("hardware without a storage compartment does not create an unknown-capacity warning", () => {
+  const fixture = structuredClone(size);
+  fixture.sockets.topTubeFront.allowedBagCategories.push("mount");
+  const hardware = bag({ category: "mount", productKind: "mount", volumeLiters: null });
+  const metrics = calculateRigMetrics(bike, fixture, { topTubeFront: hardware }, 0);
+  assert.deepEqual(metrics.unknownCapacityItemIds, []);
+  assert.equal(metrics.totalCapacityLiters, 0);
+  assert.equal(hardware.volumeLiters, null);
+});

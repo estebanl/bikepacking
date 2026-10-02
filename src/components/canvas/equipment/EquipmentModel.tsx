@@ -50,6 +50,7 @@ const stitchMaterial = new THREE.LineBasicMaterial({
   opacity: 0.7,
 });
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
+const clampRing = new THREE.TorusGeometry(.018,.004,6,16);
 const unitTube = new THREE.CylinderGeometry(1, 1, 1, 8);
 
 function Box({
@@ -187,7 +188,9 @@ function PanelShell({
   );
 }
 
-export function EquipmentModel({ bag }: { bag: BagItem }): ReactElement {
+export interface BarSupportEndpoints { clamps: [Point3,Point3]; ends: [Point3,Point3]; orientation: [number,number,number,number] }
+
+export function EquipmentModel({ bag, barSupport }: { bag: BagItem; barSupport?: BarSupportEndpoints }): ReactElement {
   const [l, h, d] = equipmentDimensions(bag),
     kind = equipmentKind(bag);
   const fabric = useMemo(
@@ -318,6 +321,14 @@ export function EquipmentModel({ bag }: { bag: BagItem }): ReactElement {
         />
       </group>
     );
+  if (bag.id === "tailfin-710832-v1" && barSupport) return <group name="illustrative-bar-support">
+    {barSupport.clamps.map((clamp,i)=><group key={i}>
+      <mesh dispose={null} geometry={clampRing} material={buckle} position={clamp} quaternion={barSupport.orientation} castShadow/>
+      <Rod a={clamp} b={barSupport.ends[i]} radius={.005} material={metal}/>
+      <Box position={barSupport.ends[i]} size={[.014,.026,.030]} material={buckle}/>
+    </group>)}
+    <Rod a={barSupport.ends[0]} b={barSupport.ends[1]} radius={.006} material={metal}/>
+  </group>;
   if (hardware)
     return (
       <group>
@@ -383,6 +394,10 @@ export function EquipmentModel({ bag }: { bag: BagItem }): ReactElement {
   return (
     <group>
       <PanelShell outline={outline} depth={d * 0.9} material={fabric} />
+      {kind === "trunk" && /fixed connector/i.test(bag.name) && <group name="illustrative-fixed-bag-connector">
+        <Box position={[0,-h*.475,0]} size={[l*.55,.011,d*.58]} material={metal}/>
+        {[-1,1].map(side=><Box key={side} position={[0,-h*.49,side*d*.23]} size={[l*.36,.018,.014]} material={buckle}/>)}
+      </group>}
       {/* Reinforced underside and small separate reflective ID patch. */}
       <Box position={[0, -h * 0.44, 0]} size={[l * 0.69, 0.006, d * 0.88]} />
       {[-1, 1].map((s) => (
@@ -413,7 +428,7 @@ export function EquipmentModel({ bag }: { bag: BagItem }): ReactElement {
               />
             </group>
           ))}
-          {[-0.31, 0.22].map((x) => (
+          {frame && [-0.31, 0.22].map((x) => (
             <group key={x}>
               <Box
                 position={[l * x, h * 0.49, 0]}
@@ -427,6 +442,13 @@ export function EquipmentModel({ bag }: { bag: BagItem }): ReactElement {
           ))}
         </>
       )}
+      {kind === "top_tube" && [-.3,.22].map(x => <group key={x}>
+        {[-1,1].map(side => <WebbingSegment key={side}
+          a={[l*x,-h*.28,side*d*.46]}
+          b={[l*x,-h*.46-.040,side*.021]}/>) }
+        <Box position={[l*x,-h*.46-.040,0]} size={[.017,.003,.045]}/>
+        <Box position={[l*x,-h*.35,d*.465]} size={[.023,.019,.006]} material={buckle}/>
+      </group>)}
       {kind === "bar_roll" && (
         <>
           {[-1, 1].map((s) => (
@@ -585,4 +607,28 @@ function RackModel({ dimensions: [l, h, d] }: { dimensions: Point3 }) {
       />
     </group>
   );
+}
+
+/** Original illustrative straps/supports, outside the measured fabric envelope. */
+function WebbingSegment({a,b}: {a: Point3; b: Point3}) {
+  const transform=useMemo(()=>{
+    const start=new THREE.Vector3(...a),end=new THREE.Vector3(...b),delta=end.clone().sub(start);
+    return {center:start.add(end).multiplyScalar(.5),length:delta.length(),rotation:new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),delta.normalize())};
+  },[...a,...b]);
+  return <mesh dispose={null} geometry={unitBox} material={webbing} position={transform.center} quaternion={transform.rotation} scale={[.017,transform.length,.003]} castShadow/>;
+}
+
+/** Connects the modeled rack deck to the fixed outer seatpost, independent of dropper travel.
+ * These original visual parts do not certify connector length, clamp or suspension compatibility.
+ */
+export function RackSeatpostConnector({a,b,seatAngle}: {a: Point3; b: Point3; seatAngle: number}) {
+  return <group name="illustrative-rack-seatpost-connector">
+    <Rod a={a} b={b} radius={.006} material={metal}/>
+    <Box position={a} size={[.022,.018,.029]} material={buckle}/>
+    <group position={b} rotation={[0,0,Math.PI/2-seatAngle]}>
+      <mesh dispose={null} rotation={[Math.PI/2,0,0]} geometry={clampRing} material={buckle} castShadow/>
+      <Box position={[-.016,0,0]} size={[.018,.023,.026]} material={metal}/>
+      <Rod a={[-.018,0,-.018]} b={[-.018,0,.018]} radius={.003} material={silver}/>
+    </group>
+  </group>;
 }
