@@ -73,6 +73,9 @@ export function evaluateClearances({
         severity: "error",
         message: `Estimated equipment and allocated payload exceed the ${socket.maxLoadGrams}g limit at ${socket.name}.`,
       });
+    if (bike.suspension?.rearTravelMm && /^(tailfin-1008020|tailfin-895075)-/.test(bag.id))
+      add({id:`full_suspension_rack_${id}`,type:"fit_unverified",severity:"warning",
+        message:`${bag.name}: the manufacturer does not recommend this removable rack system for ${bag.id.startsWith("tailfin-895075-") ? "rough full-suspension riding" : "full-suspension use"}. This placement is an illustration, not an approved Blur setup; verify the correct fixed system and installation guidance.`});
     const bounds = getEquipmentBounds(bag, socket, dropperPostCompressed, {
       allowEstimate: false,
     });

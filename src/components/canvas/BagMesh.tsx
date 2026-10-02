@@ -6,6 +6,7 @@ import { useRigStore } from "@/store/useRigStore";
 import { getEquipmentPlacement, equipmentKind, rotateEquipmentPoint, type Point3 } from "@/lib/equipmentGeometry";
 import { EquipmentModel, RackSeatpostConnector, type BarSupportEndpoints } from "./equipment/EquipmentModel";
 
+import { findSocket } from "@/lib/sockets";
 import { getBottleMountPose } from "@/lib/bottleMounts";
 import { getBikeGeometry } from "@/lib/bikeGeometry";
 
@@ -25,6 +26,11 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
   const severe = affected.some((w) => w.severity === "error");
   const placement = getEquipmentPlacement(bag, anchor, compressed);
   const { length: l, height: h, depth: d } = placement.dimensions;
+  let rearDeck: {length:number;depth:number} | undefined;
+  if (bag.id === "tailfin-1029289-v1" && mounted.rearRack) {
+    const rackAnchor=findSocket(size,"rearRack",mounted);
+    if(rackAnchor) rearDeck=getEquipmentPlacement(mounted.rearRack,rackAnchor).dimensions;
+  }
   const kind=equipmentKind(bag);
   const isRack=kind === "rack" || kind === "aeropack";
   const tubeRadius=(socketId === "bottleMountDown" || socketId === "bottleMountSeat") ? getBottleMountPose(bike,size,socketId).radius : undefined;
@@ -60,7 +66,7 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
       name={`bag_${bag.id}_${socketId}`}
     >
       <group>
-        <EquipmentModel bag={bag} barSupport={barSupport} tubeRadius={tubeRadius} />
+        <EquipmentModel bag={bag} barSupport={barSupport} tubeRadius={tubeRadius} rearDeck={rearDeck} />
         {/* Warnings stay legible without changing opaque textile into glowing plastic. */}
         {affected.length > 0 && (
           <mesh position={[-l * 0.27, h * 0.21, d * 0.52]}>

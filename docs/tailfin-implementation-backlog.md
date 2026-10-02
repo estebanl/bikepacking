@@ -2,8 +2,8 @@
 
 Source milestone: `5deac711c426727045fff546a28248ead74bf742`. The ALL-components request remains open. These are renderer planning classifications, not new manufacturer specifications or fit approvals.
 
-- mountable: 71 variants
-- implementation-pending: 81 variants
+- mountable: 78 variants
+- implementation-pending: 74 variants
 - unsupported-fit: 13 variants
 - nonvisual-spare: 17 variants
 - off-bike: 9 variants
@@ -24,11 +24,6 @@ Unknown source dimensions stay null. Future illustrative geometry must use the s
 | [Bar Cage Mount - 22mm ](https://www.tailfin.cc/ca/product/accessories/bar-bag-accessories/bar-cage-mount-22mm/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [QR Axle ](https://www.tailfin.cc/ca/product/axles/qr-axle/) | unsupported-fit | QR axle interface is not supported by the selected thru-axle Santa Cruz builds. |
 | [Third-Party Pannier Adaptors ](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/third-party-pannier-adaptors/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Journey Rack Mudguard ](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/journey-rack-mudguard/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Garmin Varia / Wahoo Trackr Light Mount ](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/garmin-varia-wahoo-trackr-light-mount/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Cateye Nano Light Mount ](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/cateye-nano-light-mount/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Seatpost Mimic Light Mount ](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/seatpost-mimic-light-mount/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Exposure Boost Light Mount ](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/exposure-boost-light-mount/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Women's Logo T-Shirt - Black/Teal ](https://www.tailfin.cc/ca/product/hats-bottles-apparel/t-shirts/womens-logo-t-shirt-black-teal/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Women's Logo T-Shirt - Black/White ](https://www.tailfin.cc/ca/product/hats-bottles-apparel/t-shirts/womens-logo-t-shirt-black-white/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Mens Logo T-Shirt - Black/Teal ](https://www.tailfin.cc/ca/product/hats-bottles-apparel/t-shirts/mens-logo-t-shirt-black-teal/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
@@ -43,8 +38,6 @@ Unknown source dimensions stay null. Future illustrative geometry must use the s
 | [Cargo Straps · 40cm ](https://www.tailfin.cc/ca/product/cargo-cage-system/cargo-straps/cargo-straps/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Cargo Straps · 50cm ](https://www.tailfin.cc/ca/product/cargo-cage-system/cargo-straps/cargo-straps/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Cargo Straps · 65cm ](https://www.tailfin.cc/ca/product/cargo-cage-system/cargo-straps/cargo-straps/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Cateye Wearable X Clip On Light ](https://www.tailfin.cc/ca/product/accessories/cateye-light/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Light Mount (Fixed) ](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/trunk-bag-fixed-light-mount/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Pannier Shoulder Strap ](https://www.tailfin.cc/ca/product/accessories/rack-bag-accessories/pannier-shoulder-strap/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Pannier Laptop Holsters ](https://www.tailfin.cc/ca/product/accessories/rack-bag-accessories/pannier-laptop-holsters/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Seat Post Connector ](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/seat-post-connector-2/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |

@@ -4,6 +4,7 @@ import type {
   BikeSizeConfig,
   SocketAnchor,
 } from "../types/index.ts";
+import { resolveRearAccessoryAnchor } from "./rearAccessoryMounts.ts";
 import { equipmentDimensions, rotateEquipmentPoint, getEquipmentPlacement } from "./equipmentGeometry.ts";
 export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, BagItem> = {}): SocketAnchor[] {
   const anchors = Object.values(size.sockets).flatMap((value) =>
@@ -11,7 +12,7 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
   );
   // Shared illustrative attachment stack. Separate the fork, backplate and bag;
   // local +X faces outboard on each side, never through the tire.
-  return anchors.map(anchor => {
+  const resolved: SocketAnchor[] = anchors.map(anchor => {
     if (anchor.id === "rackTop" && mounted.rearRack && mounted.rackTop) {
       const rackAnchor = anchors.find(a=>a.id === "rearRack");
       if (rackAnchor && mounted.rearRack.visualKind === "rack") {
@@ -45,6 +46,7 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
     const [bl,bh] = equipmentDimensions(bag);
     return {...anchor,rotation,position:[fork.position[0],fork.position[1]+(cage ? -ch*.47+bh*.44 : 0),side*(.106+bl*.5)]};
   });
+  return resolved.map(anchor => resolveRearAccessoryAnchor(anchor, resolved, mounted));
 }
 export const findSocket = (size: BikeSizeConfig, id: string, mounted: Record<string, BagItem> = {}) =>
   getSocketAnchors(size, mounted).find((socket) => socket.id === id);

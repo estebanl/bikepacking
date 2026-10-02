@@ -2968,6 +2968,26 @@ const BAR_ROLL_REPLACEMENTS: Record<string, { handlebarType: "flat" | "drop"; di
 
 function placement(p: SourceProduct, v: SourceVariant): Placement {
   const base = referencePlacement(p.catalog_section === "spares");
+  if (p.id === "tailfin-1029289")
+    return {
+      category: "accessory", productKind: "accessory", visualKind: "fender",
+      sockets: ["journeyMudguard"], requires: ["journey-rack"],
+    };
+  if (["tailfin-1027471", "tailfin-1027465", "tailfin-1027459", "tailfin-1027462"].includes(p.id))
+    return {
+      category: "mount", productKind: "mount", visualKind: "mount",
+      sockets: ["rearLightMount"], requires: ["tailfin-rear-light-interface"],
+    };
+  if (p.id === "tailfin-24700")
+    return {
+      category: "mount", productKind: "mount", visualKind: "mount",
+      sockets: ["rearLightMount"], requires: ["tailfin-fixed-bag-light-interface"],
+    };
+  if (p.id === "tailfin-789125")
+    return {
+      category: "accessory", productKind: "accessory", visualKind: "accessory",
+      sockets: ["rearLightMount"], requires: ["tailfin-clip-light-interface"],
+    };
   if (p.id === "tailfin-48952")
     return { category: "mount", productKind: "mount", visualKind: "mount",
       sockets: ["cargoFootLeft", "cargoFootRight"], requires: ["cargo-cage-load-chip-host"] };
@@ -2989,6 +3009,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
     return {
       category: "seat_pack", productKind: "bag", visualKind: "trunk",
       sockets: ["rackTop"], requires: ["rack-top"],
+      provides: ["tailfin-rear-light-interface", "tailfin-fixed-bag-light-interface"],
     };
   // Specific complete hardware kits are selectable even though their source section is Spares.
   if (p.id === "tailfin-34167")
@@ -3024,6 +3045,16 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
         "rear-rack",
         ...(fixed ? [] : ["rack-top"]),
         ...(panniers ? ["pannier-mounts"] : []),
+        ...(p.id === "tailfin-1008020"
+          ? ["journey-rack", "tailfin-rear-light-interface"]
+          : []),
+        ...(p.mount_zone === "rear-system"
+          ? [
+              "tailfin-rear-light-interface",
+              "tailfin-fixed-bag-light-interface",
+              ...(p.id === "tailfin-913333" ? ["tailfin-clip-light-interface"] : []),
+            ]
+          : []),
       ],
     };
   }
@@ -3067,6 +3098,9 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       visualKind: "trunk",
       sockets: ["rackTop"],
       requires: ["rack-top"],
+      ...(p.id === "tailfin-670"
+        ? { provides: ["tailfin-rear-light-interface", "tailfin-fixed-bag-light-interface", "tailfin-clip-light-interface"] }
+        : {}),
     };
   if (p.mount_zone === "rear-side")
     return {
@@ -3189,6 +3223,11 @@ function visualEnvelope(
     depth: Math.round(depth * factor),
   });
   const d = v.dimensions_mm;
+  if (p.id === "tailfin-1029289") return envelope(400, 30, 65);
+  if (["tailfin-1027471", "tailfin-1027465", "tailfin-1027459", "tailfin-1027462"].includes(p.id))
+    return envelope(30, 45, 35);
+  if (p.id === "tailfin-24700") return envelope(18, 25, 64);
+  if (p.id === "tailfin-789125") return envelope(25, 65, 30);
   switch (kind) {
     case "aeropack":
       return envelope(450, p.name.startsWith("Speed") ? 570 : 620, 260);
@@ -3290,6 +3329,18 @@ function normalize(
       ? v.weight_g + v.bar_clamp_weight_g
       : p.id === "tailfin-675800" ? 25 : v.weight_g;
   const notes = [
+    p.id === "tailfin-1029289"
+      ? "Illustrative mudguard envelope only; source mass and dimensions are unknown. Requires the Journey rack. The Journey rack is not recommended for full-suspension use."
+      : "",
+    ["tailfin-1027471", "tailfin-1027465", "tailfin-1027459", "tailfin-1027462"].includes(p.id)
+      ? `Illustrative mount envelope only; source mass and dimensions are unknown. Light not included.${p.id === "tailfin-1027471" ? " Garmin RCT715 requires the Lever-lock adapter from Garmin’s Seat Rail Mount Kit; adapter mass and dimensions are unknown." : ""}`
+      : "",
+    p.id === "tailfin-24700"
+      ? "Illustrative fixed light mount envelope only; source mass is unknown. Mounts to CargoPack or Fixed SpeedPack; light not included. 50 mm M5 slot spacing and 8.7 mm central wiring hole are source facts."
+      : "",
+    p.id === "tailfin-789125"
+      ? "Illustrative light envelope only; source mass and dimensions are unknown. Includes detachable clip and rubber-strap bike mount; mounted-light fit remains unverified."
+      : "",
     p.id === "tailfin-48952" ? "Optional removable L foot for Small/Large Cargo Cages, not Mini Cage. Source pages conflict: spare page 10 g, cage page 11 g; mass remains unknown. Foot envelope is illustrative." : "",
     p.id === "tailfin-675800" ? "Supplemental official product page checked 2026-10-02: adapter 25 g, 5 mm stack and up to ±45 mm cage adjustment. Preview uses 45 mm lower setting, not a required installation. Requires existing bottle bosses; cage and bottle excluded. Outer envelope and actual boss positions remain illustrative." : "",
     p.id === "tailfin-959100" ? "Frame-tube strap adapter only; never offered on forks, stays or carbon rack arches. Official page: approximately 22–90 mm tube diameter and 64 mm cage spacing; 2 straps support 1 kg, 3 straps 1.5 kg. Preview illustrates two straps. 19 g body mass excludes straps/screws, so complete mass remains unknown. Bottle and cage excluded; verify tube shape, location and instructions." : "",

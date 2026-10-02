@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, type ReactElement } from "react";
 import * as THREE from "three";
+import { isRearAccessory, RearAccessoryModel, type RearDeckDimensions } from "./RearAccessories";
 import type { BagItem } from "@/types";
 import {
   equipmentDimensions,
@@ -191,7 +192,7 @@ function PanelShell({
 
 export interface BarSupportEndpoints { clamps: [Point3,Point3]; ends: [Point3,Point3]; orientation: [number,number,number,number] }
 
-export function EquipmentModel({ bag, barSupport, tubeRadius }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number }): ReactElement {
+export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions }): ReactElement {
   const [l, h, d] = equipmentDimensions(bag),
     kind = equipmentKind(bag);
   const fabric = useMemo(
@@ -261,6 +262,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius }: { bag: BagItem; 
     "accessory",
     "spare",
   ].includes(kind);
+  if (isRearAccessory(bag)) return <RearAccessoryModel bag={bag} rearDeck={rearDeck}/>;
   if (kind === "aeropack")
     return (
       <group>
