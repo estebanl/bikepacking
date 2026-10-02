@@ -1,0 +1,588 @@
+"use client";
+
+import { useEffect, useMemo, type ReactElement } from "react";
+import * as THREE from "three";
+import type { BagItem } from "@/types";
+import {
+  equipmentDimensions,
+  equipmentKind,
+  type Point3,
+} from "@/lib/equipmentGeometry";
+
+const webbing = new THREE.MeshStandardMaterial({
+  color: "#151819",
+  roughness: 0.97,
+});
+const seam = new THREE.MeshStandardMaterial({
+  color: "#555e60",
+  roughness: 0.95,
+});
+const metal = new THREE.MeshStandardMaterial({
+  color: "#313b3e",
+  metalness: 0.76,
+  roughness: 0.34,
+});
+const buckle = new THREE.MeshStandardMaterial({
+  color: "#111718",
+  roughness: 0.53,
+});
+const silver = new THREE.MeshStandardMaterial({
+  color: "#9ba5a7",
+  metalness: 0.9,
+  roughness: 0.25,
+});
+// Tiny original procedural weave: no image download or vendor artwork required.
+const weavePixels = new Uint8Array(32 * 32 * 4);
+for (let y = 0; y < 32; y++)
+  for (let x = 0; x < 32; x++) {
+    const i = (y * 32 + x) * 4,
+      v = 112 + (x % 4 < 2 !== y % 4 < 2 ? 22 : 0);
+    weavePixels[i] = weavePixels[i + 1] = weavePixels[i + 2] = v;
+    weavePixels[i + 3] = 255;
+  }
+const weave = new THREE.DataTexture(weavePixels, 32, 32, THREE.RGBAFormat);
+weave.wrapS = weave.wrapT = THREE.RepeatWrapping;
+weave.repeat.set(38, 18);
+weave.needsUpdate = true;
+const stitchMaterial = new THREE.LineBasicMaterial({
+  color: "#4b5354",
+  transparent: true,
+  opacity: 0.7,
+});
+const unitBox = new THREE.BoxGeometry(1, 1, 1);
+const unitTube = new THREE.CylinderGeometry(1, 1, 1, 8);
+
+function Box({
+  position = [0, 0, 0],
+  size,
+  material = webbing,
+}: {
+  position?: Point3;
+  size: Point3;
+  material?: THREE.Material;
+}) {
+  return (
+    <mesh
+      dispose={null}
+      position={position}
+      scale={size}
+      geometry={unitBox}
+      material={material}
+      castShadow
+      receiveShadow
+    />
+  );
+}
+function Rod({
+  a,
+  b,
+  radius = 0.003,
+  material = seam,
+}: {
+  a: Point3;
+  b: Point3;
+  radius?: number;
+  material?: THREE.Material;
+}) {
+  const { midpoint, quaternion, length } = useMemo(() => {
+    const start = new THREE.Vector3(...a),
+      end = new THREE.Vector3(...b),
+      delta = end.clone().sub(start);
+    return {
+      midpoint: start.add(end).multiplyScalar(0.5),
+      length: delta.length(),
+      quaternion: new THREE.Quaternion().setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        delta.normalize(),
+      ),
+    };
+  }, [a[0], a[1], a[2], b[0], b[1], b[2]]);
+  return (
+    <mesh
+      dispose={null}
+      position={midpoint}
+      quaternion={quaternion}
+      scale={[radius, length, radius]}
+      geometry={unitTube}
+      material={material}
+      castShadow
+    />
+  );
+}
+
+/** Original sewn-panel shell. Polygon is extruded sideways with a small rolled edge, never a cylinder. */
+function PanelShell({
+  outline,
+  depth,
+  material,
+}: {
+  outline: number[][];
+  depth: number;
+  material: THREE.Material;
+}) {
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape();
+    outline.forEach(([x, y], i) =>
+      i ? shape.lineTo(x, y) : shape.moveTo(x, y),
+    );
+    shape.closePath();
+    const bevel = Math.min(
+      0.006,
+      depth * 0.07,
+      ...outline
+        .flat()
+        .filter((v) => v !== 0)
+        .map((v) => Math.abs(v) * 0.04),
+    );
+    const result = new THREE.ExtrudeGeometry(shape, {
+      depth: Math.max(0.001, depth - bevel * 2),
+      steps: 1,
+      bevelEnabled: true,
+      bevelSegments: 2,
+      bevelSize: bevel,
+      bevelThickness: bevel,
+      curveSegments: 1,
+    });
+    result.translate(0, 0, -depth / 2 + bevel);
+    return result;
+  }, [outline, depth]);
+  const seamGeometry = useMemo(
+    () =>
+      new THREE.BufferGeometry().setFromPoints(
+        outline.map(([x, y]) => new THREE.Vector3(x * 0.97, y * 0.97, 0)),
+      ),
+    [outline],
+  );
+  useEffect(
+    () => () => {
+      geometry.dispose();
+    },
+    [geometry],
+  );
+  useEffect(
+    () => () => {
+      seamGeometry.dispose();
+    },
+    [seamGeometry],
+  );
+  return (
+    <>
+      <mesh
+        dispose={null}
+        geometry={geometry}
+        material={material}
+        castShadow
+        receiveShadow
+      />
+      {[-1, 1].map((side) => (
+        <lineLoop
+          dispose={null}
+          key={side}
+          position={[0, 0, side * depth * 0.501]}
+          geometry={seamGeometry}
+          material={stitchMaterial}
+        />
+      ))}
+    </>
+  );
+}
+
+export function EquipmentModel({ bag }: { bag: BagItem }): ReactElement {
+  const [l, h, d] = equipmentDimensions(bag),
+    kind = equipmentKind(bag);
+  const fabric = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: bag.colorHex || "#293031",
+        roughness: 0.91,
+        metalness: 0.01,
+        bumpMap: weave,
+        bumpScale: 0.00035,
+      }),
+    [bag.colorHex],
+  );
+  useEffect(() => () => fabric.dispose(), [fabric]);
+  const outline = useMemo(() => {
+    // All outlines occupy their physical fore/aft x vertical envelope; fabric bulge is in z.
+    if (kind === "frame")
+      return [
+        [-l * 0.49, h * 0.47],
+        [l * 0.49, h * 0.47],
+        [l * 0.34, -h * 0.12],
+        [-l * 0.3, -h * 0.47],
+        [-l * 0.49, -h * 0.26],
+      ];
+    if (kind === "half_frame")
+      return [
+        [-l * 0.49, h * 0.45],
+        [l * 0.49, h * 0.45],
+        [l * 0.38, -h * 0.46],
+        [-l * 0.42, -h * 0.46],
+      ];
+    if (kind === "seat_pack")
+      return [
+        [-l * 0.49, h * 0.3],
+        [-l * 0.38, h * 0.47],
+        [l * 0.49, h * 0.12],
+        [l * 0.46, -h * 0.25],
+        [-l * 0.4, -h * 0.47],
+        [-l * 0.49, -h * 0.26],
+      ];
+    if (kind === "top_tube")
+      return [
+        [-l * 0.49, -h * 0.46],
+        [l * 0.49, -h * 0.46],
+        [l * 0.46, h * 0.38],
+        [l * 0.26, h * 0.47],
+        [-l * 0.34, h * 0.22],
+        [-l * 0.49, -h * 0.05],
+      ];
+    return [
+      [-l * 0.49, -h * 0.3],
+      [-l * 0.36, -h * 0.47],
+      [l * 0.36, -h * 0.47],
+      [l * 0.49, -h * 0.3],
+      [l * 0.47, h * 0.34],
+      [l * 0.34, h * 0.47],
+      [-l * 0.34, h * 0.47],
+      [-l * 0.47, h * 0.34],
+    ];
+  }, [kind, l, h]);
+  const hardware = [
+    "rack",
+    "cage",
+    "mount",
+    "strap",
+    "fender",
+    "accessory",
+    "spare",
+  ].includes(kind);
+  if (kind === "aeropack")
+    return (
+      <group>
+        <group position={[0, -h * 0.15, 0]}>
+          <RackModel dimensions={[l * 0.96, h * 0.65, d * 0.68]} />
+        </group>
+        <group position={[0, h * 0.32, 0]}>
+          <EquipmentModel
+            bag={{
+              ...bag,
+              visualKind: "trunk",
+              dimensionsMm: {
+                length: l * 1000,
+                height: h * 0.36 * 1000,
+                depth: d * 1000,
+              },
+            }}
+          />
+        </group>
+      </group>
+    );
+  if (kind === "rack") return <RackModel dimensions={[l, h, d]} />;
+  if (kind === "cage")
+    return (
+      <group>
+        {/* Plate lies along vertical/lateral axes; published cage depth is fore/aft. */}
+        <Box
+          position={[-l * 0.32, 0, 0]}
+          size={[Math.min(0.004, l * 0.2), h, d * 0.25]}
+          material={metal}
+        />
+        {[-0.32, 0.32].map((y) => (
+          <group key={y}>
+            <Box
+              position={[-l * 0.3, h * y, 0]}
+              size={[Math.min(0.004, l * 0.2), h * 0.055, d * 0.9]}
+              material={metal}
+            />
+            {[-1, 1].map((s) => (
+              <Rod
+                key={s}
+                a={[-l * 0.3, h * y, s * d * 0.42]}
+                b={[l * 0.35, h * y, s * d * 0.42]}
+                material={metal}
+                radius={Math.min(0.003, l * 0.15)}
+              />
+            ))}
+            <Box
+              position={[-l * 0.1, h * y, 0]}
+              size={[0.003, 0.006, 0.006]}
+              material={silver}
+            />
+          </group>
+        ))}
+        <Box
+          position={[0, -h * 0.47, 0]}
+          size={[l * 0.9, 0.005, d * 0.8]}
+          material={metal}
+        />
+      </group>
+    );
+  if (hardware)
+    return (
+      <group>
+        {kind === "strap" ? (
+          <>
+            <Box position={[0, 0, -d * 0.44]} size={[l, h, 0.003]} />
+            <Box position={[0, 0, d * 0.44]} size={[l, h, 0.003]} />
+            <Box position={[0, h * 0.5, 0]} size={[l, 0.003, d]} />
+            <Box position={[0, -h * 0.5, 0]} size={[l, 0.003, d]} />
+            <Box
+              position={[0, h * 0.3, d * 0.46]}
+              size={[l * 1.2, 0.022, 0.007]}
+              material={buckle}
+            />
+          </>
+        ) : kind === "fender" ? (
+          <PanelShell
+            outline={[
+              [-l * 0.5, -h * 0.5],
+              [-l * 0.25, h * 0.32],
+              [0, h * 0.5],
+              [l * 0.25, h * 0.32],
+              [l * 0.5, -h * 0.5],
+              [l * 0.25, h * 0.18],
+              [0, h * 0.35],
+              [-l * 0.25, h * 0.18],
+            ]}
+            depth={d}
+            material={metal}
+          />
+        ) : (
+          <>
+            <Box size={[l, h * 0.65, d * 0.35]} material={metal} />
+            {[-1, 1].map((s) => (
+              <group key={s}>
+                <Box
+                  position={[s * l * 0.35, 0, d * 0.32]}
+                  size={[l * 0.2, h, d * 0.44]}
+                  material={buckle}
+                />
+                <Rod
+                  a={[s * l * 0.35, 0, -d * 0.35]}
+                  b={[s * l * 0.35, 0, d * 0.4]}
+                  radius={Math.min(0.005, h * 0.12)}
+                  material={silver}
+                />
+              </group>
+            ))}
+          </>
+        )}
+      </group>
+    );
+
+  const frame = kind === "frame" || kind === "half_frame";
+  const roll = [
+    "fork_pack",
+    "pannier",
+    "trunk",
+    "aeropack",
+    "seat_pack",
+    "bar_bag",
+  ].includes(kind);
+  return (
+    <group>
+      <PanelShell outline={outline} depth={d * 0.9} material={fabric} />
+      {/* Reinforced underside and small separate reflective ID patch. */}
+      <Box position={[0, -h * 0.44, 0]} size={[l * 0.69, 0.006, d * 0.88]} />
+      {[-1, 1].map((s) => (
+        <Box
+          key={s}
+          position={[-l * 0.23, -h * 0.15, s * d * 0.456]}
+          size={[Math.min(0.034, l * 0.16), 0.006, 0.0015]}
+          material={seam}
+        />
+      ))}
+      {(frame || kind === "top_tube") && (
+        <>
+          {[-1, 1].map((s) => (
+            <group key={s}>
+              <Box
+                position={[0, h * 0.18, s * d * 0.46]}
+                size={[l * 0.78, 0.006, 0.0025]}
+              />
+              <Box
+                position={[l * 0.26, h * 0.145, s * d * 0.47]}
+                size={[0.016, 0.018, 0.003]}
+                material={buckle}
+              />
+              <Box
+                position={[l * 0.24, h * 0.13, s * d * 0.49]}
+                size={[0.024, 0.004, 0.003]}
+                material={seam}
+              />
+            </group>
+          ))}
+          {[-0.31, 0.22].map((x) => (
+            <group key={x}>
+              <Box
+                position={[l * x, h * 0.49, 0]}
+                size={[0.019, 0.007, d + 0.016]}
+              />
+              <Box
+                position={[l * x, h * 0.39, d * 0.46]}
+                size={[0.019, h * 0.19, 0.004]}
+              />
+            </group>
+          ))}
+        </>
+      )}
+      {kind === "bar_roll" && (
+        <>
+          {[-1, 1].map((s) => (
+            <group key={s}>
+              <Box
+                position={[0, 0, s * d * 0.46]}
+                size={[l * 0.72, h * 0.65, 0.014]}
+                material={fabric}
+              />
+              <Box
+                position={[l * 0.28, h * 0.1, s * d * 0.47]}
+                size={[0.024, 0.024, 0.012]}
+                material={buckle}
+              />
+              <Box
+                position={[0, h * 0.46, s * d * 0.28]}
+                size={[l * 0.78, 0.005, 0.024]}
+              />
+              <Box
+                position={[l * 0.475, 0, s * d * 0.28]}
+                size={[0.003, h * 0.68, 0.024]}
+              />
+              <Box
+                position={[-l * 0.475, 0, s * d * 0.28]}
+                size={[0.003, h * 0.68, 0.024]}
+              />
+              <Box
+                position={[l * 0.475, h * 0.18, s * d * 0.28]}
+                size={[0.008, 0.032, 0.031]}
+                material={buckle}
+              />
+            </group>
+          ))}
+        </>
+      )}
+      {roll && (
+        <>
+          {/* Folded waterproof closure, flat woven compression straps, acetal buckles. */}
+          {[0, 1, 2].map((i) => (
+            <Box
+              key={i}
+              position={[0, h * (0.43 + i * 0.018), 0]}
+              size={[l * 0.71, 0.005, d * (0.86 - i * 0.1)]}
+              material={i === 1 ? webbing : fabric}
+            />
+          ))}
+          {[-0.3, 0.3].map((x) => (
+            <group key={x}>
+              <Box
+                position={[l * x, h * 0.485, 0]}
+                size={[0.018, 0.003, d * 0.88]}
+              />
+              {[-1, 1].map((s) => (
+                <group key={s}>
+                  <Box
+                    position={[l * x, 0, s * d * 0.462]}
+                    size={[0.018, h * 0.81, 0.003]}
+                  />
+                  <Box
+                    position={[l * x, h * 0.22, s * d * 0.47]}
+                    size={[0.025, 0.028, 0.006]}
+                    material={buckle}
+                  />
+                  <Box
+                    position={[l * x, h * 0.22, s * d * 0.49]}
+                    size={[0.012, 0.013, 0.002]}
+                    material={seam}
+                  />
+                </group>
+              ))}
+            </group>
+          ))}
+          {kind === "pannier" && (
+            <>
+              <Box
+                position={[0, h * 0.24, -d * 0.46]}
+                size={[l * 0.7, 0.024, 0.012]}
+                material={metal}
+              />
+              {[-0.27, 0.27].map((x) => (
+                <Box
+                  key={x}
+                  position={[l * x, h * 0.3, -d * 0.44]}
+                  size={[0.027, 0.05, 0.025]}
+                  material={buckle}
+                />
+              ))}
+            </>
+          )}
+          {kind === "seat_pack" && (
+            <Box position={[l * 0.4, 0, 0]} size={[0.055, h * 0.5, d * 0.4]} />
+          )}
+        </>
+      )}
+    </group>
+  );
+}
+
+function RackModel({ dimensions: [l, h, d] }: { dimensions: Point3 }) {
+  const archOutline = useMemo(
+    () => [
+      [l * 0.06, -h * 0.46],
+      [l * 0.13, -h * 0.46],
+      [l * 0.0, h * 0.4],
+      [-l * 0.07, h * 0.45],
+      [-l * 0.13, h * 0.45],
+      [-l * 0.06, h * 0.36],
+    ],
+    [l, h],
+  );
+  return (
+    <group>
+      {/* Original single arch construction, slim deck rails and axle attachment feet. */}
+      {[-1, 1].map((s) => (
+        <group key={s}>
+          <group position={[0, 0, s * d * 0.4]}>
+            <PanelShell outline={archOutline} depth={0.012} material={metal} />
+          </group>
+          <Rod
+            a={[-l * 0.43, h * 0.44, s * d * 0.33]}
+            b={[l * 0.44, h * 0.44, s * d * 0.33]}
+            radius={0.006}
+            material={metal}
+          />
+          <Box
+            position={[l * 0.095, -h * 0.455, s * d * 0.4]}
+            size={[0.026, 0.022, 0.022]}
+            material={buckle}
+          />
+          <Rod
+            a={[l * 0.095, -h * 0.455, s * d * 0.39]}
+            b={[l * 0.095, -h * 0.455, s * d * 0.47]}
+            radius={0.005}
+            material={silver}
+          />
+          <Box
+            position={[-l * 0.065, h * 0.36, s * d * 0.44]}
+            size={[0.04, 0.019, 0.017]}
+            material={buckle}
+          />
+        </group>
+      ))}
+      {[-0.4, -0.08, 0.4].map((x) => (
+        <Rod
+          key={x}
+          a={[l * x, h * 0.44, -d * 0.36]}
+          b={[l * x, h * 0.44, d * 0.36]}
+          radius={0.005}
+          material={metal}
+        />
+      ))}
+      <Box
+        position={[l * 0.44, h * 0.45, 0]}
+        size={[0.025, 0.024, 0.048]}
+        material={buckle}
+      />
+    </group>
+  );
+}

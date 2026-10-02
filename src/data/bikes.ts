@@ -1,6 +1,11 @@
 import type { BikeModel } from "../types/index.ts";
 
-export const BIKES: BikeModel[] = [
+import { SANTA_CRUZ_BIKES } from "./santaCruz.ts";
+
+import { alignFrameSockets } from "../lib/alignSockets.ts";
+
+const BIKE_MODELS: BikeModel[] = [
+  ...SANTA_CRUZ_BIKES,
   {
     id: "salsa-cutthroat-2024",
     brand: "Salsa",
@@ -506,3 +511,4 @@ export const BIKES: BikeModel[] = [
     },
   },
 ];
+export const BIKES = BIKE_MODELS.map(alignFrameSockets);

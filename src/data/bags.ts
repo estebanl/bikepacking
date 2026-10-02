@@ -1,6 +1,8 @@
 import type { BagItem } from "../types/index.ts";
 
-export const BAGS: BagItem[] = [
+import { TAILFIN_CATALOG } from "./tailfin.ts";
+
+const LEGACY_BAGS: BagItem[] = [
   // --- Frame Bags ---
   {
     id: "ortlieb-frame-pack-rc-4l",
@@ -263,3 +265,5 @@ export const BAGS: BagItem[] = [
     colorHex: "#18181b",
   },
 ];
+
+export const BAGS: BagItem[] = [...TAILFIN_CATALOG, ...LEGACY_BAGS.filter(bag => bag.brand !== "Tailfin")];

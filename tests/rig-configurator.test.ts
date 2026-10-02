@@ -13,7 +13,7 @@ import {
 } from "../src/lib/export.ts";
 
 test("calculateRigMetrics accurately computes base weight and volume with no bags", () => {
-  const cutthroat = BIKES[0];
+  const cutthroat = BIKES.find((b) => b.id === "salsa-cutthroat-2024")!;
   const sizeConfig = cutthroat.sizes["56cm"];
 
   const metrics = calculateRigMetrics(cutthroat, sizeConfig, {}, 0);
@@ -28,7 +28,7 @@ test("calculateRigMetrics accurately computes base weight and volume with no bag
 });
 
 test("calculateRigMetrics updates weight, capacity, and axle balance with mounted gear", () => {
-  const cutthroat = BIKES[0];
+  const cutthroat = BIKES.find((b) => b.id === "salsa-cutthroat-2024")!;
   const sizeConfig = cutthroat.sizes["56cm"];
 
   const frameBag = BAGS.find((b) => b.id === "ortlieb-frame-pack-rc-4l")!;
@@ -44,10 +44,14 @@ test("calculateRigMetrics updates weight, capacity, and axle balance with mounte
   const metrics = calculateRigMetrics(cutthroat, sizeConfig, mountedBags, 2500);
 
   const expectedBagsWeight =
-    frameBag.dryWeightGrams + seatBag.dryWeightGrams + barBag.dryWeightGrams;
+    (frameBag.dryWeightGrams ?? 0) +
+    (seatBag.dryWeightGrams ?? 0) +
+    (barBag.dryWeightGrams ?? 0);
   const expectedTotalWeight = 10200 + expectedBagsWeight + 2500;
   const expectedCapacity =
-    frameBag.volumeLiters + seatBag.volumeLiters + barBag.volumeLiters;
+    (frameBag.volumeLiters ?? 0) +
+    (seatBag.volumeLiters ?? 0) +
+    (barBag.volumeLiters ?? 0);
 
   assert.equal(metrics.totalBagsDryWeightGrams, expectedBagsWeight);
   assert.equal(metrics.totalRigWeightGrams, expectedTotalWeight);
@@ -60,7 +64,7 @@ test("calculateRigMetrics updates weight, capacity, and axle balance with mounte
 });
 
 test("evaluateClearances flags frame bag collision with water bottles", () => {
-  const cutthroat = BIKES[0];
+  const cutthroat = BIKES.find((b) => b.id === "salsa-cutthroat-2024")!;
   const sizeConfig = cutthroat.sizes["56cm"];
 
   const fullFrameBag = BAGS.find((b) => b.id === "salsa-exp-full-frame-pack")!;
@@ -73,8 +77,13 @@ test("evaluateClearances flags frame bag collision with water bottles", () => {
     waterBottlesMounted: true,
   });
 
-  const bottleWarning = warningsWithBottles.find((w) => w.type === "frame_bottle");
-  assert.ok(bottleWarning, "Expected bottle cage collision warning with full frame bag");
+  const bottleWarning = warningsWithBottles.find(
+    (w) => w.type === "frame_bottle",
+  );
+  assert.ok(
+    bottleWarning,
+    "Expected bottle cage collision warning with full frame bag",
+  );
   assert.equal(bottleWarning.severity, "error");
 
   // When bottles are unmounted, collision should disappear
@@ -86,12 +95,18 @@ test("evaluateClearances flags frame bag collision with water bottles", () => {
     waterBottlesMounted: false,
   });
 
-  const noBottleWarning = warningsWithoutBottles.find((w) => w.type === "frame_bottle");
-  assert.equal(noBottleWarning, undefined, "Bottle warning should be cleared when bottles are removed");
+  const noBottleWarning = warningsWithoutBottles.find(
+    (w) => w.type === "frame_bottle",
+  );
+  assert.equal(
+    noBottleWarning,
+    undefined,
+    "Bottle warning should be cleared when bottles are removed",
+  );
 });
 
-test("evaluateClearances flags seat pack tire buzz under dropper compression", () => {
-  const cutthroat = BIKES[0];
+test("evaluateClearances does not certify unverified legacy seat pack dimensions", () => {
+  const cutthroat = BIKES.find((b) => b.id === "salsa-cutthroat-2024")!;
   const sizeConfig = cutthroat.sizes["56cm"];
 
   const largeSeatPack = BAGS.find((b) => b.id === "ortlieb-seat-pack-16-5l")!;
@@ -104,16 +119,19 @@ test("evaluateClearances flags seat pack tire buzz under dropper compression", (
     waterBottlesMounted: false,
   });
 
-  const seatWarning = warningsCompressed.find((w) => w.type === "seat_tire");
-  assert.ok(seatWarning, "Expected seat tire clearance warning under dropper compression");
-  assert.ok(seatWarning.measuredMm !== undefined);
-  assert.ok(seatWarning.recommendedMinMm === 100);
+  const uncertainty = warningsCompressed.find(
+    (w) => w.type === "fit_unverified",
+  );
+  assert.ok(uncertainty);
+  assert.equal(uncertainty.measuredMm, undefined);
 });
 
 test("export manifests serialize and contain complete component breakdown", () => {
-  const bike = BIKES[1]; // Trek Checkpoint
+  const bike = BIKES.find((b) => b.brand === "Trek")!; // Trek Checkpoint
   const sizeConfig = bike.sizes["56cm"];
-  const seatBag = BAGS.find((b) => b.id === "apidura-expedition-saddle-pack-9l")!;
+  const seatBag = BAGS.find(
+    (b) => b.id === "apidura-expedition-saddle-pack-9l",
+  )!;
 
   const mountedBags = { seatpost: seatBag };
   const metrics = calculateRigMetrics(bike, sizeConfig, mountedBags, 1200);
@@ -144,7 +162,7 @@ test("export manifests serialize and contain complete component breakdown", () =
 });
 
 test("URL query serialization and deserialization round-trip correctly", () => {
-  const bike = BIKES[0];
+  const bike = BIKES.find((b) => b.id === "salsa-cutthroat-2024")!;
   const frameBag = BAGS.find((b) => b.id === "ortlieb-frame-pack-rc-4l")!;
   const seatBag = BAGS.find((b) => b.id === "revelate-terrapin-14l")!;
 

@@ -23,7 +23,9 @@ export function ExportModal() {
   const metrics = useRigStore((s) => s.metrics);
   const getShareableUrl = useRigStore((s) => s.getShareableUrl);
 
-  const [activeTab, setActiveTab] = useState<"summary" | "markdown" | "csv">("summary");
+  const [activeTab, setActiveTab] = useState<"summary" | "markdown" | "csv">(
+    "summary",
+  );
   const [copiedMd, setCopiedMd] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
 
@@ -36,13 +38,29 @@ export function ExportModal() {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") setOpen(false);
       if (event.key !== "Tab" || !dialog) return;
-      const elements = Array.from(dialog.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [tabindex="0"]'));
-      const first = elements[0], last = elements[elements.length - 1];
-      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) { event.preventDefault(); last?.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      const elements = Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'button, a[href], input, select, textarea, [tabindex="0"]',
+        ),
+      );
+      const first = elements[0],
+        last = elements[elements.length - 1];
+      if (
+        event.shiftKey &&
+        (document.activeElement === first || document.activeElement === dialog)
+      ) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
     }
     document.addEventListener("keydown", onKeyDown);
-    return () => { document.removeEventListener("keydown", onKeyDown); previousFocus?.focus(); };
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      previousFocus?.focus();
+    };
   }, [isOpen, setOpen]);
 
   if (!isOpen) return null;
@@ -65,7 +83,7 @@ export function ExportModal() {
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
-      `bikepack3d-${currentBike.id}-${selectedSizeKey}-manifest.csv`
+      `bikepack3d-${currentBike.id}-${selectedSizeKey}-manifest.csv`,
     );
     document.body.appendChild(link);
     link.click();
@@ -91,13 +109,26 @@ export function ExportModal() {
 
   return (
     <div className="export-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="export-title" tabIndex={-1} className="export-dialog bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl text-slate-100 overflow-hidden">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="export-title"
+        tabIndex={-1}
+        className="export-dialog bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl text-slate-100 overflow-hidden"
+      >
         {/* Modal Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950/70">
           <div>
-            <h2 id="export-title" className="text-base font-bold text-white">Export Gear Manifest & Share</h2>
+            <h2 id="export-title" className="text-base font-bold text-white">
+              Export Gear Manifest & Share
+            </h2>
             <p className="text-xs text-slate-400">
-              {currentBike.brand} {currentBike.name} ({selectedSizeKey}) • {(metrics.totalRigWeightGrams / 1000).toFixed(2)} kg total
+              {currentBike.brand} {currentBike.name} ({selectedSizeKey}) •{" "}
+              {(metrics.totalRigWeightGrams / 1000).toFixed(2)} kg{" "}
+              {metrics.unknownWeightItemIds?.length
+                ? "known subtotal"
+                : "estimated total"}
             </p>
           </div>
           <button
@@ -109,6 +140,12 @@ export function ExportModal() {
           </button>
         </div>
 
+        {(metrics.unknownWeightItemIds?.length ?? 0) > 0 && (
+          <p className="px-4 py-2 text-xs text-amber-200">
+            Unknown equipment weights are excluded. Total and axle loads are
+            incomplete.
+          </p>
+        )}
         {/* Tab Strip */}
         <div className="export-tabs flex border-b border-slate-800 bg-slate-950/40 px-4">
           <button
@@ -165,7 +202,11 @@ export function ExportModal() {
                   onClick={handleCopyUrl}
                   className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center space-x-1 shrink-0"
                 >
-                  {copiedUrl ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedUrl ? (
+                    <Check className="w-3.5 h-3.5" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
                   <span>{copiedUrl ? "Copied" : "Copy Link"}</span>
                 </button>
               </div>
@@ -183,25 +224,47 @@ export function ExportModal() {
                   </thead>
                   <tbody className="divide-y divide-slate-800 text-slate-300">
                     <tr>
-                      <td className="p-2.5 font-bold text-white">Frame ({selectedSizeKey})</td>
-                      <td className="p-2.5">{currentBike.brand} {currentBike.name}</td>
+                      <td className="p-2.5 font-bold text-white">
+                        Frame ({selectedSizeKey})
+                      </td>
+                      <td className="p-2.5">
+                        {currentBike.brand} {currentBike.name}
+                      </td>
                       <td className="p-2.5">-</td>
-                      <td className="p-2.5 text-right font-mono">{(currentBike.baseWeightGrams / 1000).toFixed(2)} kg</td>
+                      <td className="p-2.5 text-right font-mono">
+                        {(currentBike.baseWeightGrams / 1000).toFixed(2)} kg
+                      </td>
                     </tr>
                     {Object.entries(mountedBags).map(([socketId, bag]) => (
                       <tr key={socketId}>
-                        <td className="p-2.5 capitalize text-sky-300">{socketId}</td>
-                        <td className="p-2.5">{bag.brand} {bag.name}</td>
-                        <td className="p-2.5">{bag.volumeLiters} L</td>
-                        <td className="p-2.5 text-right font-mono">{bag.dryWeightGrams} g</td>
+                        <td className="p-2.5 capitalize text-sky-300">
+                          {socketId}
+                        </td>
+                        <td className="p-2.5">
+                          {bag.brand} {bag.name}
+                        </td>
+                        <td className="p-2.5">
+                          {bag.volumeLiters === null
+                            ? "Unknown"
+                            : `${bag.volumeLiters} L`}
+                        </td>
+                        <td className="p-2.5 text-right font-mono">
+                          {bag.dryWeightGrams === null
+                            ? "Unknown"
+                            : `${bag.dryWeightGrams} g`}
+                        </td>
                       </tr>
                     ))}
                     {metrics.payloadEstimateGrams > 0 && (
                       <tr>
-                        <td className="p-2.5 font-semibold text-amber-300">Payload</td>
+                        <td className="p-2.5 font-semibold text-amber-300">
+                          Payload
+                        </td>
                         <td className="p-2.5">Estimated Sleep, Water & Food</td>
                         <td className="p-2.5">-</td>
-                        <td className="p-2.5 text-right font-mono">{(metrics.payloadEstimateGrams / 1000).toFixed(2)} kg</td>
+                        <td className="p-2.5 text-right font-mono">
+                          {(metrics.payloadEstimateGrams / 1000).toFixed(2)} kg
+                        </td>
                       </tr>
                     )}
                   </tbody>
@@ -210,7 +273,9 @@ export function ExportModal() {
                       <td className="p-2.5" colSpan={2}>
                         Total Capacity & Rig Weight
                       </td>
-                      <td className="p-2.5 text-emerald-400">{metrics.totalCapacityLiters} L</td>
+                      <td className="p-2.5 text-emerald-400">
+                        {metrics.totalCapacityLiters} L
+                      </td>
                       <td className="p-2.5 text-right text-emerald-400 font-mono">
                         {(metrics.totalRigWeightGrams / 1000).toFixed(2)} kg
                       </td>
@@ -226,13 +291,18 @@ export function ExportModal() {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-xs text-slate-400">
-                  Ready to paste into GitHub issues, forums, Reddit or packing lists:
+                  Ready to paste into GitHub issues, forums, Reddit or packing
+                  lists:
                 </span>
                 <button
                   onClick={handleCopyMarkdown}
                   className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center space-x-1"
                 >
-                  {copiedMd ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedMd ? (
+                    <Check className="w-3.5 h-3.5" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
                   <span>{copiedMd ? "Copied Markdown" : "Copy Markdown"}</span>
                 </button>
               </div>
@@ -267,7 +337,10 @@ export function ExportModal() {
         {/* Modal Footer */}
         <div className="p-4 border-t border-slate-800 bg-slate-950/70 flex justify-between items-center">
           <button
-            onClick={() => { setActiveTab("summary"); requestAnimationFrame(() => window.print()); }}
+            onClick={() => {
+              setActiveTab("summary");
+              requestAnimationFrame(() => window.print());
+            }}
             className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:text-white text-xs font-medium"
           >
             <Printer className="w-3.5 h-3.5" />

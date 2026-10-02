@@ -8,26 +8,22 @@ import { BikeMesh } from "./BikeMesh";
 import { BagMesh } from "./BagMesh";
 import { SocketMarkers } from "./SocketMarkers";
 import { GroundPlane } from "./GroundPlane";
-import { SocketAnchor } from "@/types";
+import { getSocketAnchors } from "@/lib/sockets";
 
 export function ConfiguratorCanvas() {
   const currentSizeConfig = useRigStore((s) => s.currentSizeConfig);
   const mountedBags = useRigStore((s) => s.mountedBags);
 
-  // Map socket IDs to anchors for easy lookup
-  const socketMap = useMemo(() => {
-    const map = new Map<string, SocketAnchor>();
-    const s = currentSizeConfig.sockets;
-    if (s.frameTriangle) map.set(s.frameTriangle.id, s.frameTriangle);
-    if (s.seatpost) map.set(s.seatpost.id, s.seatpost);
-    if (s.handlebar) map.set(s.handlebar.id, s.handlebar);
-    if (s.topTubeFront) map.set(s.topTubeFront.id, s.topTubeFront);
-    if (s.topTubeRear) map.set(s.topTubeRear.id, s.topTubeRear);
-    if (s.downtubeUnderside) map.set(s.downtubeUnderside.id, s.downtubeUnderside);
-    if (s.forkLeft) s.forkLeft.forEach((sa) => map.set(sa.id, sa));
-    if (s.forkRight) s.forkRight.forEach((sa) => map.set(sa.id, sa));
-    return map;
-  }, [currentSizeConfig]);
+  const socketMap = useMemo(
+    () =>
+      new Map(
+        getSocketAnchors(currentSizeConfig).map((anchor) => [
+          anchor.id,
+          anchor,
+        ]),
+      ),
+    [currentSizeConfig],
+  );
 
   return (
     <div className="w-full h-full relative bg-[#e8ede9] select-none">
@@ -54,9 +50,17 @@ export function ConfiguratorCanvas() {
           shadow-bias={-0.0001}
         />
         {/* Rim Back Highlight Light (defines tubing and alloy rims) */}
-        <directionalLight position={[-4, 4, -4]} intensity={1.1} color="#93c5fd" />
+        <directionalLight
+          position={[-4, 4, -4]}
+          intensity={1.1}
+          color="#93c5fd"
+        />
         {/* Front Soft Fill Light */}
-        <directionalLight position={[-2, 1, 3]} intensity={0.5} color="#e2e8f0" />
+        <directionalLight
+          position={[-2, 1, 3]}
+          intensity={0.5}
+          color="#e2e8f0"
+        />
 
         <Suspense fallback={null}>
           <group position={[0, 0, 0]}>
@@ -84,8 +88,6 @@ export function ConfiguratorCanvas() {
             <GroundPlane />
           </group>
         </Suspense>
-
-
       </Canvas>
     </div>
   );

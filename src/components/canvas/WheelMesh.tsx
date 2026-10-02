@@ -1,227 +1,131 @@
 "use client";
-
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import * as THREE from "three";
-
-interface WheelMeshProps {
+import { Rod } from "./BicycleParts";
+export function WheelMesh({
+  position,
+  isRear = false,
+  radius = 0.354,
+  tireWidth = 0.045,
+  mtb = false,
+}: {
   position: [number, number, number];
   isRear?: boolean;
-}
-
-export function WheelMesh({ position, isRear = false }: WheelMeshProps) {
-  // Materials
-  const tireTreadMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: "#18181b", // Deep black tread
-        roughness: 0.9,
-        metalness: 0.05,
-      }),
-    []
-  );
-
-  const tanGumwallMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: "#b48a58", // Classic gravel tanwall / gumwall
-        roughness: 0.75,
-        metalness: 0.1,
-      }),
-    []
-  );
-
-  const rimMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: "#1e293b", // Deep matte slate anodized alloy
-        roughness: 0.35,
-        metalness: 0.85,
-      }),
-    []
-  );
-
-  const steelSilverMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: "#cbd5e1",
-        roughness: 0.2,
-        metalness: 0.95,
-      }),
-    []
-  );
-
-  const spokeMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: "#94a3b8",
-        roughness: 0.25,
-        metalness: 0.9,
-      }),
-    []
-  );
-
-  // Generate 32 cross-laced spokes (16 drive side, 16 non-drive side)
+  radius?: number;
+  tireWidth?: number;
+  mtb?: boolean;
+}) {
   const spokes = useMemo(() => {
-    const list: {
-      position: [number, number, number];
-      rotation: [number, number, number];
-      length: number;
-      nipplePos: [number, number, number];
-      nippleRot: [number, number, number];
-    }[] = [];
-    const spokeCount = 32;
-    const rimRadius = 0.295;
-    const hubRadius = 0.028;
-    const hubWidth = 0.028;
-
-    for (let i = 0; i < spokeCount; i++) {
-      const angle = (i * 2 * Math.PI) / spokeCount;
-      const isDriveSide = i % 2 === 0;
-      const hubZ = isDriveSide ? hubWidth : -hubWidth;
-
-      // Crossing offset angle
-      const crossOffset = (i % 4 < 2 ? 1 : -1) * 0.28;
-      const rimAngle = angle + crossOffset;
-
-      const pHub = new THREE.Vector3(
-        hubRadius * Math.cos(angle),
-        hubRadius * Math.sin(angle),
-        hubZ
+    const p: number[] = [];
+    for (let i = 0; i < 28; i++) {
+      const a = (i / 28) * Math.PI * 2,
+        b = a + (i % 4 < 2 ? 0.42 : -0.42);
+      p.push(
+        Math.cos(a) * 0.024,
+        Math.sin(a) * 0.024,
+        i % 2 ? 0.028 : -0.028,
+        Math.cos(b) * 0.295,
+        Math.sin(b) * 0.295,
+        0,
       );
-      const pRim = new THREE.Vector3(
-        rimRadius * Math.cos(rimAngle),
-        rimRadius * Math.sin(rimAngle),
-        isDriveSide ? 0.005 : -0.005
-      );
-
-      const dir = new THREE.Vector3().subVectors(pRim, pHub);
-      const len = dir.length();
-      const mid = new THREE.Vector3().addVectors(pHub, pRim).multiplyScalar(0.5);
-
-      const quaternion = new THREE.Quaternion().setFromUnitVectors(
-        new THREE.Vector3(0, 1, 0),
-        dir.clone().normalize()
-      );
-      const rot = new THREE.Euler().setFromQuaternion(quaternion);
-
-      list.push({
-        position: [mid.x, mid.y, mid.z],
-        rotation: [rot.x, rot.y, rot.z],
-        length: len,
-        nipplePos: [pRim.x, pRim.y, pRim.z],
-        nippleRot: [0, 0, rimAngle + Math.PI / 2],
-      });
     }
-    return list;
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(p, 3));
+    return geo;
   }, []);
-
+  const tread = useMemo(() => {
+    const p: number[] = [];
+    for (let i = 0; i < 100; i++) {
+      const a = (i / 100) * Math.PI * 2;
+      for (const z of [-1, 1]) {
+        const r = radius - 0.003;
+        p.push(
+          Math.cos(a) * r,
+          Math.sin(a) * r,
+          z * tireWidth * 0.22,
+          Math.cos(a + 0.014) * r,
+          Math.sin(a + 0.014) * r,
+          z * tireWidth * 0.42,
+        );
+      }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(p, 3));
+    return geo;
+  }, [radius, tireWidth]);
   return (
     <group position={position} name={isRear ? "rearWheel" : "frontWheel"}>
-      {/* --- 1. TIRE --- */}
-      {/* Black Outer Tread */}
-      <mesh material={tireTreadMaterial} castShadow>
-        <torusGeometry args={[0.330, 0.024, 24, 64]} />
+      <mesh castShadow scale={[1, 1, 0.78]}>
+        <torusGeometry args={[radius - tireWidth / 2, tireWidth / 2, 12, 80]} />
+        <meshStandardMaterial color="#232827" roughness={0.95} />
       </mesh>
-      {/* Tan Gumwall Sidewalls (Drive and Non-Drive Sides) */}
-      <mesh position={[0, 0, 0.010]} material={tanGumwallMaterial}>
-        <torusGeometry args={[0.316, 0.016, 20, 64]} />
-      </mesh>
-      <mesh position={[0, 0, -0.010]} material={tanGumwallMaterial}>
-        <torusGeometry args={[0.316, 0.016, 20, 64]} />
-      </mesh>
-
-      {/* --- 2. DEEP-V ALLOY RIM --- */}
-      <mesh material={rimMaterial}>
-        <torusGeometry args={[0.298, 0.014, 20, 64]} />
-      </mesh>
-      <mesh material={rimMaterial}>
-        <torusGeometry args={[0.288, 0.009, 16, 64]} />
-      </mesh>
-
-      {/* Presta Valve Stem */}
-      <mesh position={[0, 0.280, 0]} material={steelSilverMaterial}>
-        <cylinderGeometry args={[0.003, 0.003, 0.035, 10]} />
-      </mesh>
-
-      {/* --- 3. SPOKES & BRASS NIPPLES --- */}
-      {spokes.map((s, idx) => (
-        <group key={idx}>
-          <mesh position={s.position} rotation={s.rotation} material={steelSilverMaterial}>
-            <cylinderGeometry args={[0.0018, 0.0018, s.length, 6]} />
-          </mesh>
-          <mesh position={s.nipplePos} rotation={s.nippleRot} material={steelSilverMaterial}>
-            <cylinderGeometry args={[0.003, 0.003, 0.010, 8]} />
-          </mesh>
-        </group>
+      <lineSegments geometry={tread}>
+        <lineBasicMaterial color="#434843" />
+      </lineSegments>
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[0, 0, s * tireWidth * 0.24]}>
+          <torusGeometry
+            args={[0.311 + tireWidth * 0.19, tireWidth * 0.18, 8, 80]}
+          />
+          <meshStandardMaterial
+            color={mtb ? "#333630" : "#8e7960"}
+            roughness={0.92}
+          />
+        </mesh>
       ))}
-
-      {/* --- 4. HUB & FLANGES --- */}
-      {/* Center Hub Shell */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} material={rimMaterial}>
-        <cylinderGeometry args={[0.018, 0.018, 0.09, 20]} />
+      <mesh>
+        <torusGeometry args={[0.3, 0.011, 8, 80]} />
+        <meshStandardMaterial color="#20282a" roughness={0.4} metalness={0.6} />
       </mesh>
-      {/* Drive Side Flange (+Z) */}
-      <mesh position={[0, 0, 0.032]} rotation={[Math.PI / 2, 0, 0]} material={rimMaterial}>
-        <cylinderGeometry args={[0.032, 0.032, 0.006, 24]} />
-      </mesh>
-      {/* Non-Drive Side Flange (-Z) */}
-      <mesh position={[0, 0, -0.032]} rotation={[Math.PI / 2, 0, 0]} material={rimMaterial}>
-        <cylinderGeometry args={[0.032, 0.032, 0.006, 24]} />
-      </mesh>
-      {/* Thru-Axle End Caps */}
-      <mesh position={[0, 0, 0.056]} rotation={[Math.PI / 2, 0, 0]} material={steelSilverMaterial}>
-        <cylinderGeometry args={[0.012, 0.012, 0.016, 16]} />
-      </mesh>
-      <mesh position={[0, 0, -0.056]} rotation={[Math.PI / 2, 0, 0]} material={steelSilverMaterial}>
-        <cylinderGeometry args={[0.012, 0.012, 0.016, 16]} />
-      </mesh>
-      {/* Quick Release Skewer Lever (Non-Drive Side) */}
-      <group position={[0, 0, -0.066]} rotation={[0, 0, 0.4]}>
-        <mesh position={[0, 0.035, 0]} material={steelSilverMaterial}>
-          <boxGeometry args={[0.010, 0.07, 0.004]} />
+      <lineSegments geometry={spokes}>
+        <lineBasicMaterial color="#748082" />
+      </lineSegments>
+      <Rod a={[0, 0, -0.052]} b={[0, 0, 0.052]} r={0.019} />
+      <Rod a={[0, 0.277, 0]} b={[0, 0.297, 0]} r={0.0025} color="#9ca4a6" />
+      <group position={[0, 0, -0.045]}>
+        <mesh>
+          <ringGeometry args={[0.071, 0.08, 48]} />
+          <meshStandardMaterial
+            color="#a6aead"
+            side={THREE.DoubleSide}
+            metalness={0.85}
+            roughness={0.36}
+          />
+        </mesh>
+        {[0, 1, 2, 3, 4, 5].map((i) => {
+          const a = (i * Math.PI) / 3;
+          return (
+            <Rod
+              key={i}
+              a={[Math.cos(a) * 0.022, Math.sin(a) * 0.022, 0]}
+              b={[Math.cos(a + 0.2) * 0.074, Math.sin(a + 0.2) * 0.074, 0]}
+              r={0.003}
+              color="#8b9294"
+            />
+          );
+        })}
+        <mesh position={[-0.055, 0.05, 0]} rotation={[0, 0, 0.7]}>
+          <boxGeometry args={[0.044, 0.027, 0.023]} />
+          <meshStandardMaterial color="#252c2e" />
         </mesh>
       </group>
-
-      {/* --- 5. DISC BRAKE ROTOR & CALIPER (Non-Drive Side: -Z) --- */}
-      <group position={[0, 0, -0.038]}>
-        {/* Main Outer Braking Track (in XY plane, rotation [0,0,0]) */}
-        <mesh material={steelSilverMaterial}>
-          <torusGeometry args={[0.075, 0.008, 12, 36]} />
-        </mesh>
-        {/* Inner Carrier Spider Disc */}
-        <mesh rotation={[Math.PI / 2, 0, 0]} material={rimMaterial}>
-          <cylinderGeometry args={[0.048, 0.048, 0.003, 16]} />
-        </mesh>
-        {/* 6-Bolt Mount Ring */}
-        <mesh rotation={[Math.PI / 2, 0, 0]} material={steelSilverMaterial}>
-          <cylinderGeometry args={[0.024, 0.024, 0.005, 12]} />
-        </mesh>
-        {/* Disc Brake Caliper */}
-        <mesh position={[-0.055, 0.055, 0]} rotation={[0, 0, 0.78]} material={rimMaterial}>
-          <boxGeometry args={[0.045, 0.032, 0.026]} />
-        </mesh>
-      </group>
-
-      {/* --- 6. CASSETTE (Drive Side: +Z, Rear Wheel Only) --- */}
-      {isRear && (
-        <group position={[0, 0, 0.036]}>
-          {/* Stepped 7-speed Cog Cluster extending outward along +Z */}
-          {[0.082, 0.074, 0.066, 0.058, 0.050, 0.042, 0.034].map((radius, idx) => (
-            <mesh
-              key={idx}
-              position={[0, 0, idx * 0.0045]}
-              rotation={[Math.PI / 2, 0, 0]}
-              material={steelSilverMaterial}
-            >
-              <cylinderGeometry args={[radius, radius, 0.002, 24]} />
-            </mesh>
-          ))}
-          {/* Lockring */}
-          <mesh position={[0, 0, 0.034]} rotation={[Math.PI / 2, 0, 0]} material={rimMaterial}>
-            <cylinderGeometry args={[0.02, 0.02, 0.004, 16]} />
+      {isRear &&
+        Array.from({ length: 12 }, (_, i) => (
+          <mesh
+            key={i}
+            position={[0, 0, 0.031 + i * 0.003]}
+            rotation={[Math.PI / 2, 0, 0]}
+          >
+            <cylinderGeometry
+              args={[0.095 - i * 0.0065, 0.095 - i * 0.0065, 0.0018, 32]}
+            />
+            <meshStandardMaterial
+              color={i < 4 ? "#434b4d" : "#899293"}
+              metalness={0.7}
+              roughness={0.38}
+            />
           </mesh>
-        </group>
-      )}
+        ))}
     </group>
   );
 }

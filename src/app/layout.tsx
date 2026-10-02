@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "3D Bikepacking Rig Configurator | Exact-Fit Gear & Clearance Checker",
-  description: "Interactive 3D configurator for bikepacking setups with exact-fit gear catalog, real-time weight distribution balance, and tire clearance validation.",
+  title: "Bikepack3D | Bicycle & Gear Planner",
+  description:
+    "Explore bicycle geometry, equipment and estimated weight distribution in an illustrative 3D bikepacking planner. Verify loaded fit on your actual bicycle.",
 };
 
 export default function RootLayout({

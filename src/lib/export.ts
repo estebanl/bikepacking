@@ -1,5 +1,25 @@
 import type { BikeModel, BagItem, RigMetrics } from "../types/index.ts";
 
+export const MAX_PAYLOAD_GRAMS = 50_000;
+export function clampPayloadGrams(value: number): number {
+  return Number.isFinite(value)
+    ? Math.min(MAX_PAYLOAD_GRAMS, Math.max(0, Math.round(value)))
+    : 0;
+}
+const known = (value: number | null, suffix = "") =>
+  value === null ? "Unknown" : `${value}${suffix}`;
+const safeSocket = (key: string) =>
+  /^[a-zA-Z][a-zA-Z0-9_-]{0,79}$/.test(key) &&
+  !["__proto__", "prototype", "constructor"].includes(key);
+function unknownNote(mounted: Record<string, BagItem>): string {
+  const missing = Object.entries(mounted).filter(
+    ([, b]) => b.dryWeightGrams === null || b.volumeLiters === null,
+  );
+  return missing.length
+    ? `Known subtotals only. Unknown weight or capacity: ${missing.map(([socket, b]) => `${b.name} (${socket})`).join(", ")}. Unknown mass is omitted from axle estimates.`
+    : "";
+}
+
 export interface RigManifestData {
   bike: BikeModel;
   sizeKey: string;
@@ -15,16 +35,25 @@ export function generateCsvManifest({
   metrics,
 }: RigManifestData): string {
   const rows: string[][] = [
-    ["Type", "Category", "Brand", "Model", "Volume (L)", "Dry Weight (g)", "Waterproof Rating", "Direct Store Link"],
     [
-      "Bicycle Frame",
+      "Type",
+      "Category",
+      "Brand",
+      "Model",
+      "Volume (L)",
+      "Dry Weight (g)",
+      "Waterproof Rating",
+      "Direct Store Link",
+    ],
+    [
+      "Complete Bicycle",
       bike.category.toUpperCase(),
       bike.brand,
       `${bike.name} (${sizeKey})`,
       "-",
       bike.baseWeightGrams.toString(),
       "-",
-      "https://bikepacking.com",
+      bike.sourceUrl ?? "",
     ],
   ];
 
@@ -34,8 +63,8 @@ export function generateCsvManifest({
       bag.category,
       bag.brand,
       bag.name,
-      bag.volumeLiters.toString(),
-      bag.dryWeightGrams.toString(),
+      known(bag.volumeLiters),
+      known(bag.dryWeightGrams),
       bag.waterproofRating || "N/A",
       bag.productUrl,
     ]);
@@ -54,12 +83,30 @@ export function generateCsvManifest({
     ]);
   }
 
+  const uncertainty = unknownNote(mountedBags);
+  if (uncertainty) rows.push(["SPECIFICATION NOTICE", uncertainty]);
+
   // Summary Row
   rows.push([]);
-  rows.push(["TOTAL RIG SUMMARY", "", "", "", metrics.totalCapacityLiters.toString(), metrics.totalRigWeightGrams.toString()]);
-  rows.push(["FRONT / REAR AXLE RATIO", "", "", "", `${metrics.frontRatioPercent}% / ${metrics.rearRatioPercent}% (${metrics.balanceStatus})`]);
+  rows.push([
+    "TOTAL RIG SUMMARY",
+    "",
+    "",
+    "",
+    metrics.totalCapacityLiters.toString(),
+    metrics.totalRigWeightGrams.toString(),
+  ]);
+  rows.push([
+    "FRONT / REAR AXLE RATIO",
+    "",
+    "",
+    "",
+    `${metrics.frontRatioPercent}% / ${metrics.rearRatioPercent}% (${metrics.balanceStatus})`,
+  ]);
 
-  return rows.map((r) => r.map((c) => `"${(c || "").replace(/"/g, '""')}"`).join(",")).join("\n");
+  return rows
+    .map((r) => r.map((c) => `"${(c || "").replace(/"/g, '""')}"`).join(","))
+    .join("\n");
 }
 
 export function generateMarkdownManifest({
@@ -73,13 +120,15 @@ export function generateMarkdownManifest({
   md += `**Total Bag Capacity:** ${metrics.totalCapacityLiters} Liters\n`;
   md += `**Axle Weight Balance:** ${metrics.frontRatioPercent}% Front / ${metrics.rearRatioPercent}% Rear (${metrics.balanceStatus.replace("_", " ")})\n\n`;
 
+  const uncertainty = unknownNote(mountedBags);
+  if (uncertainty) md += `**Specification notice:** ${uncertainty}\n\n`;
   md += `### 📦 Itemized Gear Breakdown\n\n`;
   md += `| Position | Brand | Product | Volume | Dry Weight | Price | Store Link |\n`;
   md += `| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n`;
-  md += `| **Bike Frame** | ${bike.brand} | ${bike.name} (${sizeKey}) | - | ${(bike.baseWeightGrams / 1000).toFixed(2)} kg | - | [Bike Info](https://bikepacking.com) |\n`;
+  md += `| **Complete Bicycle** | ${bike.brand} | ${bike.name} (${sizeKey}) | - | ${(bike.baseWeightGrams / 1000).toFixed(2)} kg | - | ${bike.sourceUrl ? `[Bike Info](${bike.sourceUrl})` : "—"} |\n`;
 
   Object.entries(mountedBags).forEach(([socketId, bag]) => {
-    md += `| ${socketId} | ${bag.brand} | ${bag.name} | ${bag.volumeLiters} L | ${bag.dryWeightGrams} g | \$${bag.priceUsd} | [View Product](${bag.productUrl}) |\n`;
+    md += `| ${socketId} | ${bag.brand} | ${bag.name} | ${known(bag.volumeLiters, " L")} | ${known(bag.dryWeightGrams, " g")} | ${bag.price ? `${bag.price.currency} ${bag.price.amount}` : known(bag.priceUsd, " USD")} | [View Product](${bag.productUrl}) |\n`;
   });
 
   if (metrics.payloadEstimateGrams > 0) {
@@ -99,6 +148,7 @@ export function serializeRigToUrlQuery(params: {
   bottles: boolean;
 }): string {
   const bagsParam = Object.entries(params.mountedBags)
+    .filter(([socket]) => safeSocket(socket))
     .map(([socket, bag]) => `${socket}:${bag.id}`)
     .join(",");
 
@@ -106,7 +156,8 @@ export function serializeRigToUrlQuery(params: {
   searchParams.set("b", params.bikeId);
   searchParams.set("s", params.sizeKey);
   if (bagsParam) searchParams.set("bags", bagsParam);
-  if (params.payloadGrams > 0) searchParams.set("p", params.payloadGrams.toString());
+  if (clampPayloadGrams(params.payloadGrams) > 0)
+    searchParams.set("p", clampPayloadGrams(params.payloadGrams).toString());
   if (params.dropper) searchParams.set("drop", "1");
   if (!params.bottles) searchParams.set("bot", "0");
 
@@ -115,7 +166,7 @@ export function serializeRigToUrlQuery(params: {
 
 export function deserializeRigFromUrlQuery(
   queryString: string,
-  allBags: BagItem[]
+  allBags: BagItem[],
 ): {
   bikeId?: string;
   sizeKey?: string;
@@ -124,20 +175,24 @@ export function deserializeRigFromUrlQuery(
   dropper?: boolean;
   bottles?: boolean;
 } {
-  const params = new URLSearchParams(queryString.startsWith("?") ? queryString.slice(1) : queryString);
+  const params = new URLSearchParams(
+    queryString.startsWith("?") ? queryString.slice(1) : queryString,
+  );
   const bikeId = params.get("b") || undefined;
   const sizeKey = params.get("s") || undefined;
-  const payloadGrams = params.has("p") ? parseInt(params.get("p")!, 10) : undefined;
+  const payloadGrams = params.has("p")
+    ? clampPayloadGrams(Number(params.get("p")))
+    : undefined;
   const dropper = params.get("drop") === "1";
   const bottles = params.get("bot") !== "0";
 
   const mountedBags: Record<string, BagItem> = {};
   const bagsParam = params.get("bags");
   if (bagsParam) {
-    const pairs = bagsParam.split(",");
+    const pairs = bagsParam.split(",").slice(0, 100);
     pairs.forEach((pair) => {
       const [socket, bagId] = pair.split(":");
-      if (socket && bagId) {
+      if (socket && safeSocket(socket) && bagId) {
         const bag = allBags.find((b) => b.id === bagId);
         if (bag) {
           mountedBags[socket] = bag;

@@ -8,7 +8,10 @@ interface DrivetrainMeshProps {
   rearAxlePosition: THREE.Vector3;
 }
 
-export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshProps) {
+export function DrivetrainMesh({
+  bbPosition,
+  rearAxlePosition,
+}: DrivetrainMeshProps) {
   // Materials
   const blackAlloy = useMemo(
     () =>
@@ -17,7 +20,7 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
         roughness: 0.35,
         metalness: 0.8,
       }),
-    []
+    [],
   );
 
   const silverMetal = useMemo(
@@ -27,7 +30,7 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
         roughness: 0.25,
         metalness: 0.95,
       }),
-    []
+    [],
   );
 
   const chainMaterial = useMemo(
@@ -37,11 +40,11 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
         roughness: 0.3,
         metalness: 0.9,
       }),
-    []
+    [],
   );
 
-  const chainringRadius = 0.096;
-  const innerRingRadius = 0.068;
+  const chainringRadius = 0.077;
+
   const cassetteRadius = 0.072;
   const chainZ = 0.044; // Drive side is on +Z facing camera!
 
@@ -49,7 +52,7 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
   const derailleurPos = new THREE.Vector3(
     rearAxlePosition.x + 0.04,
     rearAxlePosition.y - 0.075,
-    0.048
+    0.048,
   );
 
   // 5-Arm Crank Spider Arms
@@ -59,8 +62,8 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
       return {
         angle,
         pos: [
-          (chainringRadius * 0.52) * Math.cos(angle),
-          (chainringRadius * 0.52) * Math.sin(angle),
+          chainringRadius * 0.52 * Math.cos(angle),
+          chainringRadius * 0.52 * Math.sin(angle),
           0.044,
         ] as [number, number, number],
       };
@@ -82,7 +85,11 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
 
         {/* --- DRIVE SIDE (+Z Facing Viewer) --- */}
         {/* Center Spider Hub */}
-        <mesh position={[0, 0, 0.044]} rotation={[Math.PI / 2, 0, 0]} material={blackAlloy}>
+        <mesh
+          position={[0, 0, 0.044]}
+          rotation={[Math.PI / 2, 0, 0]}
+          material={blackAlloy}
+        >
           <cylinderGeometry args={[0.038, 0.038, 0.008, 20]} />
         </mesh>
 
@@ -105,11 +112,6 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
         {/* Outer Teeth Ring (laser cut silver) */}
         <mesh position={[0, 0, 0.045]} material={silverMetal}>
           <torusGeometry args={[chainringRadius + 0.005, 0.0025, 8, 48]} />
-        </mesh>
-
-        {/* Inner Chainring (34T) */}
-        <mesh position={[0, 0, 0.039]} material={silverMetal}>
-          <torusGeometry args={[innerRingRadius, 0.005, 10, 40]} />
         </mesh>
 
         {/* Right Crank Arm (Drive Side: +Z) */}
@@ -153,23 +155,43 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
           <boxGeometry args={[0.025, 0.035, 0.02]} />
         </mesh>
         {/* Parallelogram Body */}
-        <mesh position={[-0.015, -0.015, 0.005]} rotation={[0, 0, 0.3]} material={blackAlloy}>
+        <mesh
+          position={[-0.015, -0.015, 0.005]}
+          rotation={[0, 0, 0.3]}
+          material={blackAlloy}
+        >
           <boxGeometry args={[0.04, 0.025, 0.018]} />
         </mesh>
         {/* Outer Silver P-Cage Plate */}
-        <mesh position={[-0.02, -0.04, 0.01]} rotation={[0, 0, -0.4]} material={silverMetal}>
+        <mesh
+          position={[-0.02, -0.04, 0.01]}
+          rotation={[0, 0, -0.4]}
+          material={silverMetal}
+        >
           <boxGeometry args={[0.012, 0.07, 0.004]} />
         </mesh>
         {/* Inner Silver P-Cage Plate */}
-        <mesh position={[-0.02, -0.04, -0.006]} rotation={[0, 0, -0.4]} material={silverMetal}>
+        <mesh
+          position={[-0.02, -0.04, -0.006]}
+          rotation={[0, 0, -0.4]}
+          material={silverMetal}
+        >
           <boxGeometry args={[0.012, 0.07, 0.004]} />
         </mesh>
         {/* Upper Guide Pulley */}
-        <mesh position={[-0.01, -0.025, 0.002]} rotation={[Math.PI / 2, 0, 0]} material={blackAlloy}>
+        <mesh
+          position={[-0.01, -0.025, 0.002]}
+          rotation={[Math.PI / 2, 0, 0]}
+          material={blackAlloy}
+        >
           <cylinderGeometry args={[0.014, 0.014, 0.005, 16]} />
         </mesh>
         {/* Lower Tension Pulley */}
-        <mesh position={[-0.035, -0.065, 0.002]} rotation={[Math.PI / 2, 0, 0]} material={blackAlloy}>
+        <mesh
+          position={[-0.035, -0.065, 0.002]}
+          rotation={[Math.PI / 2, 0, 0]}
+          material={blackAlloy}
+        >
           <cylinderGeometry args={[0.014, 0.014, 0.005, 16]} />
         </mesh>
       </group>
@@ -179,15 +201,21 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
       <mesh
         position={[
           (bbPosition.x + rearAxlePosition.x) / 2,
-          (bbPosition.y + chainringRadius + rearAxlePosition.y + cassetteRadius) / 2,
+          (bbPosition.y +
+            chainringRadius +
+            rearAxlePosition.y +
+            cassetteRadius) /
+            2,
           chainZ,
         ]}
         rotation={[
           0,
           0,
           Math.atan2(
-            rearAxlePosition.y + cassetteRadius - (bbPosition.y + chainringRadius),
-            rearAxlePosition.x - bbPosition.x
+            rearAxlePosition.y +
+              cassetteRadius -
+              (bbPosition.y + chainringRadius),
+            rearAxlePosition.x - bbPosition.x,
           ),
         ]}
         material={chainMaterial}
@@ -196,7 +224,9 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
           args={[
             new THREE.Vector2(
               rearAxlePosition.x - bbPosition.x,
-              rearAxlePosition.y + cassetteRadius - (bbPosition.y + chainringRadius)
+              rearAxlePosition.y +
+                cassetteRadius -
+                (bbPosition.y + chainringRadius),
             ).length(),
             0.007,
             0.005,
@@ -216,7 +246,7 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
           0,
           Math.atan2(
             derailleurPos.y - 0.065 - (bbPosition.y - chainringRadius),
-            derailleurPos.x - 0.035 - bbPosition.x
+            derailleurPos.x - 0.035 - bbPosition.x,
           ),
         ]}
         material={chainMaterial}
@@ -225,7 +255,7 @@ export function DrivetrainMesh({ bbPosition, rearAxlePosition }: DrivetrainMeshP
           args={[
             new THREE.Vector2(
               derailleurPos.x - 0.035 - bbPosition.x,
-              derailleurPos.y - 0.065 - (bbPosition.y - chainringRadius)
+              derailleurPos.y - 0.065 - (bbPosition.y - chainringRadius),
             ).length(),
             0.007,
             0.005,

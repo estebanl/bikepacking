@@ -11,9 +11,16 @@ import {
 } from "@/types";
 import { calculateRigMetrics } from "@/lib/balance";
 import { evaluateClearances } from "@/lib/clearance";
-import { deserializeRigFromUrlQuery, serializeRigToUrlQuery } from "@/lib/export";
+import {
+  clampPayloadGrams,
+  deserializeRigFromUrlQuery,
+  serializeRigToUrlQuery,
+} from "@/lib/export";
+
+import { findSocket, validateMount, sanitizeMountedBags } from "@/lib/sockets";
 
 interface RigState {
+  lastActionMessage: string | null;
   bikes: BikeModel[];
   bags: BagItem[];
   selectedBikeId: string;
@@ -47,7 +54,9 @@ interface RigState {
   setSelectedSocketId: (socketId: string | null) => void;
   setActiveSidebarTab: (tab: "bike" | "bags" | "payload") => void;
   setExportModalOpen: (open: boolean) => void;
-  loadPresetDemo: (presetName: "endurance" | "minimalist" | "overloaded") => void;
+  loadPresetDemo: (
+    presetName: "endurance" | "minimalist" | "overloaded",
+  ) => void;
   syncFromUrl: () => void;
   getShareableUrl: () => string;
 }
@@ -62,15 +71,21 @@ function computeState(
   mountedBags: Record<string, BagItem>,
   payloadGrams: number,
   dropper: boolean,
-  bottles: boolean
+  bottles: boolean,
 ) {
-  const metrics = calculateRigMetrics(bike, sizeConfig, mountedBags, payloadGrams);
+  const metrics = calculateRigMetrics(
+    bike,
+    sizeConfig,
+    mountedBags,
+    payloadGrams,
+  );
   const clearanceWarnings = evaluateClearances({
     bike,
     sizeConfig,
     mountedBags,
     dropperPostCompressed: dropper,
     waterBottlesMounted: bottles,
+    payloadEstimateGrams: payloadGrams,
   });
   return { metrics, clearanceWarnings };
 }
@@ -82,10 +97,46 @@ export const useRigStore = create<RigState>((set, get) => {
     {},
     0,
     false,
-    true
+    true,
   );
 
+  const applyConfiguration = (
+    bike: BikeModel,
+    sizeKey: string,
+    bags: Record<string, BagItem>,
+    payload = get().payloadEstimateGrams,
+    dropper = get().dropperPostCompressed,
+    bottles = get().waterBottlesMounted,
+  ) => {
+    const sizeConfig = bike.sizes[sizeKey];
+    const clean = sanitizeMountedBags(bags, sizeConfig);
+    const safePayload = clampPayloadGrams(payload);
+    set({
+      selectedBikeId: bike.id,
+      selectedSizeKey: sizeKey,
+      currentBike: bike,
+      currentSizeConfig: sizeConfig,
+      mountedBags: clean.mountedBags,
+      payloadEstimateGrams: safePayload,
+      dropperPostCompressed: dropper,
+      waterBottlesMounted: bottles,
+      selectedSocketId: null,
+      lastActionMessage: clean.removed.length
+        ? `Removed equipment: ${clean.removed.map((item) => `${item.bagId} (${item.reasons.join("; ")})`).join(", ")}`
+        : null,
+      ...computeState(
+        bike,
+        sizeConfig,
+        clean.mountedBags,
+        safePayload,
+        dropper,
+        bottles,
+      ),
+    });
+  };
+
   return {
+    lastActionMessage: null,
     bikes: BIKES,
     bags: BAGS,
     selectedBikeId: defaultBike.id,
@@ -97,7 +148,7 @@ export const useRigStore = create<RigState>((set, get) => {
     activeCameraPreset: "iso",
     cameraRevision: 0,
     selectedSocketId: null,
-    activeSidebarTab: "bags",
+    activeSidebarTab: "bike",
     isExportModalOpen: false,
 
     currentBike: defaultBike,
@@ -106,126 +157,71 @@ export const useRigStore = create<RigState>((set, get) => {
     clearanceWarnings: initialComputed.clearanceWarnings,
 
     selectBike: (bikeId: string) => {
-      const bike = get().bikes.find((b) => b.id === bikeId) || get().bikes[0];
-      const availableSizes = Object.keys(bike.sizes);
-      const currentSizeKey = get().selectedSizeKey;
-      const sizeKey = availableSizes.includes(currentSizeKey)
-        ? currentSizeKey
-        : availableSizes[0];
-      const sizeConfig = bike.sizes[sizeKey];
-
-      const computed = computeState(
-        bike,
-        sizeConfig,
-        get().mountedBags,
-        get().payloadEstimateGrams,
-        get().dropperPostCompressed,
-        get().waterBottlesMounted
-      );
-
-      set({
-        selectedBikeId: bike.id,
-        selectedSizeKey: sizeKey,
-        currentBike: bike,
-        currentSizeConfig: sizeConfig,
-        metrics: computed.metrics,
-        clearanceWarnings: computed.clearanceWarnings,
-      });
+      const bike = get().bikes.find((b) => b.id === bikeId);
+      if (!bike) {
+        set({ lastActionMessage: "Unknown bicycle." });
+        return;
+      }
+      const sizeKey = Object.prototype.hasOwnProperty.call(
+        bike.sizes,
+        get().selectedSizeKey,
+      )
+        ? get().selectedSizeKey
+        : Object.keys(bike.sizes)[0];
+      applyConfiguration(bike, sizeKey, get().mountedBags);
     },
-
     selectSize: (sizeKey: string) => {
-      const bike = get().currentBike;
-      if (!bike.sizes[sizeKey]) return;
-      const sizeConfig = bike.sizes[sizeKey];
-
-      const computed = computeState(
-        bike,
-        sizeConfig,
-        get().mountedBags,
-        get().payloadEstimateGrams,
-        get().dropperPostCompressed,
-        get().waterBottlesMounted
-      );
-
-      set({
-        selectedSizeKey: sizeKey,
-        currentSizeConfig: sizeConfig,
-        metrics: computed.metrics,
-        clearanceWarnings: computed.clearanceWarnings,
-      });
+      if (
+        !Object.prototype.hasOwnProperty.call(get().currentBike.sizes, sizeKey)
+      ) {
+        set({ lastActionMessage: "Unknown frame size." });
+        return;
+      }
+      applyConfiguration(get().currentBike, sizeKey, get().mountedBags);
     },
-
     mountBag: (socketId: string, bag: BagItem) => {
-      const updatedBags = { ...get().mountedBags, [socketId]: bag };
-      const computed = computeState(
-        get().currentBike,
+      const catalogBag = get().bags.find((item) => item.id === bag.id);
+      if (!catalogBag) {
+        set({ lastActionMessage: "Equipment is not in the catalogue." });
+        return;
+      }
+      const check = validateMount(
+        catalogBag,
+        socketId,
         get().currentSizeConfig,
-        updatedBags,
-        get().payloadEstimateGrams,
-        get().dropperPostCompressed,
-        get().waterBottlesMounted
+        get().mountedBags,
       );
-
-      set({
-        mountedBags: updatedBags,
-        metrics: computed.metrics,
-        clearanceWarnings: computed.clearanceWarnings,
+      if (!check.allowed) {
+        set({ lastActionMessage: check.reasons.join(" ") });
+        return;
+      }
+      applyConfiguration(get().currentBike, get().selectedSizeKey, {
+        ...get().mountedBags,
+        [socketId]: catalogBag,
       });
     },
-
     unmountBag: (socketId: string) => {
-      const updatedBags = { ...get().mountedBags };
-      delete updatedBags[socketId];
-
-      const computed = computeState(
-        get().currentBike,
-        get().currentSizeConfig,
-        updatedBags,
-        get().payloadEstimateGrams,
-        get().dropperPostCompressed,
-        get().waterBottlesMounted
-      );
-
-      set({
-        mountedBags: updatedBags,
-        metrics: computed.metrics,
-        clearanceWarnings: computed.clearanceWarnings,
-      });
+      const next = { ...get().mountedBags };
+      delete next[socketId];
+      applyConfiguration(get().currentBike, get().selectedSizeKey, next);
     },
 
     clearAllBags: () => {
-      const computed = computeState(
-        get().currentBike,
-        get().currentSizeConfig,
-        {},
-        0,
-        get().dropperPostCompressed,
-        get().waterBottlesMounted
-      );
-
-      set({
-        mountedBags: {},
-        payloadEstimateGrams: 0,
-        metrics: computed.metrics,
-        clearanceWarnings: computed.clearanceWarnings,
-      });
+      applyConfiguration(get().currentBike, get().selectedSizeKey, {}, 0);
     },
-
     setPayloadEstimate: (grams: number) => {
-      const computed = computeState(
+      const payload = clampPayloadGrams(grams);
+      applyConfiguration(
         get().currentBike,
-        get().currentSizeConfig,
+        get().selectedSizeKey,
         get().mountedBags,
-        grams,
-        get().dropperPostCompressed,
-        get().waterBottlesMounted
+        payload,
       );
-
-      set({
-        payloadEstimateGrams: grams,
-        metrics: computed.metrics,
-        clearanceWarnings: computed.clearanceWarnings,
-      });
+      if (payload !== grams)
+        set({
+          lastActionMessage:
+            "Payload must be a finite value between 0 and 50,000 g. It has been adjusted.",
+        });
     },
 
     toggleDropper: () => {
@@ -236,7 +232,7 @@ export const useRigStore = create<RigState>((set, get) => {
         get().mountedBags,
         get().payloadEstimateGrams,
         nextDropper,
-        get().waterBottlesMounted
+        get().waterBottlesMounted,
       );
 
       set({
@@ -253,7 +249,7 @@ export const useRigStore = create<RigState>((set, get) => {
         get().mountedBags,
         get().payloadEstimateGrams,
         get().dropperPostCompressed,
-        nextBottles
+        nextBottles,
       );
 
       set({
@@ -263,11 +259,19 @@ export const useRigStore = create<RigState>((set, get) => {
     },
 
     setCameraPreset: (preset: CameraPreset) => {
-      set({ activeCameraPreset: preset, cameraRevision: get().cameraRevision + 1 });
+      set({
+        activeCameraPreset: preset,
+        cameraRevision: get().cameraRevision + 1,
+      });
     },
 
     setSelectedSocketId: (socketId: string | null) => {
-      set({ selectedSocketId: socketId });
+      set({
+        selectedSocketId:
+          socketId && findSocket(get().currentSizeConfig, socketId)
+            ? socketId
+            : null,
+      });
     },
 
     setActiveSidebarTab: (tab: "bike" | "bags" | "payload") => {
@@ -279,20 +283,32 @@ export const useRigStore = create<RigState>((set, get) => {
     },
 
     loadPresetDemo: (presetName) => {
-      const bike = get().bikes[0]; // Cutthroat
-      const sizeKey = "56cm";
+      const bike =
+        get().bikes.find((b) => b.id === "salsa-cutthroat-2024") ??
+        get().bikes[0];
+      const sizeKey = Object.prototype.hasOwnProperty.call(bike.sizes, "56cm")
+        ? "56cm"
+        : Object.keys(bike.sizes)[0];
       const sizeConfig = bike.sizes[sizeKey];
 
-      let newBags: Record<string, BagItem> = {};
+      const newBags: Record<string, BagItem> = {};
       let payload = 0;
       let dropper = false;
 
       if (presetName === "endurance") {
         // Balanced 42/58 setup
-        const frameBag = get().bags.find((b) => b.id === "ortlieb-frame-pack-rc-4l");
-        const seatBag = get().bags.find((b) => b.id === "apidura-expedition-saddle-pack-9l");
-        const barBag = get().bags.find((b) => b.id === "revelate-sweetroll-11l");
-        const topBag = get().bags.find((b) => b.id === "apidura-racing-bolt-on-top-tube-1l");
+        const frameBag = get().bags.find(
+          (b) => b.id === "ortlieb-frame-pack-rc-4l",
+        );
+        const seatBag = get().bags.find(
+          (b) => b.id === "apidura-expedition-saddle-pack-9l",
+        );
+        const barBag = get().bags.find(
+          (b) => b.id === "revelate-sweetroll-11l",
+        );
+        const topBag = get().bags.find(
+          (b) => b.id === "apidura-racing-bolt-on-top-tube-1l",
+        );
         if (frameBag) newBags["frameTriangle"] = frameBag;
         if (seatBag) newBags["seatpost"] = seatBag;
         if (barBag) newBags["handlebar"] = barBag;
@@ -300,16 +316,26 @@ export const useRigStore = create<RigState>((set, get) => {
         payload = 2500;
       } else if (presetName === "minimalist") {
         // Ultra-light race setup
-        const topBag = get().bags.find((b) => b.id === "apidura-racing-bolt-on-top-tube-1l");
-        const seatBag = get().bags.find((b) => b.id === "apidura-expedition-saddle-pack-9l");
+        const topBag = get().bags.find(
+          (b) => b.id === "apidura-racing-bolt-on-top-tube-1l",
+        );
+        const seatBag = get().bags.find(
+          (b) => b.id === "apidura-expedition-saddle-pack-9l",
+        );
         if (topBag) newBags["topTubeFront"] = topBag;
         if (seatBag) newBags["seatpost"] = seatBag;
         payload = 800;
       } else if (presetName === "overloaded") {
         // Expeditions with massive rear load + dropper drop to trigger clearance alert
-        const frameBag = get().bags.find((b) => b.id === "salsa-exp-full-frame-pack");
-        const seatBag = get().bags.find((b) => b.id === "ortlieb-seat-pack-16-5l");
-        const barBag = get().bags.find((b) => b.id === "ortlieb-handlebar-pack-15l");
+        const frameBag = get().bags.find(
+          (b) => b.id === "salsa-exp-full-frame-pack",
+        );
+        const seatBag = get().bags.find(
+          (b) => b.id === "ortlieb-seat-pack-16-5l",
+        );
+        const barBag = get().bags.find(
+          (b) => b.id === "ortlieb-handlebar-pack-15l",
+        );
         const forkL = get().bags.find((b) => b.id === "ortlieb-fork-pack-4-1l");
         const forkR = get().bags.find((b) => b.id === "tailfin-cargo-pack-5l");
         if (frameBag) newBags["frameTriangle"] = frameBag;
@@ -321,27 +347,7 @@ export const useRigStore = create<RigState>((set, get) => {
         dropper = true; // Intentionally trigger buzz warning!
       }
 
-      const computed = computeState(
-        bike,
-        sizeConfig,
-        newBags,
-        payload,
-        dropper,
-        true
-      );
-
-      set({
-        selectedBikeId: bike.id,
-        selectedSizeKey: sizeKey,
-        currentBike: bike,
-        currentSizeConfig: sizeConfig,
-        mountedBags: newBags,
-        payloadEstimateGrams: payload,
-        dropperPostCompressed: dropper,
-        waterBottlesMounted: true,
-        metrics: computed.metrics,
-        clearanceWarnings: computed.clearanceWarnings,
-      });
+      applyConfiguration(bike, sizeKey, newBags, payload, dropper, true);
     },
 
     syncFromUrl: () => {
@@ -354,36 +360,22 @@ export const useRigStore = create<RigState>((set, get) => {
         ? get().bikes.find((b) => b.id === parsed.bikeId) || get().currentBike
         : get().currentBike;
       const sizeKey =
-        parsed.sizeKey && bike.sizes[parsed.sizeKey]
+        parsed.sizeKey &&
+        Object.prototype.hasOwnProperty.call(bike.sizes, parsed.sizeKey)
           ? parsed.sizeKey
           : Object.keys(bike.sizes)[0];
-      const sizeConfig = bike.sizes[sizeKey];
-
       const payload = parsed.payloadGrams ?? get().payloadEstimateGrams;
       const dropper = parsed.dropper ?? get().dropperPostCompressed;
       const bottles = parsed.bottles ?? get().waterBottlesMounted;
 
-      const computed = computeState(
+      applyConfiguration(
         bike,
-        sizeConfig,
+        sizeKey,
         parsed.mountedBags,
         payload,
         dropper,
-        bottles
+        bottles,
       );
-
-      set({
-        selectedBikeId: bike.id,
-        selectedSizeKey: sizeKey,
-        currentBike: bike,
-        currentSizeConfig: sizeConfig,
-        mountedBags: parsed.mountedBags,
-        payloadEstimateGrams: payload,
-        dropperPostCompressed: dropper,
-        waterBottlesMounted: bottles,
-        metrics: computed.metrics,
-        clearanceWarnings: computed.clearanceWarnings,
-      });
     },
 
     getShareableUrl: () => {

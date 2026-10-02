@@ -14,7 +14,7 @@ import { Loader2, MousePointer2 } from "lucide-react";
 const ConfiguratorCanvas = dynamic(
   () =>
     import("@/components/canvas/ConfiguratorCanvas").then(
-      (mod) => mod.ConfiguratorCanvas
+      (mod) => mod.ConfiguratorCanvas,
     ),
   {
     ssr: false,
@@ -22,11 +22,11 @@ const ConfiguratorCanvas = dynamic(
       <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-slate-400 space-y-3">
         <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
         <span className="text-xs font-semibold uppercase tracking-wider">
-          Initializing 3D Canvas & Physics Engine...
+          Preparing your bicycle preview…
         </span>
       </div>
     ),
-  }
+  },
 );
 
 export default function ConfiguratorPage() {
@@ -48,14 +48,26 @@ export default function ConfiguratorPage() {
         <div>
           <p className="eyebrow">PLAN THE RIDE. PACK YOUR WAY.</p>
           <h2>Build your next adventure.</h2>
-          <p className="workspace-description">Choose a bike, dial in your gear, and find your balance.</p>
+          <p className="workspace-description">
+            Choose a bike, dial in your gear, and find your balance.
+          </p>
         </div>
         <label className="preset-picker">
           <span>Start with a setup</span>
-          <select aria-label="Load a preset" value="" onChange={(event) => {
-            if (event.target.value) loadPreset(event.target.value as "endurance" | "minimalist" | "overloaded");
-          }}>
-            <option value="" disabled>Choose a preset</option>
+          <select
+            aria-label="Load a preset"
+            value=""
+            onChange={(event) => {
+              if (event.target.value)
+                loadPreset(
+                  event.target.value as
+                    "endurance" | "minimalist" | "overloaded",
+                );
+            }}
+          >
+            <option value="" disabled>
+              Choose a preset
+            </option>
             <option value="endurance">Endurance</option>
             <option value="minimalist">Ultra-light</option>
             <option value="overloaded">Clearance test</option>
@@ -64,17 +76,40 @@ export default function ConfiguratorPage() {
       </div>
       <div className="rig-workspace">
         <Sidebar />
-        <section className="preview-panel" aria-label="Interactive 3D rig preview">
+        <section
+          className="preview-panel"
+          aria-label="Interactive 3D rig preview"
+        >
           <div className="preview-heading">
-            <div><p className="eyebrow">YOUR RIG / SIZE {size}</p><h3>{bike.brand} {bike.name}</h3></div>
-            <span className="preview-badge"><span />3D PREVIEW</span>
+            <div>
+              <p className="eyebrow">YOUR RIG / SIZE {size}</p>
+              <h3>
+                {bike.brand} {bike.name}
+              </h3>
+            </div>
+            <span className="preview-badge">
+              <span />
+              3D PREVIEW
+            </span>
           </div>
           <div className="canvas-stage">
-            {mounted ? <ConfiguratorCanvas /> : <div className="flex h-full items-center justify-center"><Loader2 className="animate-spin text-emerald-600" aria-label="Loading 3D preview" /></div>}
+            {mounted ? (
+              <ConfiguratorCanvas />
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <Loader2
+                  className="animate-spin text-emerald-600"
+                  aria-label="Loading 3D preview"
+                />
+              </div>
+            )}
           </div>
           <div className="preview-footer">
             <CameraControls />
-            <p><MousePointer2 size={13} /> Drag to orbit · Scroll or pinch to zoom</p>
+            <p>
+              <MousePointer2 size={13} /> Drag to orbit · Scroll or pinch to
+              zoom
+            </p>
           </div>
         </section>
         <RigHUD />
