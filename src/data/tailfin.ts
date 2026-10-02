@@ -3104,6 +3104,39 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
   return base;
 }
 
+/** Renderer backlog classification, not manufacturer compatibility or dimensional evidence.
+ * Visible replacement parts stay pending even when their parent system already has a preview.
+ * Only internal/service-only parts are nonvisual; retail/off-bike products are a separate group.
+ */
+const NONVISUAL_SPARES = new Set([
+  "855567", "734880", "661776", "661795", "653454", "653447", "652726",
+  "652723", "141832", "793582", "138815", "129657", "809537", "48957",
+  "48956", "16145", "710834",
+].map((id) => `tailfin-${id}`));
+const UNSUPPORTED_INTERFACES = new Map([
+  ["361", "QR axle interface is not supported by the selected thru-axle Santa Cruz builds."],
+  ["652018", "X35 e-bike interface is outside these Santa Cruz builds."],
+  ["652015", "X35 e-bike interface is outside these Santa Cruz builds."],
+  ["652789", "LOOK-specific axle interface is not verified for these Santa Cruz builds."],
+  ["24733", "R.A.T-specific axle interface is not verified for these Santa Cruz builds."],
+  ["730717", "Pearson-specific axle interface is not verified for these Santa Cruz builds."],
+  ["33032", "Salsa-specific dropout interface is not verified for these Santa Cruz builds."],
+  ["20092", "Required frame-eyelet interface is not confirmed for these Santa Cruz builds."],
+  ["48954", "Required frame-eyelet interface is not confirmed for these Santa Cruz builds."],
+].map(([id, reason]) => [`tailfin-${id}`, reason]));
+function previewCoverage(p: SourceProduct, v: SourceVariant, place: Placement) {
+  const result = (previewStatus: NonNullable<BagItem["previewStatus"]>, previewStatusLabel: string, previewStatusReason: string) =>
+    ({ previewStatus, previewStatusLabel, previewStatusReason });
+  if (place.sockets.length) return result("mountable", "Illustrative preview", "Placement is available; model-specific physical fit remains unverified.");
+  if (/Direct Mount/i.test(v.label)) return result("unsupported-fit", "Unsupported fit", "Direct-mount frame eyelets are not confirmed for these Santa Cruz builds.");
+  const unsupported = UNSUPPORTED_INTERFACES.get(p.id);
+  if (unsupported) return result("unsupported-fit", "Unsupported fit", unsupported);
+  if (p.role === "non-bike-merchandise" || p.role === "off-bike-accessory")
+    return result("off-bike", "Off-bike item", "Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned.");
+  if (NONVISUAL_SPARES.has(p.id)) return result("nonvisual-spare", "Internal / service spare", "Internal structure, service kit or small fastener: no standalone exterior placement. This does not certify a replacement part's compatibility.");
+  return result("implementation-pending", "Preview still to build", "Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete.");
+}
+
 // Illustrator envelopes, not product specifications. Scaling makes capacity variants visibly distinct
 // while preserving the explicit absence of measured length/height/depth for clearance calculations.
 function visualEnvelope(
@@ -3206,6 +3239,7 @@ function normalize(
   index: number,
 ): TailfinCatalogItem {
   const place = placement(p, v);
+  const coverage = previewCoverage(p, v, place);
   const dimensions = actualEnvelope(p, v, place);
   const envelope = visualEnvelope(p, v, place.visualKind);
   const unknownDimensions = Object.values(dimensions).some(
@@ -3224,7 +3258,7 @@ function normalize(
       : "Axis mapping uses published component dimensions; attachment location remains illustrative.",
     place.sockets.length
       ? ""
-      : "Reference only: no supported mounting action is configured for this component or variant.",
+      : `${coverage.previewStatusLabel}: ${coverage.previewStatusReason}`,
     p.mount_zone === "rear-system"
       ? "Fixed system mass includes bag and arch. Published unrolled bag dimensions do not describe the complete system. CargoPack was formerly AeroPack."
       : "",
@@ -3270,6 +3304,7 @@ function normalize(
     sourceVariantLabel: v.label,
     catalogSection: p.catalog_section === "spares" ? "spares" : "main",
     referenceOnly: place.sockets.length === 0,
+    ...coverage,
     brand: "Tailfin",
     name: `${p.name}${v.label === "Standard / options not yet normalized" ? "" : ` · ${v.label}`}`,
     category: place.category,
@@ -3321,6 +3356,11 @@ export const TAILFIN_BAGS = TAILFIN_CATALOG.filter(
 export const TAILFIN_SPARES = TAILFIN_CATALOG.filter(
   (item) => item.catalogSection === "spares",
 );
+export const TAILFIN_PREVIEW_COUNTS = TAILFIN_CATALOG.reduce((counts, item) => {
+  const status = item.previewStatus!;
+  counts[status] += 1;
+  return counts;
+}, { mountable: 0, "implementation-pending": 0, "unsupported-fit": 0, "nonvisual-spare": 0, "off-bike": 0 });
 export const TAILFIN_CATALOG_COVERAGE = {
   checkedAt: "2026-10-02",
   mainFamilies: 50,
@@ -3329,6 +3369,6 @@ export const TAILFIN_CATALOG_COVERAGE = {
   variants: 191,
   advertisedMainCount: 52,
   advertisedSparesCount: 96,
-  note: "50 main product families and 95 spare families indexed; source banners show 52 and 96. This snapshot does not certify exhaustive SKU, color or option coverage. Reference-only items are searchable but cannot be mounted.",
+  note: "50 main product families and 95 spare families indexed; source banners show 52 and 96. This snapshot does not certify exhaustive SKU, color or option coverage. Entries without a preview remain searchable and are classified below. The all-components implementation request remains open.",
   sourceUrl: "https://www.tailfin.cc/ca/shop/",
 };

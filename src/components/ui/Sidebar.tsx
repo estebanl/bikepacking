@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { TAILFIN_CATALOG_COVERAGE } from "@/data/tailfin";
+import { TAILFIN_CATALOG_COVERAGE, TAILFIN_PREVIEW_COUNTS } from "@/data/tailfin";
 import { useRigStore } from "@/store/useRigStore";
 import { BagItem } from "@/types";
 import {
@@ -354,9 +354,14 @@ export function Sidebar() {
                 Tailfin snapshot · 50 products + 95 spares
               </summary>
               <p className="mt-2">
-                {TAILFIN_CATALOG_COVERAGE.note} 191 variant records; 62 have
-                illustrative mounting previews. Remaining entries are reference
-                only.
+                {TAILFIN_CATALOG_COVERAGE.note}
+              </p>
+              <p className="mt-2">
+                {TAILFIN_PREVIEW_COUNTS.mountable} illustrative previews · {TAILFIN_PREVIEW_COUNTS["implementation-pending"]} visible components still to build · {TAILFIN_PREVIEW_COUNTS["unsupported-fit"]} unsupported fit · {TAILFIN_PREVIEW_COUNTS["nonvisual-spare"]} internal/service spares · {TAILFIN_PREVIEW_COUNTS["off-bike"]} off-bike items.
+              </p>
+              <p className="mt-2">
+                Next: bags, racks, cages and adapters before retail merchandise.
+                Estimated rendering dimensions remain separate from sourced specifications.
               </p>
             </details>
             {/* Bags Catalog List */}
@@ -414,7 +419,7 @@ export function Sidebar() {
                         </div>
                         {bag.compatibleSockets.length === 0 && (
                           <span className="text-[9px] uppercase tracking-wide text-amber-300">
-                            Reference only
+                            {bag.previewStatusLabel ?? "Reference only"}
                           </span>
                         )}
                         <h4 className="text-xs font-bold text-white mt-0.5 leading-snug">
@@ -430,6 +435,9 @@ export function Sidebar() {
                       </span>
                     </div>
 
+                    {bag.previewStatusReason && bag.compatibleSockets.length === 0 && (
+                      <p className="mt-2 text-[11px] leading-relaxed text-slate-400">{bag.previewStatusReason}</p>
+                    )}
                     {/* Specs Row */}
                     <div className="gear-specs grid grid-cols-3 gap-1.5 mt-2.5 text-center text-[10px]">
                       <div className="bg-slate-900/80 p-1.5 rounded-lg border border-slate-800">

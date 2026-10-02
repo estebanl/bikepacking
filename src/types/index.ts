@@ -129,6 +129,9 @@ export interface BagItem {
   weightStatus?: "verified" | "estimated" | "unknown";
   specSourceUrl?: string;
   specNotes?: string;
+  previewStatus?: "mountable" | "implementation-pending" | "unsupported-fit" | "nonvisual-spare" | "off-bike";
+  previewStatusLabel?: string;
+  previewStatusReason?: string;
   capacityOptions?: number[];
   currency?: "USD" | "CAD" | "GBP";
   provides?: string[]; // Capabilities such as rear-rack or cargo-cage-left.
