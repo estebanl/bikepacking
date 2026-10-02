@@ -23,6 +23,7 @@ interface RigState {
   dropperPostCompressed: boolean;
   waterBottlesMounted: boolean;
   activeCameraPreset: CameraPreset;
+  cameraRevision: number;
   selectedSocketId: string | null;
   activeSidebarTab: "bike" | "bags" | "payload";
   isExportModalOpen: boolean;
@@ -94,6 +95,7 @@ export const useRigStore = create<RigState>((set, get) => {
     dropperPostCompressed: false,
     waterBottlesMounted: true,
     activeCameraPreset: "iso",
+    cameraRevision: 0,
     selectedSocketId: null,
     activeSidebarTab: "bags",
     isExportModalOpen: false,
@@ -261,7 +263,7 @@ export const useRigStore = create<RigState>((set, get) => {
     },
 
     setCameraPreset: (preset: CameraPreset) => {
-      set({ activeCameraPreset: preset });
+      set({ activeCameraPreset: preset, cameraRevision: get().cameraRevision + 1 });
     },
 
     setSelectedSocketId: (socketId: string | null) => {
@@ -336,6 +338,7 @@ export const useRigStore = create<RigState>((set, get) => {
         mountedBags: newBags,
         payloadEstimateGrams: payload,
         dropperPostCompressed: dropper,
+        waterBottlesMounted: true,
         metrics: computed.metrics,
         clearanceWarnings: computed.clearanceWarnings,
       });

@@ -17,18 +17,19 @@ export function CameraControls() {
   ];
 
   return (
-    <div className="absolute bottom-6 left-6 z-20 flex items-center bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-1.5 shadow-2xl">
-      <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-2 border-r border-slate-700/60 mr-1 hidden sm:block">
+    <div className="camera-controls">
+      <div className="sr-only">
         Camera
       </div>
-      <div className="flex space-x-1">
+      <div className="flex gap-1">
         {presets.map((p) => {
           const isActive = activePreset === p.id;
           return (
             <button
               key={p.id}
+              aria-pressed={isActive}
               onClick={() => setCameraPreset(p.id)}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center space-x-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-all ${
                 isActive
                   ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm"
                   : "text-slate-300 hover:text-white hover:bg-slate-800"

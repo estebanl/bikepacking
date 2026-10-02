@@ -8,7 +8,7 @@ import { RigHUD } from "@/components/ui/RigHUD";
 import { CameraControls } from "@/components/ui/CameraControls";
 import { ExportModal } from "@/components/ui/ExportModal";
 import { useRigStore } from "@/store/useRigStore";
-import { Compass, Loader2 } from "lucide-react";
+import { Loader2, MousePointer2 } from "lucide-react";
 
 // Dynamically import 3D Canvas with ssr disabled for WebGL safety
 const ConfiguratorCanvas = dynamic(
@@ -31,6 +31,9 @@ const ConfiguratorCanvas = dynamic(
 
 export default function ConfiguratorPage() {
   const syncFromUrl = useRigStore((s) => s.syncFromUrl);
+  const bike = useRigStore((s) => s.currentBike);
+  const size = useRigStore((s) => s.selectedSizeKey);
+  const loadPreset = useRigStore((s) => s.loadPresetDemo);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -39,29 +42,42 @@ export default function ConfiguratorPage() {
   }, [syncFromUrl]);
 
   return (
-    <main className="flex flex-col h-screen w-screen overflow-hidden bg-slate-950 select-none">
+    <main className="rig-app">
       <Header />
-
-      <div className="flex flex-1 overflow-hidden relative">
-        {/* Gear and Bike Configuration Sidebar */}
+      <div className="workspace-heading">
+        <div>
+          <p className="eyebrow">PLAN THE RIDE. PACK YOUR WAY.</p>
+          <h2>Build your next adventure.</h2>
+          <p className="workspace-description">Choose a bike, dial in your gear, and find your balance.</p>
+        </div>
+        <label className="preset-picker">
+          <span>Start with a setup</span>
+          <select aria-label="Load a preset" value="" onChange={(event) => {
+            if (event.target.value) loadPreset(event.target.value as "endurance" | "minimalist" | "overloaded");
+          }}>
+            <option value="" disabled>Choose a preset</option>
+            <option value="endurance">Endurance</option>
+            <option value="minimalist">Ultra-light</option>
+            <option value="overloaded">Clearance test</option>
+          </select>
+        </label>
+      </div>
+      <div className="rig-workspace">
         <Sidebar />
-
-        {/* 3D Viewport & HUD Canvas */}
-        <section className="flex-1 relative h-full w-full overflow-hidden">
-          {mounted ? (
-            <ConfiguratorCanvas />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-slate-950">
-              <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
-            </div>
-          )}
-
-          {/* Viewpoint Camera Shortcuts */}
-          <CameraControls />
-
-          {/* Live Weight Distribution, Capacity & Clearance HUD */}
-          <RigHUD />
+        <section className="preview-panel" aria-label="Interactive 3D rig preview">
+          <div className="preview-heading">
+            <div><p className="eyebrow">YOUR RIG / SIZE {size}</p><h3>{bike.brand} {bike.name}</h3></div>
+            <span className="preview-badge"><span />3D PREVIEW</span>
+          </div>
+          <div className="canvas-stage">
+            {mounted ? <ConfiguratorCanvas /> : <div className="flex h-full items-center justify-center"><Loader2 className="animate-spin text-emerald-600" aria-label="Loading 3D preview" /></div>}
+          </div>
+          <div className="preview-footer">
+            <CameraControls />
+            <p><MousePointer2 size={13} /> Drag to orbit · Scroll or pinch to zoom</p>
+          </div>
         </section>
+        <RigHUD />
       </div>
 
       {/* Manifest & Share Modal */}

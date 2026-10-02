@@ -88,3 +88,25 @@ npm run start
 - **State Management**: Zustand
 - **Styling**: Tailwind CSS, Lucide Icons
 - **Clearance Engine**: Geometric bounding & socket offset clearance validator
+
+### Browser validation
+
+The visual regression smoke script exercises desktop, tablet, and mobile layouts,
+gear mounting, presets, camera views, URL sharing, and exports against the running
+production app. It requires Playwright and Chromium in the validation environment
+(the app itself has no browser-test runtime dependency).
+
+```bash
+npm run build
+npm run start
+# In a separate terminal with Playwright available:
+EVIDENCE_DIR=/tmp/bikepacking-evidence node scripts/visual-smoke.cjs
+```
+
+Set `BASE_URL` or `CHROMIUM_PATH` if needed. The script saves before/after camera
+interaction captures for visual comparison as well as layout screenshots. WebGL
+checks use Chromium's software renderer; they do not benchmark real GPU or touch
+hardware. The route checks verify local HTML/GPX availability, not third-party tiles.
+
+For standalone TypeScript validation, run `npx tsc --noEmit`. The existing
+`npm test` command uses Node's type stripping and requires Node 22.6 or newer.

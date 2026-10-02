@@ -2,7 +2,6 @@
 
 import React, { Suspense, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import { useRigStore } from "@/store/useRigStore";
 import { CameraController } from "./CameraController";
 import { BikeMesh } from "./BikeMesh";
@@ -31,21 +30,24 @@ export function ConfiguratorCanvas() {
   }, [currentSizeConfig]);
 
   return (
-    <div className="w-full h-full relative bg-gradient-to-b from-slate-900 via-slate-950 to-black select-none">
+    <div className="w-full h-full relative bg-[#e8ede9] select-none">
       <Canvas
         shadows
+        dpr={[1, 1.5]}
         camera={{ position: [1.5, 1.25, 1.7], fov: 45 }}
         gl={{ antialias: true, alpha: false }}
       >
+        <color attach="background" args={["#e8ede9"]} />
+        <fog attach="fog" args={["#e8ede9", 5, 12]} />
         <CameraController />
 
         {/* --- PBR Studio Lighting Setup --- */}
-        <hemisphereLight args={["#f8fafc", "#0f172a", 0.75]} />
-        <ambientLight intensity={0.4} />
+        <hemisphereLight args={["#ffffff", "#a1b4a6", 2.2]} />
+        <ambientLight intensity={0.9} />
         {/* Main Sun Key Light with crisp contact shadow */}
         <directionalLight
           position={[4, 6, 4]}
-          intensity={1.8}
+          intensity={2.5}
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
@@ -83,16 +85,7 @@ export function ConfiguratorCanvas() {
           </group>
         </Suspense>
 
-        {/* Orbit Controls */}
-        <OrbitControls
-          makeDefault
-          minDistance={0.8}
-          maxDistance={5.0}
-          maxPolarAngle={Math.PI / 2 - 0.02} // Do not dip below ground
-          target={[0, 0.6, 0]}
-          dampingFactor={0.06}
-          enableDamping
-        />
+
       </Canvas>
     </div>
   );

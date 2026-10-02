@@ -62,7 +62,7 @@ export function Sidebar() {
 
   // Helper to determine the best compatible socket for a bag
   function getTargetSocketForBag(bag: BagItem): string | null {
-    if (selectedSocketId && bag.compatibleSockets.includes(selectedSocketId.split("_")[0])) {
+    if (selectedSocketId && bag.compatibleSockets.includes(selectedSocketId)) {
       return selectedSocketId;
     }
     // Default fallback to first compatible socket
@@ -88,10 +88,12 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-96 h-[calc(100vh-64px)] bg-slate-900 border-r border-slate-800 flex flex-col z-20 text-slate-100 shadow-2xl">
+    <aside aria-label="Configure your rig" className="config-panel text-slate-100">
+      <div className="panel-heading"><span className="eyebrow">01 / CUSTOMIZE</span><h3>Make it yours</h3></div>
       {/* Navigation Tabs */}
       <div className="flex border-b border-slate-800 bg-slate-950/60 p-1">
         <button
+          aria-pressed={activeTab === "bike"}
           onClick={() => setActiveTab("bike")}
           className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
             activeTab === "bike"
@@ -100,9 +102,10 @@ export function Sidebar() {
           }`}
         >
           <Bike className="w-4 h-4 text-emerald-400" />
-          <span>Bike Frame</span>
+          <span>Bike</span>
         </button>
         <button
+          aria-pressed={activeTab === "bags"}
           onClick={() => setActiveTab("bags")}
           className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
             activeTab === "bags"
@@ -111,9 +114,10 @@ export function Sidebar() {
           }`}
         >
           <Luggage className="w-4 h-4 text-sky-400" />
-          <span>Bikepacking Gear</span>
+          <span>Gear</span>
         </button>
         <button
+          aria-pressed={activeTab === "payload"}
           onClick={() => setActiveTab("payload")}
           className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
             activeTab === "payload"
@@ -127,7 +131,7 @@ export function Sidebar() {
       </div>
 
       {/* --- TAB CONTENT --- */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="config-content flex-1 overflow-y-auto p-4 space-y-4">
         {/* ================= BIKE TAB ================= */}
         {activeTab === "bike" && (
           <div className="space-y-5 animate-in fade-in duration-200">
@@ -142,6 +146,7 @@ export function Sidebar() {
                   return (
                     <button
                       key={bike.id}
+                      aria-pressed={isSelected}
                       onClick={() => selectBike(bike.id)}
                       className={`w-full text-left p-3 rounded-xl border transition-all flex items-center justify-between ${
                         isSelected
@@ -178,6 +183,7 @@ export function Sidebar() {
                   return (
                     <button
                       key={sizeKey}
+                      aria-pressed={isSelected}
                       onClick={() => selectSize(sizeKey)}
                       className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-center ${
                         isSelected
@@ -240,6 +246,7 @@ export function Sidebar() {
                   <span className="font-semibold">{selectedSocketId}</span>
                 </div>
                 <button
+                  aria-label="Clear selected mount"
                   onClick={() => setSelectedSocketId(null)}
                   className="p-1 hover:bg-sky-900 rounded-lg text-sky-300"
                 >
@@ -248,11 +255,13 @@ export function Sidebar() {
               </div>
             )}
 
+            <label className="gear-search"><span className="sr-only">Search gear</span><input type="search" placeholder="Search brands or gear…" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} /></label>
             {/* Category Filter Pills */}
-            <div className="flex overflow-x-auto space-x-1.5 pb-1 text-xs no-scrollbar">
+            <div className="flex flex-wrap gap-1.5 pb-1 text-xs">
               {categoryFilters.map((cat) => (
                 <button
                   key={cat.id}
+                  aria-pressed={selectedCategory === cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
                     selectedCategory === cat.id
@@ -267,6 +276,7 @@ export function Sidebar() {
 
             {/* Bags Catalog List */}
             <div className="space-y-3">
+              {filteredBags.length === 0 && <p className="text-sm text-slate-400 py-4">No gear matches. Try another name or category.</p>}
               {filteredBags.map((bag) => {
                 // Check if this bag is currently mounted on any socket
                 const mountedSocket = Object.entries(mountedBags).find(
@@ -297,7 +307,7 @@ export function Sidebar() {
                     </div>
 
                     {/* Specs Row */}
-                    <div className="grid grid-cols-3 gap-1.5 mt-2.5 text-center text-[10px]">
+                    <div className="gear-specs grid grid-cols-3 gap-1.5 mt-2.5 text-center text-[10px]">
                       <div className="bg-slate-900/80 p-1.5 rounded-lg border border-slate-800">
                         <span className="text-slate-400 block">Volume</span>
                         <span className="font-bold text-white">{bag.volumeLiters} L</span>
@@ -308,7 +318,7 @@ export function Sidebar() {
                       </div>
                       <div className="bg-slate-900/80 p-1.5 rounded-lg border border-slate-800">
                         <span className="text-slate-400 block">Rating</span>
-                        <span className="font-bold text-white truncate">{bag.waterproofRating || "Standard"}</span>
+                        <span title={bag.waterproofRating || "Standard"} className="block font-bold text-white truncate">{bag.waterproofRating || "Standard"}</span>
                       </div>
                     </div>
 
@@ -365,6 +375,7 @@ export function Sidebar() {
                 </span>
               </div>
               <input
+                aria-label="Gear payload estimate"
                 type="range"
                 min="0"
                 max="12000"

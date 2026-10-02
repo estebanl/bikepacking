@@ -18,10 +18,11 @@ export function RigHUD() {
   const payloadKg = (metrics.payloadEstimateGrams / 1000).toFixed(2);
 
   return (
-    <div className="absolute top-20 right-6 z-20 flex flex-col items-end space-y-3 pointer-events-none max-w-sm w-full">
+    <div className="summary-panel flex flex-col space-y-3">
+      <div className="panel-heading"><span className="eyebrow">02 / FINE-TUNE</span><h3>Ready for the ride?</h3><p>Weight, balance, and fit at a glance.</p></div>
       {/* --- Clearance Warning Banner --- */}
       {clearanceWarnings.length > 0 && (
-        <div className="w-full flex flex-col space-y-2 pointer-events-auto animate-in fade-in slide-in-from-top-2 duration-200">
+        <div role="status" className="clearance-notices w-full flex flex-col space-y-2 pointer-events-auto animate-in fade-in slide-in-from-top-2 duration-200">
           {clearanceWarnings.map((warning) => {
             const isError = warning.severity === "error";
             return (
@@ -39,7 +40,7 @@ export function RigHUD() {
                   <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5 mr-2" />
                 )}
                 <div className="flex-1">
-                  <div className="font-semibold text-white flex items-center justify-between">
+                  <div className="font-semibold text-white flex flex-wrap gap-1 items-center justify-between">
                     <span>{isError ? "Clearance Hazard" : "Clearance Warning"}</span>
                     {warning.measuredMm !== undefined && (
                       <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-black/40">
@@ -56,7 +57,7 @@ export function RigHUD() {
       )}
 
       {/* --- Rig Summary Card --- */}
-      <div className="w-full bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl p-4 shadow-2xl pointer-events-auto text-slate-100">
+      <div className="summary-card w-full bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 text-slate-100">
         <div className="flex items-center justify-between pb-3 border-b border-slate-800">
           <div className="flex items-center space-x-2">
             <Scale className="w-4 h-4 text-emerald-400" />
@@ -88,6 +89,7 @@ export function RigHUD() {
           </div>
         </div>
 
+        <div className="flex justify-between text-xs mb-3 text-slate-400"><span>Packed gear payload</span><span className="font-semibold text-white">{payloadKg} kg</span></div>
         {/* Weight Distribution & Balance Gauge */}
         <div className="pt-2 border-t border-slate-800/80">
           <div className="flex items-center justify-between text-xs mb-1.5">
@@ -139,8 +141,9 @@ export function RigHUD() {
         </div>
 
         {/* Quick Simulation Toggles */}
-        <div className="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+        <div className="mt-3 pt-3 border-t border-slate-800 flex flex-wrap gap-2 text-xs">
           <button
+            aria-pressed={dropperCompressed}
             onClick={toggleDropper}
             className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium transition-colors ${
               dropperCompressed
@@ -152,6 +155,7 @@ export function RigHUD() {
           </button>
 
           <button
+            aria-pressed={waterBottlesMounted}
             onClick={toggleBottles}
             className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium transition-colors ${
               waterBottlesMounted
@@ -163,6 +167,7 @@ export function RigHUD() {
           </button>
         </div>
       </div>
+      <p className="summary-note">Preview fit before you pack. Confirm dimensions and clearances on your actual bike.</p>
     </div>
   );
 }
