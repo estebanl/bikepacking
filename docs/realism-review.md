@@ -3,7 +3,7 @@
 Reviewed PR: https://github.com/estebanl/bikepacking/pull/3
 Original head: `b0251726ed9d4fa61918bdf76551890179586368`.
 First visual improvement: `50e6e96c1867c3e7d069e59e6b73b1279097f09d`.
-Follow-up work: isolated branch `review/santa-cruz-tailfin`; no merge or deployment by this executor.
+Follow-up work: isolated branch `review/santa-cruz-tailfin`; reconciled onto the existing private Site source after explicit publishing authorization. No GitHub merge.
 Tracking: https://github.com/estebanl/bikepacking/issues/4 (bicycles), https://github.com/estebanl/bikepacking/issues/5 (catalog), https://github.com/estebanl/bikepacking/issues/6 (fit/state).
 
 ## Concrete review findings
@@ -38,4 +38,4 @@ Static weight balance assumes45% unloaded front load and distributes payload by 
 
 Before and first-improvement evidence remains under `/workspace/bikepacking-evidence`. New captures are in its `realism/` subdirectory. Paths are executor-local and are not automatically delivered to another machine.
 
-Library transfer was blocked by the cloud proxy (CONNECT403); no canonical library_file_id was created. No failed reservation ID is presented as a delivered file. Parent owns screenshot transfer and the existing private Site publishing workflow.
+Library transfer was blocked by the cloud proxy (CONNECT403); no canonical library_file_id was created. No failed reservation ID is presented as a delivered file. The cloud executor now owns the explicitly authorized existing private Site publication. Before/after screenshots are included in `public/review/` for delivery through that same private Site.
