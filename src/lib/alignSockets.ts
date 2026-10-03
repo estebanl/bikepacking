@@ -1,4 +1,4 @@
-import { getDownTubePackReference } from "./frameAttachmentGeometry.ts";
+import { getDownTubePackReference } from "./downTubeReference.ts";
 import type { BikeModel, BikeSizeConfig } from "../types/index.ts";
 import { getBikeGeometry, interpolate, topTubeRadius } from "./bikeGeometry.ts";
 

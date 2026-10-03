@@ -43,14 +43,6 @@ export function getFrameAttachmentStations(bike:BikeModel,size:BikeSizeConfig,ba
  });
 }
 
-/** Shared centreline datum for down-tube bag sockets; computed once per bike size. */
-export function getDownTubePackReference(bike:BikeModel,size:BikeSizeConfig):{position:Point3;rotation:Point3;radius:number} {
- const g=getBikeGeometry(bike,size);
- const path=new CatmullRomCurve3([g.bb,[g.bb[0]+.11,g.bb[1]+.09,0] as Point3,[g.headTubeBottom[0],g.headTubeBottom[1]+.025,0] as Point3].map(point=>new Vector3(...point)));
- const t=.4,point=path.getPoint(t),tangent=path.getTangent(t),slope=Math.atan2(tangent.y,tangent.x);
- return {position:point.toArray() as Point3,rotation:[0,0,slope-Math.PI/2],radius:.037};
-}
-
 /** Optional rear top-tube bag strap to the fixed post; stays independent of dropper travel.
  * SaddleMesh currently renders a 14mm-radius post. Keep this loop on that surface.
  */
