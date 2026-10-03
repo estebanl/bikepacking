@@ -119,8 +119,10 @@ test('all provisionable catalogue placements conserve mass and survive share rou
     for(const value of Object.values(metrics).filter(v=>typeof v==='number')) assert.ok(Number.isFinite(value));
     const replacementInstalled = !!(mounted.barCageReplacement || mounted.barCageClampLeft || mounted.barCageClampRight);
     const modifiedHost = replacementInstalled ? (mounted.barMount?.id === 'tailfin-825745-v1' ? mounted.barMount : mounted.handlebar?.id.startsWith('tailfin-825745-') ? mounted.handlebar : undefined) : undefined;
-    const modifiedRear=(mounted.rearArchReplacement || mounted.rearSeatConnector || mounted.rearSeatStrap || mounted.rearTopStay) ? mounted.rearRack : undefined;
+    const modifiedRear=(mounted.rearArchReplacement || mounted.rearSeatConnector || mounted.rearSeatStrap || mounted.rearTopStay || mounted.rearArchBumpers || mounted.rearDropoutLeft || mounted.rearDropoutRight || mounted.rearDropoutBushings) ? mounted.rearRack : undefined;
     const uncertainSockets = new Set(Object.entries(mounted).filter(([,b])=>b===modifiedHost || b===modifiedRear).map(([id])=>id));
+    if(mounted.rearAxleHardware && (mounted.rearAxleNds || mounted.rearAxleDs || mounted.rearAxleSpacers)) uncertainSockets.add('rearAxleHardware');
+    if(mounted.rearUdhHardware && mounted.rearUdhHanger) uncertainSockets.add('rearUdhHardware');
     for(const side of ['Left','Right']) if(mounted[`forkPackHardware${side}`] || mounted[`forkPackHook${side}`]) {
       const host=mounted[`fork${side}_0`];
       if(host && /^tailfin-(655674|972100)-v[12]$/.test(host.id)) uncertainSockets.add(`fork${side}_0`);

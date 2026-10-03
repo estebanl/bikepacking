@@ -1,5 +1,8 @@
 "use client";
 
+import { AxleHardwareModel, UdhHardwareModel } from "./equipment/AxleHardwareModel";
+import { getAxleHardwarePoses } from "@/lib/axleHardwareGeometry";
+import { RearArchHardwareModel } from "./equipment/RearArchHardwareModel";
 import { RearConnectorModel } from "./equipment/RearConnectorModel";
 import { getRearConnectorGeometry } from "@/lib/rearConnectorGeometry";
 import { RearPannierHardwareModel } from "./equipment/RearPannierHardwareModel";
@@ -42,12 +45,26 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
     if(rackAnchor) rearDeck=getEquipmentPlacement(mounted.rearRack,rackAnchor).dimensions;
   }
   const rearHostAnchor=mounted.rearRack ? findSocket(size,"rearRack",mounted) : undefined;
-  const rearArchDimensions=mounted.rearRack && rearHostAnchor ? getRearArchPose(mounted.rearRack,rearHostAnchor).dimensions : undefined;
+  const rearArchPose=mounted.rearRack && rearHostAnchor ? getRearArchPose(mounted.rearRack,rearHostAnchor) : undefined;
+  const rearArchDimensions=rearArchPose?.dimensions;
+  const installedArch=mounted.rearArchReplacement ?? mounted.rearRack;
+  const fastRelease=/^tailfin-(895075|913333|894178)-v/.test(mounted.rearRack?.id ?? "");
   const rackParts={
     hideArch: !!mounted.rearArchReplacement,
-    carbon: /Carbon/.test(bag.name),
+    carbon: /Carbon/.test(installedArch?.name ?? bag.name),
+    fastRelease,
+    showDropouts: [!mounted.rearDropoutLeft,!mounted.rearDropoutRight] as [boolean,boolean],
+    showBushings: !mounted.rearDropoutBushings,
+    showBumpers: !mounted.rearArchBumpers,
     pannierMounts: isRearArchReplacement(bag) ? archHasPannierMounts(bag) : rackHasPannierMounts(mounted),
   };
+  const axlePoses=getAxleHardwarePoses(bike,size);
+  const axleHost=socketId==='rearAxleHardware' && /^tailfin-(34167|564)-v/.test(bag.id);
+  const axlePart=['rearAxleNds','rearAxleDs','rearAxleSpacers'].includes(socketId);
+  const udhHost=socketId==='rearUdhHardware' && /^tailfin-664853-v/.test(bag.id);
+  const udhPart=socketId==='rearUdhHanger';
+  const archHardwarePart=['rearDropoutLeft','rearDropoutRight','rearDropoutBushings','rearArchBumpers'].includes(socketId);
+  const dedicatedHardware=axleHost || axlePart || udhHost || udhPart || archHardwarePart;
   const forkSide=forkPackSide(socketId);
   const forkHostId=`fork${forkSide}_0`;
   const forkHostAnchor=findSocket(size,forkHostId,mounted);
@@ -106,6 +123,20 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
     };
   }
   return <>
+    {(axleHost || axlePart) && <group {...axlePoses.axle} name={`bag_${bag.id}_${socketId}`}>
+      <AxleHardwareModel showShaft={axleHost}
+        showNds={axleHost ? !mounted.rearAxleNds : socketId==='rearAxleNds'}
+        showDs={axleHost ? !mounted.rearAxleDs : socketId==='rearAxleDs'}
+        showSpacers={axleHost ? !mounted.rearAxleNds && !mounted.rearAxleSpacers : socketId==='rearAxleNds' || socketId==='rearAxleSpacers'}/>
+    </group>}
+    {(udhHost || udhPart) && <group {...axlePoses.udh} name={`bag_${bag.id}_${socketId}`}>
+      <UdhHardwareModel showHanger={udhPart || !mounted.rearUdhHanger} showAdapter={udhHost}/>
+    </group>}
+    {archHardwarePart && rearArchPose && <group position={rearArchPose.position} rotation={rearArchPose.rotation} name={`bag_${bag.id}_${socketId}`}>
+      <RearArchHardwareModel dimensions={rearArchPose.dimensions} carbon={rackParts.carbon} fastRelease={fastRelease}
+        showDropouts={[socketId==='rearDropoutLeft',socketId==='rearDropoutRight']}
+        showBushings={socketId==='rearDropoutBushings'} showBumpers={socketId==='rearArchBumpers'}/>
+    </group>}
     {frameHost && frameStations.map(station=>{
       const suffix=station.id === 'front' ? 'Fore' : 'Aft';
       return <FrameAttachmentModel key={station.id} station={station} showMount={!mounted[`${socketId}VMount${suffix}`]} showStrap={!mounted[`${socketId}Strap${suffix}`]} showBuckle={!mounted[`${socketId}Strap${suffix}`]}/>;
@@ -113,7 +144,7 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
     {framePart && framePartStations.map(station=><FrameAttachmentModel key={station.id} station={station} showMount={framePart.role==='vMount'} showStrap={framePart.role==='strap'||framePart.role==='seatpostStrap'} showBuckle={framePart.role==='strap'||framePart.role==='seatpostStrap'} showKeepers={framePart.role==='keepers'}/>)}
     {rearConnector && isRack && <RearConnectorModel {...rearConnector} carbon={/Carbon/.test(bag.name)} showStay={!mounted.rearTopStay} showConnector={!mounted.rearSeatConnector} showStrap={!mounted.rearSeatStrap}/>}
     {rearConnector && connectorPart && <RearConnectorModel {...rearConnector} carbon={socketId==='rearTopStay'} showStay={socketId==='rearTopStay'} showConnector={socketId==='rearSeatConnector'} showStrap={socketId==='rearSeatStrap'} longStrap={socketId==='rearSeatStrap'}/>}
-    {!connectorPart && !framePart &&
+    {!connectorPart && !framePart && !dedicatedHardware &&
     <group
       position={placement.position}
       rotation={placement.rotation}

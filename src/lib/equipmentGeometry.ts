@@ -1,5 +1,12 @@
 import type { BagItem } from "../types/index";
 
+/** Shared original soft-trunk reinforced floor; dimensions are rendering estimates. */
+export const SOFT_TRUNK_BASE_CENTER_RATIO = .444;
+export const SOFT_TRUNK_BASE_THICKNESS = .004;
+export function softTrunkBaseOffset(height: number): number {
+  return height * SOFT_TRUNK_BASE_CENTER_RATIO + SOFT_TRUNK_BASE_THICKNESS / 2;
+}
+
 export type EquipmentVisualKind = NonNullable<BagItem["visualKind"]>;
 export type Point3 = [number, number, number];
 

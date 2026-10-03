@@ -59,7 +59,7 @@ test('replacement assembly exposes unknown mass instead of silently using integr
 });
 
 
-test('SpeedPack top-bag upgrade requires a rack without double-counting an integrated arch',()=>{
+test('fixed SpeedPack kit remains pending until a bare-arch conversion is modeled',()=>{
  const kit=item('tailfin-894177');
  const rack=item('tailfin-1008020');
  const integrated=item('tailfin-894178');
@@ -68,6 +68,9 @@ test('SpeedPack top-bag upgrade requires a rack without double-counting an integ
  assert.equal(kit.volumeLiters,null);
  assert.equal(kit.provides?.includes('rear-rack')??false,false);
  assert.equal(validateMount(kit,'rackTop',blur.sizes.M,{}).allowed,false);
- assert.equal(validateMount(kit,'rackTop',blur.sizes.M,{rearRack:rack}).allowed,true);
+ assert.equal(kit.previewStatus,'implementation-pending');
+ assert.deepEqual(kit.compatibleSockets,[]);
+ assert.match(kit.previewStatusReason!,/bare Carbon or Alloy arch/);
+ assert.equal(validateMount(kit,'rackTop',blur.sizes.M,{rearRack:rack}).allowed,false);
  assert.equal(validateMount(kit,'rackTop',blur.sizes.M,{rearRack:integrated}).allowed,false);
 });

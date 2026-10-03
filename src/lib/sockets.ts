@@ -1,3 +1,5 @@
+import { axleSpareConflictReasons } from "./axleSpareAssembly.ts";
+import { rearArchHardwareConflictReasons } from "./rearArchHardware.ts";
 import { getFrameAttachmentSpec, frameAttachmentConflictReasons } from "./frameAttachments.ts";
 import { requiredProductCapabilities, forkPackConflictReasons } from "./forkPackAssembly.ts";
 import { getForkPackHardwarePose, forkPackSide, getRearPannierPose } from "./forkPackGeometry.ts";
@@ -11,7 +13,7 @@ import type {
 } from "../types/index.ts";
 import { resolveCargoStrapAnchor, getBarCageEnvelope, isBarCageBundle } from "./cargoStraps.ts";
 import { resolveRearAccessoryAnchor } from "./rearAccessoryMounts.ts";
-import { equipmentDimensions, rotateEquipmentPoint, getEquipmentPlacement } from "./equipmentGeometry.ts";
+import { equipmentDimensions, rotateEquipmentPoint, getEquipmentPlacement, softTrunkBaseOffset } from "./equipmentGeometry.ts";
 export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, BagItem> = {}): SocketAnchor[] {
   const anchors = Object.values(size.sockets).flatMap((value) =>
     Array.isArray(value) ? value : value ? [value] : [],
@@ -33,9 +35,9 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
       if (rackAnchor && mounted.rearRack.visualKind === "rack") {
         const rack = getEquipmentPlacement(mounted.rearRack,rackAnchor);
         const [,bagHeight] = equipmentDimensions(mounted.rackTop);
-        // Deck rail radius6mm; fixed connector underside is .499 of bag height.
-        const underside = /fixed connector/i.test(mounted.rackTop.name) ? .499 : .47;
-        return {...anchor,rotation:rack.rotation,position:[rack.position[0],rack.position[1]+rack.dimensions.height*.44+.006+bagHeight*underside,rack.position[2]]};
+        // Shared rendered floor sits on the 6mm deck rail, including its thickness.
+        const underside = /fixed connector/i.test(mounted.rackTop.name) ? Math.max(softTrunkBaseOffset(bagHeight),bagHeight*.49+.009) : softTrunkBaseOffset(bagHeight);
+        return {...anchor,rotation:rack.rotation,position:[rack.position[0],rack.position[1]+rack.dimensions.height*.44+.006+underside,rack.position[2]]};
       }
     }
     if (anchor.id === "barMount" && mounted.barMount?.id === "tailfin-825745-v1") {
@@ -84,7 +86,7 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
       const hostAnchor=resolved.find(a=>a.id===hostId);
       if(hostAnchor) { const pose=getForkPackHardwarePose(mounted[hostId],hostAnchor,side); return {...anchor,position:pose.position,rotation:pose.rotation}; }
     }
-    if((anchor.id === "rearArchReplacement" || anchor.id === "thirdPartyPannierAdapters") && mounted.rearRack) {
+    if(["rearArchReplacement", "thirdPartyPannierAdapters", "rearArchBumpers", "rearDropoutLeft", "rearDropoutRight", "rearDropoutBushings"].includes(anchor.id) && mounted.rearRack) {
       const hostAnchor=resolved.find(a=>a.id === "rearRack");
       if(hostAnchor) { const pose=getRearArchPose(mounted.rearRack,hostAnchor); return {...anchor,position:pose.position,rotation:pose.rotation}; }
     }
@@ -213,6 +215,8 @@ export function validateMount(
   )
     reasons.push("Conflicts with equipment already fitted.");
   reasons.push(...forkPackConflictReasons(bag,socketId,mounted));
+  reasons.push(...axleSpareConflictReasons(bag,socketId,mounted));
+  reasons.push(...rearArchHardwareConflictReasons(bag,socketId,mounted));
   reasons.push(...frameAttachmentConflictReasons(bag,socketId,mounted));
   return { allowed: reasons.length === 0, reasons };
 }

@@ -1,3 +1,5 @@
+import { AXLE_SPARE_PARTS } from "../lib/axleSpareAssembly.ts";
+import { REAR_ARCH_HARDWARE_PARTS } from "../lib/rearArchHardware.ts";
 import { FRAME_ATTACHMENT_PARTS } from "../lib/frameAttachments.ts";
 import type { BagItem, BagCategory } from "../types/index.ts";
 
@@ -2969,6 +2971,10 @@ const BAR_ROLL_REPLACEMENTS: Record<string, { handlebarType: "flat" | "drop"; di
 
 function placement(p: SourceProduct, v: SourceVariant): Placement {
   const base = referencePlacement(p.catalog_section === "spares");
+  const axleSpare=AXLE_SPARE_PARTS[p.id];
+  if(axleSpare) return {category:"mount",productKind:"spare",visualKind:"mount",sockets:[axleSpare.socketId],requires:[axleSpare.requiredCapability]};
+  const rearArchHardware=REAR_ARCH_HARDWARE_PARTS[p.id];
+  if(rearArchHardware) return {category:"mount",productKind:"spare",visualKind:"mount",sockets:rearArchHardware.socketIds,requires:rearArchHardware.requiredCapabilities};
   const frameAttachment=FRAME_ATTACHMENT_PARTS[p.id];
   if(frameAttachment) return {category:"mount",productKind:"spare",visualKind:"mount",sockets:frameAttachment.socketIds};
   if (["tailfin-48947", "tailfin-652020"].includes(p.id))
@@ -3050,17 +3056,16 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
   if (p.id === "tailfin-894177")
     return {
       category: "seat_pack", productKind: "bag", visualKind: "trunk",
-      sockets: ["rackTop"], requires: ["rack-top"],
-      provides: ["tailfin-rear-light-interface", "tailfin-fixed-bag-light-interface"],
+      sockets: [],
     };
   // Specific complete hardware kits are selectable even though their source section is Spares.
-  if (p.id === "tailfin-34167")
+  if (p.id === "tailfin-34167" || p.id === "tailfin-564")
     return {
       category: "mount",
       productKind: "mount",
       visualKind: "mount",
       sockets: ["rearAxleHardware"],
-      provides: ["tailfin-axle"],
+      provides: ["tailfin-axle","tailfin-thru-axle-host",...(p.id==="tailfin-34167" ? ["universal-axle-host"] : [])],
     };
   if (p.id === "tailfin-664853")
     return {
@@ -3068,7 +3073,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       productKind: "mount",
       visualKind: "mount",
       sockets: ["rearUdhHardware"],
-      provides: ["udh-adapter"],
+      provides: ["udh-adapter","udh-kit-host"],
     };
   if (p.mount_zone === "rear-system" || p.mount_zone === "rear-rack") {
     // Direct mounts need confirmed frame eyelets; neither Santa Cruz model has that confirmation.
@@ -3085,6 +3090,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       requires: ["tailfin-axle", "udh-adapter"],
       provides: [
         "rear-rack",
+        ...(p.id === "tailfin-895075" || (fixed && /Fast Release/i.test(v.label)) ? ["fast-release-host"] : []),
         ...(p.id === "tailfin-895075" ? ["carbon-rack-top-stay"] : []),
         ...(p.id === "tailfin-895075" || p.mount_zone === "rear-system" ? ["legacy-rear-seat-strap"] : []),
         ...(p.id === "tailfin-895075" || (fixed && /Carbon/.test(v.label)) ? ["tailfin-carbon-arch-host"] : fixed && /Alloy/.test(v.label) ? ["tailfin-alloy-arch-host"] : []),
@@ -3244,6 +3250,7 @@ function previewCoverage(p: SourceProduct, v: SourceVariant, place: Placement) {
   const result = (previewStatus: NonNullable<BagItem["previewStatus"]>, previewStatusLabel: string, previewStatusReason: string) =>
     ({ previewStatus, previewStatusLabel, previewStatusReason });
   if (place.sockets.length) return result("mountable", "Illustrative preview", "Placement is available; model-specific physical fit remains unverified.");
+  if (p.id === "tailfin-894177") return result("implementation-pending", "Bare-arch conversion still to build", "The fixed SpeedPack bag kit attaches to a bare Carbon or Alloy arch, not a complete rack with top stay. Bare-arch conversion and its dependencies are not modeled.");
   if (/Direct Mount/i.test(v.label)) return result("unsupported-fit", "Unsupported fit", "Direct-mount frame eyelets are not confirmed for these Santa Cruz builds.");
   const unsupported = UNSUPPORTED_INTERFACES.get(p.id);
   if (unsupported) return result("unsupported-fit", "Unsupported fit", unsupported);
@@ -3389,8 +3396,15 @@ function normalize(
     v.weight_g !== null &&
     v.bar_clamp_weight_g !== undefined
       ? v.weight_g + v.bar_clamp_weight_g
-      : p.id === "tailfin-675800" ? 25 : p.id === "tailfin-642" ? 370 : p.id === "tailfin-591" ? 471 : p.id === "tailfin-20115" ? 82.5 : v.weight_g;
+      : p.id === "tailfin-675800" ? 25 : p.id === "tailfin-642" ? 370 : p.id === "tailfin-591" ? 471 : p.id === "tailfin-20115" ? 82.5 : p.id === "tailfin-129215" ? 18 : v.weight_g;
   const notes = [
+    REAR_ARCH_HARDWARE_PARTS[p.id]
+      ? "Replaces included rear arch hardware; removed component mass is unknown, so the modified rear system is excluded from known mass. Bumpers require matching Carbon or Alloy material and pannier mounts; Journey is excluded. Official Carbon bumper pair mass is18g; other spare masses and installed dimensions remain unknown. Each Fast Release Dropout selection is one physical side; the bushing kit is four pieces, two small and two large, illustrated as one of each per side. Base included dropout bodies support a selected bushing kit without requiring duplicate replacement bodies. Exact generation, fastening and physical fit remain unverified. Geometry is illustrative, not manufacturer CAD."
+      : "",
+    AXLE_SPARE_PARTS[p.id] || p.id === "tailfin-564"
+      ? "Illustrative axle interface only: exact length, collar selection, thread pitch, dropout and drivetrain compatibility must be verified. Universal axle end spares require the Universal Thru Axle host; NDS spare includes spacers and cannot stack with a separate spacer set. SRAM UDH hanger replaces the hanger included in the UDH Adaptor Set; it does not independently replace the required adapter. Removed host subcomponent mass is unknown, so replacement-modified hardware assemblies are excluded from known gear mass. Source spare masses and dimensions remain unknown. No source quantity or frame fit approval is inferred from the drawing."
+      : "",
+
     FRAME_ATTACHMENT_PARTS[p.id]
       ? "Replaces the selected attachment on the matching bag family, except the rear seatpost strap, which is an optional third strap added to the published two-strap bag mass. Each fore/aft station is one illustrative physical part; source package counts are not inferred. Frame Bag Long Strap is 29 cm; Top Tube Long Strap is 36 cm; Short Strap is 18.5 cm and also supports Frame Bags. The Keeper pack contains four loops, shown as two per station on one host. DownTube V-Mount straps are 18.5 cm (road design) or 30 cm (MTB design); the catalog label x20cm is a source-label ambiguity, while the official listing gives 20 mm width. Nominal loose lengths do not certify installed circumference, routing or fit. Source mass and installed dimensions remain unknown. Replacement-modified host mass is excluded because removed component mass is unknown; the optional rear seatpost strap preserves the two-strap base bag mass and adds its own unknown mass. Capacity and payload remain counted. The rear bag includes two18.5cm straps plus one14.5cm strap, but the spare seatpost SKU is not explicitly identified as that14.5cm strap, so no9g mass is inferred. Original estimated geometry, not manufacturer CAD."
       : "",
@@ -3456,7 +3470,7 @@ function normalize(
     p.id === "tailfin-959100" ? "Frame-tube strap adapter only; never offered on forks, stays or carbon rack arches. Official page: approximately 22–90 mm tube diameter and 64 mm cage spacing; 2 straps support 1 kg, 3 straps 1.5 kg. Preview illustrates two straps. 19 g body mass excludes straps/screws, so complete mass remains unknown. Bottle and cage excluded; verify tube shape, location and instructions." : "",
 
     p.id === "tailfin-894177"
-      ? "Top bag plus fixed connector upgrade kit; requires an existing supported rack. This is not a complete SpeedPack system and does not add a second arch. Source spare-kit mass and normalized capacity are unknown; fixed connector geometry is illustrative. Verify rack generation and conversion instructions."
+      ? "Fixed SpeedPack bag and connector kit requires a bare Carbon or Alloy arch. A complete rack with top stay is not the supported assembly. Preview remains pending until bare-arch conversion is modeled; no rackTop placement is offered. Spare-kit mass and normalized capacity remain unknown."
       : "",
     BAR_ROLL_REPLACEMENTS[p.id]
       ? "Replacement bag includes bag-side hardware, not the separate bike-side Bar Bag Mounting Kit. Listed spare mass/capacity remain unknown; sibling complete-system specifications are not substituted. Rendered bag-size differences are illustration estimates."

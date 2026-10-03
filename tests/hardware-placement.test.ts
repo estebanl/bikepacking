@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { BIKES } from '../src/data/bikes.ts';
 import { TAILFIN_CATALOG } from '../src/data/tailfin.ts';
 import { findSocket, validateMount, sanitizeMountedBags } from '../src/lib/sockets.ts';
-import { equipmentDimensions, getEquipmentBounds, getEquipmentPlacement } from '../src/lib/equipmentGeometry.ts';
+import { equipmentDimensions, getEquipmentBounds, getEquipmentPlacement, softTrunkBaseOffset } from '../src/lib/equipmentGeometry.ts';
 const item=(id:string)=>{const x=TAILFIN_CATALOG.find(b=>b.id===id);assert.ok(x,id);return x;};
 const size=BIKES.find(b=>b.id==='santa-cruz-stigmata-2027')!.sizes.M;
 const cage=item('tailfin-32010-v1'),large=item('tailfin-32010-v2'),chip=item('tailfin-48952-v1'),fork=item('tailfin-42733-v1');
@@ -26,10 +26,12 @@ test('mirrored fork bags stay outboard and foot follows selected cage height',()
  const largeFoot=findSocket(size,'cargoFootLeft',{...mounted,cageLeft:large})!;
  assert.ok(Math.abs((smallFoot.position[1]-largeFoot.position[1])-(equipmentDimensions(large)[1]-equipmentDimensions(cage)[1])*.47)<1e-9);
 });
-test('replacement top bag connector touches its installed rack deck',()=>{
+test('valid removable SpeedPack reinforced floor touches its installed rack deck',()=>{
  const rack=TAILFIN_CATALOG.find(b=>b.name.startsWith('Journey')&&b.visualKind==='rack')!;
- assert.ok(rack);const bag=item('tailfin-894177-v1');const mounted={rearRack:rack,rackTop:bag};
+ assert.ok(rack);const bag=item('tailfin-930095-v1');
+ assert.equal(validateMount(bag,'rackTop',size,{rearRack:rack}).allowed,true);
+ const mounted={rearRack:rack,rackTop:bag};
  const rackPose=getEquipmentPlacement(rack,findSocket(size,'rearRack',mounted)!);
  const bagPose=getEquipmentPlacement(bag,findSocket(size,'rackTop',mounted)!);
- assert.ok(Math.abs(bagPose.position[1]-equipmentDimensions(bag)[1]*.499-(rackPose.position[1]+rackPose.dimensions.height*.44+.006))<1e-9);
+ assert.ok(Math.abs(bagPose.position[1]-softTrunkBaseOffset(equipmentDimensions(bag)[1])-(rackPose.position[1]+rackPose.dimensions.height*.44+.006))<1e-9);
 });

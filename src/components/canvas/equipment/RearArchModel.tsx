@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
-import type { Point3 } from "@/lib/equipmentGeometry";
+import { RearArchHardwareModel, type RearArchHardwareProps } from "./RearArchHardwareModel";
 
 const alloyFinish = new THREE.MeshStandardMaterial({
   color: "#586369", metalness: 0.82, roughness: 0.31,
@@ -11,20 +11,16 @@ const carbonFinish = new THREE.MeshStandardMaterial({
   color: "#20282b", metalness: 0.12, roughness: 0.62,
 });
 const receiverFinish = new THREE.MeshStandardMaterial({ color: "#111718", roughness: 0.53 });
-const pinFinish = new THREE.MeshStandardMaterial({ color: "#9ba5a7", metalness: 0.9, roughness: 0.25 });
 const box = new THREE.BoxGeometry(1, 1, 1);
-const pin = new THREE.CylinderGeometry(1, 1, 1, 12);
 
 /** Original estimated rear arch, shared by complete racks and replacement parts.
  * Includes both legs, their continuous top bridge, axle feet/pins and optional
  * pannier receivers. Deck, seatpost connector and assembly mass belong to callers.
  * Shape and finish are illustrative, not manufacturer CAD or a fit assertion.
  */
-export function RearArchModel({ dimensions: [l, h, d], carbon = false, pannierMounts = true }: {
-  dimensions: Point3;
-  carbon?: boolean;
-  pannierMounts?: boolean;
-}) {
+export function RearArchModel({ dimensions: [l, h, d], carbon = false, pannierMounts = true,
+  fastRelease = false, showDropouts = [true,true], showBushings = true, showBumpers = true,
+}: RearArchHardwareProps & { pannierMounts?: boolean }) {
   const depth = carbon ? 0.014 : 0.010;
   const legGeometry = useMemo(() => {
     const shape = new THREE.Shape();
@@ -50,15 +46,11 @@ export function RearArchModel({ dimensions: [l, h, d], carbon = false, pannierMo
     <mesh dispose={null} geometry={box} material={material}
       position={[-l * 0.087, h * 0.427, 0]}
       scale={[l * 0.06, h * 0.046, d * 0.8 + depth]} castShadow receiveShadow />
+    <RearArchHardwareModel dimensions={[l,h,d]} carbon={carbon} fastRelease={fastRelease}
+      showDropouts={showDropouts} showBushings={showBushings} showBumpers={pannierMounts && showBumpers}/>
     {[-1, 1].map(side => <group key={side}>
       <mesh dispose={null} geometry={legGeometry} material={material}
         position={[0, 0, side * d * 0.4]} castShadow receiveShadow />
-      <mesh dispose={null} geometry={box} material={receiverFinish}
-        position={[l * 0.095, -h * 0.455, side * d * 0.4]}
-        scale={[0.026, 0.022, 0.022]} castShadow />
-      <mesh dispose={null} geometry={pin} material={pinFinish} rotation={[Math.PI / 2, 0, 0]}
-        position={[l * 0.095, -h * 0.455, side * d * 0.43]}
-        scale={[0.005, d * 0.08, 0.005]} castShadow />
       {pannierMounts && <mesh dispose={null} geometry={box} material={receiverFinish}
         position={[-l * 0.065, h * 0.36, side * d * 0.44]}
         scale={[0.04, 0.019, 0.017]} castShadow />}

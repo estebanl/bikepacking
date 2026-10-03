@@ -1,7 +1,9 @@
 "use client";
 import { ForkPackHardwareModel } from "./ForkPackHardwareModel";
+import { SoftLuggageModel } from "./SoftLuggageModel";
 import { isForkPackPart } from "@/lib/forkPackGeometry";
 import { RearArchModel } from "./RearArchModel";
+import type { RearArchHardwareProps } from "./RearArchHardwareModel";
 import { ThirdPartyAdapterModel } from "./ThirdPartyAdapterModel";
 import { CatalogBottleModel } from "./CatalogBottleModel";
 import { isCatalogBottle } from "@/lib/catalogBottles";
@@ -17,6 +19,7 @@ import { CargoStrapModel } from "./CargoStrapModel";
 import type { BagItem } from "@/types";
 import {
   equipmentDimensions,
+  softTrunkBaseOffset,
   equipmentKind,
   type Point3,
 } from "@/lib/equipmentGeometry";
@@ -201,9 +204,11 @@ function PanelShell({
   );
 }
 
+type RackParts = Partial<Omit<RearArchHardwareProps,"dimensions">> & { hideArch?:boolean; pannierMounts?:boolean };
+
 export interface BarSupportEndpoints { clamps: [Point3,Point3]; ends: [Point3,Point3]; orientation: [number,number,number,number] }
 
-export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts, rearArchDimensions, rackParts, bottleCageBackSign, forkPackHardware, convertedForkPannier, hideTubeAttachments }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]}; hideTubeAttachments?:boolean; convertedForkPannier?:boolean; forkPackHardware?:{dimensions:Point3;showMount:boolean;showHook:boolean}; rearArchDimensions?:Point3; bottleCageBackSign?:1|-1; rackParts?:{hideArch?:boolean;carbon?:boolean;pannierMounts?:boolean} }): ReactElement {
+export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts, rearArchDimensions, rackParts, bottleCageBackSign, forkPackHardware, convertedForkPannier, hideTubeAttachments }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]}; hideTubeAttachments?:boolean; convertedForkPannier?:boolean; forkPackHardware?:{dimensions:Point3;showMount:boolean;showHook:boolean}; rearArchDimensions?:Point3; bottleCageBackSign?:1|-1; rackParts?:RackParts }): ReactElement {
   const [l, h, d] = equipmentDimensions(bag),
     kind = equipmentKind(bag);
   const fabric = useMemo(
@@ -275,7 +280,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
   ].includes(kind);
   if (isForkPackPart(bag) && forkPackHardware) return <ForkPackHardwareModel {...forkPackHardware}/>;
   if (isCatalogBottle(bag)) return <CatalogBottleModel item={bag} cageBackSign={bottleCageBackSign}/>;
-  if (isRearArchReplacement(bag) && rearArchDimensions) return <RearArchModel dimensions={rearArchDimensions} carbon={rackParts?.carbon} pannierMounts={rackParts?.pannierMounts}/>;
+  if (isRearArchReplacement(bag) && rearArchDimensions) return <RearArchModel dimensions={rearArchDimensions} {...rackParts}/>;
   if (bag.id === "tailfin-20115-v1" && rearArchDimensions) return <ThirdPartyAdapterModel dimensions={rearArchDimensions}/>;
   if (bag.id === "tailfin-1012933-v1" || bag.id === "tailfin-1012929-v1") return <group name="illustrative-empty-bar-cage-accessory">
     <Box position={[0,.004,0]} size={[.022,.008,.027]} material={metal}/>
@@ -298,7 +303,9 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
         <group position={[0, -h * 0.15, 0]}>
           <RackModel dimensions={[l * 0.96, h * 0.65, d * 0.68]} {...rackParts}/>
         </group>
-        <group position={[0, h * 0.32, 0]}>
+        {/* The 4mm reinforced floor rests on the 6mm deck rails. This is an
+            internal assembly adjustment; the catalog envelope stays unchanged. */}
+        <group position={[0, h * 0.136 + 0.006 + softTrunkBaseOffset(h * 0.36), 0]}>
           <EquipmentModel
             bag={{
               ...bag,
@@ -443,6 +450,14 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
       </group>
     );
 
+  if(kind === "bar_roll" || kind === "trunk") return <group>
+    <SoftLuggageModel kind={kind} dimensions={[l,h,d]} color={bag.colorHex}/>
+    {isBarCageBundle(bag) && barCageEnvelope && <BarCageModel envelope={barCageEnvelope} support={barSupport} {...barCageParts}/>}
+    {kind === "trunk" && /fixed connector/i.test(bag.name) && <group name="illustrative-fixed-bag-connector">
+      <Box position={[0,-h*.475,0]} size={[l*.55,.011,d*.58]} material={metal}/>
+      {[-1,1].map(side=><Box key={side} position={[0,-h*.49,side*d*.23]} size={[l*.36,.018,.014]} material={buckle}/>)}
+    </group>}
+  </group>;
   const frame = kind === "frame" || kind === "half_frame";
   const roll = [
     "fork_pack",
@@ -455,10 +470,6 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
   return (
     <group>
       <PanelShell outline={outline} depth={d * 0.9} material={fabric} />
-      {kind === "trunk" && /fixed connector/i.test(bag.name) && <group name="illustrative-fixed-bag-connector">
-        <Box position={[0,-h*.475,0]} size={[l*.55,.011,d*.58]} material={metal}/>
-        {[-1,1].map(side=><Box key={side} position={[0,-h*.49,side*d*.23]} size={[l*.36,.018,.014]} material={buckle}/>)}
-      </group>}
       {/* Reinforced underside and small separate reflective ID patch. */}
       <Box position={[0, -h * 0.44, 0]} size={[l * 0.69, 0.006, d * 0.88]} />
       {[-1, 1].map((s) => (
@@ -510,42 +521,6 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
         <Box position={[l*x,-h*.46-.040,0]} size={[.017,.003,.045]}/>
         <Box position={[l*x,-h*.35,d*.465]} size={[.023,.019,.006]} material={buckle}/>
       </group>)}
-      {isBarCageBundle(bag) && barCageEnvelope && <BarCageModel envelope={barCageEnvelope} support={barSupport} {...barCageParts}/>}
-      {kind === "bar_roll" && (
-        <>
-          {[-1, 1].map((s) => (
-            <group key={s}>
-              <Box
-                position={[0, 0, s * d * 0.46]}
-                size={[l * 0.72, h * 0.65, 0.014]}
-                material={fabric}
-              />
-              <Box
-                position={[l * 0.28, h * 0.1, s * d * 0.47]}
-                size={[0.024, 0.024, 0.012]}
-                material={buckle}
-              />
-              <Box
-                position={[0, h * 0.46, s * d * 0.28]}
-                size={[l * 0.78, 0.005, 0.024]}
-              />
-              <Box
-                position={[l * 0.475, 0, s * d * 0.28]}
-                size={[0.003, h * 0.68, 0.024]}
-              />
-              <Box
-                position={[-l * 0.475, 0, s * d * 0.28]}
-                size={[0.003, h * 0.68, 0.024]}
-              />
-              <Box
-                position={[l * 0.475, h * 0.18, s * d * 0.28]}
-                size={[0.008, 0.032, 0.031]}
-                material={buckle}
-              />
-            </group>
-          ))}
-        </>
-      )}
       {roll && (
         <>
           {/* Folded waterproof closure, flat woven compression straps, acetal buckles. */}
@@ -609,16 +584,11 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
   );
 }
 
-function RackModel({ dimensions, hideArch = false, carbon = false, pannierMounts = true }: {
-  dimensions: Point3;
-  hideArch?: boolean;
-  carbon?: boolean;
-  pannierMounts?: boolean;
-}) {
+function RackModel({ dimensions, hideArch = false, ...archParts }: { dimensions: Point3 } & RackParts) {
   const [l, h, d] = dimensions;
   return (
     <group>
-      {!hideArch && <RearArchModel dimensions={dimensions} carbon={carbon} pannierMounts={pannierMounts} />}
+      {!hideArch && <RearArchModel dimensions={dimensions} {...archParts} />}
       {/* Deck rails and crossbars stay with the host when its arch is replaced. */}
       {[-1, 1].map((s) => (
         <Rod key={s}
