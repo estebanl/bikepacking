@@ -11,13 +11,21 @@ import { evaluateClearances } from '../src/lib/clearance.ts';
 const bikes = BIKES.filter(b => b.brand === 'Santa Cruz');
 const cases = bikes.flatMap(bike => Object.entries(bike.sizes).map(([key,size]) => ({bike,key,size})));
 const side = (id: string) => /Left/.test(id) ? 'Left' : /Right/.test(id) ? 'Right' : null;
-const scoped = new Set(['fork-mount','cargo-cage','cargo-cage-load-chip-host']);
+const scoped = new Set(['fork-mount','cargo-cage','cargo-cage-load-chip-host','cargo-strap-upper','cargo-strap-lower']);
 // Independent contract oracle: no production capability/validation helper is used here.
 function compatible(item: BagItem, anchor: SocketAnchor) {
   return anchor.allowedBagCategories.includes(item.category) && item.compatibleSockets.some(id => id === anchor.id || ((id==='forkLeft'||id==='forkRight') && anchor.id.startsWith(id))) && !(item.handlebarType && anchor.handlebarType && item.handlebarType !== anchor.handlebarType);
 }
+// Published length pairing: small pack 40cm, medium 50cm, large 50/65cm.
+function strapMatches(pack: BagItem, strap: BagItem) {
+  if (!pack.id.startsWith('tailfin-56316-')) return true;
+  return pack.volumeLiters === 1.7 ? strap.name.includes('40cm') : pack.volumeLiters === 3 ? strap.name.includes('50cm') : strap.name.includes('50cm') || strap.name.includes('65cm');
+}
+function roleMatches(required: string, socketId: string) {
+  return required === 'cargo-strap-upper' ? socketId.startsWith('cargoStrapUpper') : required === 'cargo-strap-lower' ? socketId.startsWith('cargoStrapLower') : true;
+}
 function dependencies(item: BagItem, anchor: SocketAnchor, mounted: Record<string,BagItem>) {
-  return [...(item.requires??[]),...(anchor.requires??[])].every(required => Object.entries(mounted).some(([id, provider]) => id!==anchor.id && (provider.id===required || provider.provides?.includes(required)) && (!scoped.has(required) || (side(id)!==null && side(id)===side(anchor.id)))));
+  return [...(item.requires??[]),...(anchor.requires??[])].every(required => Object.entries(mounted).some(([id, provider]) => id!==anchor.id && (provider.id===required || provider.provides?.includes(required)) && roleMatches(required,id) && (!required.startsWith("cargo-strap-") || strapMatches(item,provider)) && (!scoped.has(required) || (side(id)!==null && side(id)===side(anchor.id)))));
 }
 function assertClean(size: BikeSizeConfig, mounted: Record<string,BagItem>) {
   const anchors=getSocketAnchors(size,mounted);
@@ -36,7 +44,9 @@ function provision(item: BagItem, anchor: SocketAnchor, size: BikeSizeConfig, mo
     if(dependencies({...item,requires:[required]}, {...anchor,requires:[]},next)) continue;
     let found: Record<string,BagItem>|null=null;
     for(const provider of TAILFIN_CATALOG.filter(p=>p.id===required || p.provides?.includes(required))) {
+      if(required.startsWith("cargo-strap-") && !strapMatches(item,provider)) continue;
       for(const target of getSocketAnchors(size)) {
+        if(!roleMatches(required,target.id)) continue;
         if(nextVisit.has(target.id) || (scoped.has(required) && (!side(anchor.id)||side(target.id)!==side(anchor.id)))) continue;
         const candidate=provision(provider,target,size,next,nextVisit);
         if(candidate) {found=candidate;break;}

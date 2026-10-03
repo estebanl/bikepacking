@@ -2988,6 +2988,18 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       category: "accessory", productKind: "accessory", visualKind: "accessory",
       sockets: ["rearLightMount"], requires: ["tailfin-clip-light-interface"],
     };
+  if (p.id === "tailfin-126220")
+    return {
+      category: "mount", productKind: "mount", visualKind: "strap",
+      sockets: ["cargoStrapUpperLeft", "cargoStrapLowerLeft", "cargoStrapUpperRight", "cargoStrapLowerRight"],
+      requires: ["cargo-cage"],
+      provides: ["cargo-strap-upper", "cargo-strap-lower"],
+    };
+  if (["tailfin-1012933", "tailfin-1012929"].includes(p.id))
+    return {
+      category: "mount", productKind: "mount", visualKind: "mount",
+      sockets: ["barCageAccessory"], requires: ["bar-cage"],
+    };
   if (p.id === "tailfin-48952")
     return { category: "mount", productKind: "mount", visualKind: "mount",
       sockets: ["cargoFootLeft", "cargoFootRight"], requires: ["cargo-cage-load-chip-host"] };
@@ -3141,7 +3153,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       productKind: "bag",
       visualKind: "fork_pack",
       sockets: ["forkLeft_0", "forkRight_0"],
-      requires: ["cargo-cage"],
+      requires: ["cargo-cage", "cargo-strap-upper", "cargo-strap-lower"],
     };
   if (p.id === "tailfin-655674")
     return {
@@ -3171,10 +3183,10 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
 
 /** Renderer backlog classification, not manufacturer compatibility or dimensional evidence.
  * Visible replacement parts stay pending even when their parent system already has a preview.
- * Only internal/service-only parts are nonvisual; retail/off-bike products are a separate group.
+ * Internal storage inserts and service-only parts are nonvisual; retail/off-bike products are separate.
  */
 const NONVISUAL_SPARES = new Set([
-  "855567", "734880", "661776", "661795", "653454", "653447", "652726",
+  "855567", "734880", "661776", "661795", "653454", "653447", "652726", "732058",
   "652723", "141832", "793582", "138815", "129657", "809537", "48957",
   "48956", "16145", "710834",
 ].map((id) => `tailfin-${id}`));
@@ -3198,7 +3210,7 @@ function previewCoverage(p: SourceProduct, v: SourceVariant, place: Placement) {
   if (unsupported) return result("unsupported-fit", "Unsupported fit", unsupported);
   if (p.role === "non-bike-merchandise" || p.role === "off-bike-accessory")
     return result("off-bike", "Off-bike item", "Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned.");
-  if (NONVISUAL_SPARES.has(p.id)) return result("nonvisual-spare", "Internal / service spare", "Internal structure, service kit or small fastener: no standalone exterior placement. This does not certify a replacement part's compatibility.");
+  if (NONVISUAL_SPARES.has(p.id)) return result("nonvisual-spare", p.id === "tailfin-732058" ? "Internal storage insert" : "Internal / service spare", p.id === "tailfin-732058" ? "Internal divider, pockets and tool loops are storage inserts, not a visible exterior component." : "Internal structure, service kit or small fastener: no standalone exterior placement. This does not certify a replacement part's compatibility.");
   return result("implementation-pending", "Preview still to build", "Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete.");
 }
 
@@ -3223,6 +3235,9 @@ function visualEnvelope(
     depth: Math.round(depth * factor),
   });
   const d = v.dimensions_mm;
+  if (p.id === "tailfin-126220") return envelope(140, 20, 130);
+  if (p.id === "tailfin-1012933") return envelope(60, 25, 35);
+  if (p.id === "tailfin-1012929") return envelope(40, 30, 45);
   if (p.id === "tailfin-1029289") return envelope(400, 30, 65);
   if (["tailfin-1027471", "tailfin-1027465", "tailfin-1027459", "tailfin-1027462"].includes(p.id))
     return envelope(30, 45, 35);
@@ -3264,6 +3279,7 @@ function visualEnvelope(
     case "pannier":
       return envelope(250, 330, 160, scale(10));
     case "fork_pack":
+      if (p.id === "tailfin-56316") return capacity <= 1.7 ? envelope(100,245,100) : capacity <= 3 ? envelope(125,290,120) : envelope(150,365,140);
       return envelope(140, 260, 130, scale(3));
     case "cage":
       return p.id === "tailfin-825745"
@@ -3289,6 +3305,9 @@ function actualEnvelope(
   place: Placement,
 ): BagItem["dimensionsMm"] {
   const d = v.dimensions_mm;
+  // Cargo Strap source dimensions describe the loose strap, not an installed loop.
+  if (p.id === "tailfin-126220")
+    return { length: null, height: null, depth: null };
   // Source rear-system dimensions describe the bag only, not the complete arch system envelope.
   if (!d || place.visualKind === "aeropack")
     return { length: null, height: null, depth: null };
@@ -3329,6 +3348,21 @@ function normalize(
       ? v.weight_g + v.bar_clamp_weight_g
       : p.id === "tailfin-675800" ? 25 : v.weight_g;
   const notes = [
+    p.id === "tailfin-126220"
+      ? `Sold individually; a strap is not included with Cage Packs. Source strap size ${v.dimensions_mm?.length} × ${v.dimensions_mm?.width} × ${v.dimensions_mm?.thickness} mm and mass ${v.weight_g} g describe the loose strap only. The illustrated installed loop shape is unverified.`
+      : "",
+    p.id === "tailfin-56316"
+      ? `Cargo Straps are not included. Official FAQ: https://www.tailfin.cc/product/cargo-cage-system/cage-packs/cage-packs/ recommends 40 cm for 1.7 L, 50 cm for 3 L and 5 L, and 65 cm for 5 L. Published ${v.weight_g} g pack mass excludes separate cargo straps. The 5 L pack includes side compression T-Hook straps, a different part.`
+      : "",
+    p.id === "tailfin-1012933"
+      ? "Illustrative computer mount envelope only; source mass and dimensions are unknown. GPS/computer not included. Requires the standalone Bar Cage interface; the integrated cage-and-bag bundle accessory preview is unfinished."
+      : "",
+    p.id === "tailfin-1012929"
+      ? "Illustrative light mount envelope only; source mass and dimensions are unknown. Light not included. The 22 mm name is a nominal mount size, not the complete envelope. Requires the standalone Bar Cage interface; the integrated cage-and-bag bundle accessory preview is unfinished."
+      : "",
+    p.id === "tailfin-732058"
+      ? "Internal storage accessory pack: additional divider, two accessory pockets and two tool/pump loops. Source mass and dimensions are unknown; components are not modeled as exterior geometry."
+      : "",
     p.id === "tailfin-1029289"
       ? "Illustrative mudguard envelope only; source mass and dimensions are unknown. Requires the Journey rack. The Journey rack is not recommended for full-suspension use."
       : "",

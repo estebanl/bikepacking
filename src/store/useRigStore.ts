@@ -123,7 +123,7 @@ export const useRigStore = create<RigState>((set, get) => {
       waterBottlesMounted: bottles,
       selectedSocketId: null,
       lastActionMessage: clean.removed.length
-        ? `Removed equipment: ${clean.removed.map((item) => `${item.bagId} (${item.reasons.join("; ")})`).join(", ")}`
+        ? `Removed equipment: ${clean.removed.map((item) => `${BAGS.find(bag => bag.id === item.bagId)?.name ?? item.bagId} (${item.reasons.join("; ")})`).join(", ")}`
         : null,
       ...computeState(
         bike,

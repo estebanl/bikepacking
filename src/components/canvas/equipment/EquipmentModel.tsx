@@ -3,6 +3,9 @@
 import { useEffect, useMemo, type ReactElement } from "react";
 import * as THREE from "three";
 import { isRearAccessory, RearAccessoryModel, type RearDeckDimensions } from "./RearAccessories";
+import { BarCageModel } from "./BarCageModel";
+import { CagePackModel } from "./CagePackModel";
+import { CargoStrapModel } from "./CargoStrapModel";
 import type { BagItem } from "@/types";
 import {
   equipmentDimensions,
@@ -192,7 +195,7 @@ function PanelShell({
 
 export interface BarSupportEndpoints { clamps: [Point3,Point3]; ends: [Point3,Point3]; orientation: [number,number,number,number] }
 
-export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions }): ReactElement {
+export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3 }): ReactElement {
   const [l, h, d] = equipmentDimensions(bag),
     kind = equipmentKind(bag);
   const fabric = useMemo(
@@ -262,6 +265,18 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck }: { bag:
     "accessory",
     "spare",
   ].includes(kind);
+  if (bag.id === "tailfin-1012933-v1" || bag.id === "tailfin-1012929-v1") return <group name="illustrative-empty-bar-cage-accessory">
+    <Box position={[0,.004,0]} size={[.022,.008,.027]} material={metal}/>
+    <Rod a={[0,.004,0]} b={[.015,.028,0]} radius={.005} material={metal}/>
+    {bag.id === "tailfin-1012933-v1" ? <>
+      <Box position={[.015,.032,0]} size={[.035,.005,.035]} material={buckle}/>
+      <mesh dispose={null} geometry={clampRing} material={buckle} position={[.015,.037,0]} rotation={[Math.PI/2,0,0]} scale={.8}/>
+      {[-1,1].map(s=><Box key={s} position={[.015+s*.010,.038,0]} size={[.005,.004,.013]} material={metal}/>)}
+    </> : <mesh dispose={null} geometry={unitTube} material={buckle} position={[.015,.037,0]} rotation={[Math.PI/2,0,0]} scale={[.011,.032,.011]} castShadow/>}
+  </group>;
+  if (bag.id === "tailfin-825745-v1" && barCageEnvelope) return <BarCageModel envelope={barCageEnvelope} support={barSupport}/>;
+  if (bag.id.startsWith("tailfin-56316-")) return <CagePackModel bag={bag} fabric={fabric}/>;
+  if (bag.id.startsWith("tailfin-126220-") && strapEnvelope) return <CargoStrapModel envelope={strapEnvelope} rearExtension={strapRearExtension}/>;
   if (isRearAccessory(bag)) return <RearAccessoryModel bag={bag} rearDeck={rearDeck}/>;
   if (kind === "aeropack")
     return (

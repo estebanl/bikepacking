@@ -4,6 +4,7 @@ import type {
   BikeSizeConfig,
   SocketAnchor,
 } from "../types/index.ts";
+import { resolveCargoStrapAnchor, getBarCageEnvelope } from "./cargoStraps.ts";
 import { resolveRearAccessoryAnchor } from "./rearAccessoryMounts.ts";
 import { equipmentDimensions, rotateEquipmentPoint, getEquipmentPlacement } from "./equipmentGeometry.ts";
 export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, BagItem> = {}): SocketAnchor[] {
@@ -22,6 +23,14 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
         const underside = /fixed connector/i.test(mounted.rackTop.name) ? .499 : .47;
         return {...anchor,rotation:rack.rotation,position:[rack.position[0],rack.position[1]+rack.dimensions.height*.44+.006+bagHeight*underside,rack.position[2]]};
       }
+    }
+    if (anchor.id === "barMount" && mounted.barMount?.id === "tailfin-825745-v1") {
+      const bag=mounted.handlebar;
+      if(bag?.requires?.includes("bar-cage")) {
+        const pose=getEquipmentPlacement(bag,size.sockets.handlebar);
+        return {...anchor,position:pose.position,rotation:pose.rotation};
+      }
+      return {...anchor,position:[anchor.position[0]+.065,anchor.position[1]-.13,anchor.position[2]]};
     }
     const match = /^(cage|cargoFoot|forkMount|fork)(Left|Right)(?:_0)?$/.exec(anchor.id);
     if (!match) return anchor;
@@ -46,12 +55,35 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
     const [bl,bh] = equipmentDimensions(bag);
     return {...anchor,rotation,position:[fork.position[0],fork.position[1]+(cage ? -ch*.47+bh*.44 : 0),side*(.106+bl*.5)]};
   });
-  return resolved.map(anchor => resolveRearAccessoryAnchor(anchor, resolved, mounted));
+  return resolved.map(anchor => {
+    if(anchor.id === "barCageAccessory" && mounted.barMount?.provides?.includes("bar-cage")) {
+      const cageAnchor=resolved.find(a=>a.id === "barMount");
+      if(cageAnchor) {
+        const [l,h]=getBarCageEnvelope(mounted);
+        const offset=rotateEquipmentPoint([-l*.5-.008,h*.5+.018,0],cageAnchor.rotation);
+        return {...anchor,position:cageAnchor.position.map((v,i)=>v+offset[i]) as [number,number,number],rotation:cageAnchor.rotation};
+      }
+    }
+    return resolveRearAccessoryAnchor(resolveCargoStrapAnchor(anchor, resolved, mounted), resolved, mounted);
+  });
 }
 export const findSocket = (size: BikeSizeConfig, id: string, mounted: Record<string, BagItem> = {}) =>
   getSocketAnchors(size, mounted).find((socket) => socket.id === id);
 export const getWheelbaseMm = (bike: BikeModel, size: BikeSizeConfig) =>
   size.geometry.wheelbaseMm ?? bike.wheelbaseMm;
+export function mountRequirementLabel(required: string): string {
+  const labels: Record<string,string> = {
+    "cargo-cage":"cargo cage", "fork-mount":"fork mounting kit",
+    "cargo-cage-load-chip-host":"Small or Large Cargo Cage",
+    "cargo-strap-upper":"upper Cargo Strap", "cargo-strap-lower":"lower Cargo Strap",
+    "tailfin-axle":"Tailfin axle", "udh-adapter":"UDH adapter", "rack-top":"rack top support",
+    "pannier-mounts":"pannier mounts", "bar-cage":"Bar Cage", "bar-bag-mount":"Bar Bag Mounting Kit",
+    "journey-rack":"Journey Pannier Rack", "tailfin-rear-light-interface":"compatible rear light attachment",
+    "tailfin-fixed-bag-light-interface":"CargoPack or Fixed SpeedPack bag",
+    "tailfin-clip-light-interface":"compatible CargoPack clip attachment",
+  };
+  return labels[required] ?? required.replace(/-/g," ");
+}
 export function hasMountCapability(
   mounted: Record<string, BagItem>,
   socketId: string,
@@ -63,12 +95,14 @@ export function hasMountCapability(
       : id.toLowerCase().includes("right")
         ? "right"
         : null;
-  const scoped = ["cargo-cage", "fork-mount", "cargo-cage-load-chip-host"].includes(required);
+  const scoped = ["cargo-cage", "fork-mount", "cargo-cage-load-chip-host", "cargo-strap-upper", "cargo-strap-lower"].includes(required);
   return Object.entries(mounted).some(
     ([id, item]) =>
       id !== socketId &&
       (item.id === required || item.provides?.includes(required)) &&
-      (!scoped || (side(id) !== null && side(id) === side(socketId))),
+      (!scoped || (side(id) !== null && side(id) === side(socketId))) &&
+      (required !== "cargo-strap-upper" || /^cargoStrapUpper(Left|Right)$/.test(id)) &&
+      (required !== "cargo-strap-lower" || /^cargoStrapLower(Left|Right)$/.test(id)),
   );
 }
 export function validateMount(
@@ -109,8 +143,23 @@ export function validateMount(
   for (const required of [...(bag.requires ?? []), ...(socket.requires ?? [])])
     if (!hasMountCapability(mounted, socketId, required))
       reasons.push(
-        `Requires ${required}${["cargo-cage", "fork-mount", "cargo-cage-load-chip-host"].includes(required) ? " on this side" : ""}.`,
+        `Requires ${mountRequirementLabel(required)}${["cargo-cage", "fork-mount", "cargo-cage-load-chip-host", "cargo-strap-upper", "cargo-strap-lower"].includes(required) ? " on this side" : ""}.`,
       );
+  // Manufacturer Cage Pack FAQ specifies strap lengths; one individual strap
+  // occupies each upper/lower slot. Pack mass excludes these two straps.
+  const allowedStraps: Record<string, string[]> = {
+    "tailfin-56316-v1": ["tailfin-126220-v1"],
+    "tailfin-56316-v2": ["tailfin-126220-v2"],
+    "tailfin-56316-v3": ["tailfin-126220-v2", "tailfin-126220-v3"],
+  };
+  const accepted = allowedStraps[bag.id];
+  if (accepted) {
+    const side = socketId.includes("Left") ? "Left" : socketId.includes("Right") ? "Right" : null;
+    for (const level of ["Upper", "Lower"]) {
+      const strap = side ? mounted[`cargoStrap${level}${side}`] : undefined;
+      if (strap && !accepted.includes(strap.id)) reasons.push(`${level} Cargo Strap length does not match this Cage Pack. Use ${bag.id.endsWith("v1") ? "40 cm" : bag.id.endsWith("v2") ? "50 cm" : "50 or 65 cm"} straps on this side.`);
+    }
+  }
   if (
     (bag.excludes ?? []).some((id) => capabilities.has(id)) ||
     others.some((item) =>

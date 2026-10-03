@@ -543,6 +543,8 @@ test("actual Tailfin fork pack cannot depend on the opposite fork mounting hardw
     validateMount(pack, "forkRight_0", config, {
       forkMountRight: mount,
       cageRight: cage,
+      cargoStrapUpperRight: TAILFIN_CATALOG.find(item => item.id === "tailfin-126220-v1")!,
+      cargoStrapLowerRight: TAILFIN_CATALOG.find(item => item.id === "tailfin-126220-v1")!,
     }).allowed,
     true,
   );

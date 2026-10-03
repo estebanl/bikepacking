@@ -4,7 +4,7 @@ import type {
   BagItem,
   ClearanceWarning,
 } from "../types/index.ts";
-import { findSocket, hasMountCapability } from "./sockets.ts";
+import { findSocket, hasMountCapability, mountRequirementLabel } from "./sockets.ts";
 import { getReferenceBottleEnvelope } from "./bottleMounts.ts";
 import { getEquipmentBounds } from "./equipmentGeometry.ts";
 export interface ClearanceCheckParams {
@@ -45,7 +45,7 @@ export function evaluateClearances({
         id: `dependency_${id}`,
         type: "dependency",
         severity: "error",
-        message: `${bag.name} requires ${missing.join(", ")}.`,
+        message: `${bag.name} requires ${missing.map(mountRequirementLabel).join(", ")}.`,
       });
     if (
       socket.maxVolumeLiters !== undefined &&
