@@ -203,7 +203,7 @@ function PanelShell({
 
 export interface BarSupportEndpoints { clamps: [Point3,Point3]; ends: [Point3,Point3]; orientation: [number,number,number,number] }
 
-export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts, rearArchDimensions, rackParts, bottleCageBackSign, forkPackHardware, convertedForkPannier }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]}; convertedForkPannier?:boolean; forkPackHardware?:{dimensions:Point3;showMount:boolean;showHook:boolean}; rearArchDimensions?:Point3; bottleCageBackSign?:1|-1; rackParts?:{hideArch?:boolean;carbon?:boolean;pannierMounts?:boolean} }): ReactElement {
+export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts, rearArchDimensions, rackParts, bottleCageBackSign, forkPackHardware, convertedForkPannier, hideTubeAttachments }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]}; hideTubeAttachments?:boolean; convertedForkPannier?:boolean; forkPackHardware?:{dimensions:Point3;showMount:boolean;showHook:boolean}; rearArchDimensions?:Point3; bottleCageBackSign?:1|-1; rackParts?:{hideArch?:boolean;carbon?:boolean;pannierMounts?:boolean} }): ReactElement {
   const [l, h, d] = equipmentDimensions(bag),
     kind = equipmentKind(bag);
   const fabric = useMemo(
@@ -489,7 +489,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
               />
             </group>
           ))}
-          {frame && [-0.31, 0.22].map((x) => (
+          {frame && !hideTubeAttachments && [-0.31, 0.22].map((x) => (
             <group key={x}>
               <Box
                 position={[l * x, h * 0.49, 0]}
@@ -503,7 +503,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
           ))}
         </>
       )}
-      {kind === "top_tube" && [-.3,.22].map(x => <group key={x}>
+      {kind === "top_tube" && !hideTubeAttachments && [-.3,.22].map(x => <group key={x}>
         {[-1,1].map(side => <WebbingSegment key={side}
           a={[l*x,-h*.28,side*d*.46]}
           b={[l*x,-h*.46-.040,side*.021]}/>) }

@@ -3,6 +3,9 @@
 import { RearConnectorModel } from "./equipment/RearConnectorModel";
 import { getRearConnectorGeometry } from "@/lib/rearConnectorGeometry";
 import { RearPannierHardwareModel } from "./equipment/RearPannierHardwareModel";
+import { FrameAttachmentModel } from "./equipment/FrameAttachmentModel";
+import { getFrameAttachmentStations, getRearSeatStrapStation } from "@/lib/frameAttachmentGeometry";
+import { getFrameAttachmentSpec } from "@/lib/frameAttachments";
 import * as THREE from "three";
 import { ForkPackHardwareModel } from "./equipment/ForkPackHardwareModel";
 import { isForkPackBag, isMiniPannier, isForkPackPart, isWholeForkPackKit, forkPackSide, getForkPackHardwarePose, getRearPannierPose } from "@/lib/forkPackGeometry";
@@ -61,6 +64,12 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
     showMount:bag.id !== "tailfin-676061-v1",
     showHook:bag.id !== "tailfin-661731-v1",
   } : undefined;
+  const framePart=getFrameAttachmentSpec(socketId);
+  const frameHost=/^tailfin-(1006881|1006882|1051880|732053|798331|129268)-v/.test(bag.id);
+  const frameHostItem=framePart ? mounted[framePart.hostSocket] : bag;
+  const frameHostAnchor=framePart ? findSocket(size,framePart.hostSocket,mounted) : anchor;
+  const frameStations=frameHostItem && frameHostAnchor && (framePart || frameHost) ? getFrameAttachmentStations(bike,size,frameHostItem,frameHostAnchor) : [];
+  const framePartStations=framePart?.role === 'seatpostStrap' && frameHostItem && frameHostAnchor ? [getRearSeatStrapStation(bike,size,frameHostItem,frameHostAnchor)] : frameStations.filter(station=>framePart?.role === 'keepers' || (framePart?.position === 'fore' ? station.id === 'front' : station.id === 'rear'));
   const kind=equipmentKind(bag);
   const isRack=kind === "rack" || kind === "aeropack";
   const tubeRadius=(socketId === "bottleMountDown" || socketId === "bottleMountSeat") ? getBottleMountPose(bike,size,socketId).radius : undefined;
@@ -97,9 +106,14 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
     };
   }
   return <>
+    {frameHost && frameStations.map(station=>{
+      const suffix=station.id === 'front' ? 'Fore' : 'Aft';
+      return <FrameAttachmentModel key={station.id} station={station} showMount={!mounted[`${socketId}VMount${suffix}`]} showStrap={!mounted[`${socketId}Strap${suffix}`]} showBuckle={!mounted[`${socketId}Strap${suffix}`]}/>;
+    })}
+    {framePart && framePartStations.map(station=><FrameAttachmentModel key={station.id} station={station} showMount={framePart.role==='vMount'} showStrap={framePart.role==='strap'||framePart.role==='seatpostStrap'} showBuckle={framePart.role==='strap'||framePart.role==='seatpostStrap'} showKeepers={framePart.role==='keepers'}/>)}
     {rearConnector && isRack && <RearConnectorModel {...rearConnector} carbon={/Carbon/.test(bag.name)} showStay={!mounted.rearTopStay} showConnector={!mounted.rearSeatConnector} showStrap={!mounted.rearSeatStrap}/>}
     {rearConnector && connectorPart && <RearConnectorModel {...rearConnector} carbon={socketId==='rearTopStay'} showStay={socketId==='rearTopStay'} showConnector={socketId==='rearSeatConnector'} showStrap={socketId==='rearSeatStrap'} longStrap={socketId==='rearSeatStrap'}/>}
-    {!connectorPart &&
+    {!connectorPart && !framePart &&
     <group
       position={placement.position}
       rotation={placement.rotation}
@@ -108,7 +122,7 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
       <group>
         {includedForkHardware && <ForkPackHardwareModel dimensions={[l,h,d]} showMount={!forkMountPart} showHook={!wholeKit && !forkHookPart}/>}
         {rearBag && !isForkPackBag(bag) && <RearPannierHardwareModel dimensions={[l,h,d]} showUpper={!mounted[`rearPannierUpper${forkSide}`]} showLower={!mounted[`rearPannierLower${forkSide}`]}/> }
-        {rearConversion && rearPose ? <RearPannierHardwareModel dimensions={rearPose.dimensions} showUpper={socketId.includes("Upper")} showLower={socketId.includes("Lower")}/> : <EquipmentModel bag={bag} convertedForkPannier={rearBag || (/^fork(Left|Right)_0$/.test(socketId) && isMiniPannier(bag))} forkPackHardware={forkPackHardware} bottleCageBackSign={socketId === "bottleSeat" ? -1 : 1} rearArchDimensions={rearArchDimensions} rackParts={rackParts} barSupport={barSupport} tubeRadius={tubeRadius} rearDeck={rearDeck} barCageParts={barCageParts} barCageEnvelope={hasCageEnvelope ? getBarCageEnvelope(mounted) : undefined} strapEnvelope={bag.id.startsWith("tailfin-126220-") ? getCargoStrapEnvelope(mounted,socketId) : undefined} strapRearExtension={bag.id.startsWith("tailfin-126220-") ? getCargoStrapRearExtension(mounted,socketId) : undefined} />}
+        {rearConversion && rearPose ? <RearPannierHardwareModel dimensions={rearPose.dimensions} showUpper={socketId.includes("Upper")} showLower={socketId.includes("Lower")}/> : <EquipmentModel bag={bag} hideTubeAttachments={frameHost} convertedForkPannier={rearBag || (/^fork(Left|Right)_0$/.test(socketId) && isMiniPannier(bag))} forkPackHardware={forkPackHardware} bottleCageBackSign={socketId === "bottleSeat" ? -1 : 1} rearArchDimensions={rearArchDimensions} rackParts={rackParts} barSupport={barSupport} tubeRadius={tubeRadius} rearDeck={rearDeck} barCageParts={barCageParts} barCageEnvelope={hasCageEnvelope ? getBarCageEnvelope(mounted) : undefined} strapEnvelope={bag.id.startsWith("tailfin-126220-") ? getCargoStrapEnvelope(mounted,socketId) : undefined} strapRearExtension={bag.id.startsWith("tailfin-126220-") ? getCargoStrapRearExtension(mounted,socketId) : undefined} />}
         {/* Warnings stay legible without changing opaque textile into glowing plastic. */}
         {affected.length > 0 && (
           <mesh position={[-l * 0.27, h * 0.21, d * 0.52]}>

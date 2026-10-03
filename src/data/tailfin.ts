@@ -1,3 +1,4 @@
+import { FRAME_ATTACHMENT_PARTS } from "../lib/frameAttachments.ts";
 import type { BagItem, BagCategory } from "../types/index.ts";
 
 /** Normalized from docs/reference/tailfin-catalog.json, researched 2026-10-02.
@@ -2968,6 +2969,8 @@ const BAR_ROLL_REPLACEMENTS: Record<string, { handlebarType: "flat" | "drop"; di
 
 function placement(p: SourceProduct, v: SourceVariant): Placement {
   const base = referencePlacement(p.catalog_section === "spares");
+  const frameAttachment=FRAME_ATTACHMENT_PARTS[p.id];
+  if(frameAttachment) return {category:"mount",productKind:"spare",visualKind:"mount",sockets:frameAttachment.socketIds};
   if (["tailfin-48947", "tailfin-652020"].includes(p.id))
     return {category:"mount",productKind:"spare",visualKind:"mount",sockets:p.id==="tailfin-48947" ? ["rearPannierUpperLeft","rearPannierUpperRight"] : ["rearPannierLowerLeft","rearPannierLowerRight"],
       requires:["pannier-mounts"],provides:[p.id==="tailfin-48947" ? "rear-pannier-upper" : "rear-mini-lower"], excludes:["third-party-pannier-adapters"]};
@@ -3160,6 +3163,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       productKind: "bag",
       visualKind: "half_frame",
       sockets: ["frameTriangle"],
+      provides:["frame-bag-host"],
     };
   if (p.mount_zone === "top-tube" || p.mount_zone === "rear-top-tube")
     return {
@@ -3169,6 +3173,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       sockets: [
         p.mount_zone === "rear-top-tube" ? "topTubeRear" : "topTubeFront",
       ],
+      provides:[p.mount_zone === "rear-top-tube" ? "rear-top-tube-host" : "front-top-tube-host"],
     };
   if (p.id === "tailfin-32010" || p.id === "tailfin-46283")
     return {
@@ -3202,6 +3207,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       productKind: "bag",
       visualKind: "fork_pack",
       sockets: ["downtubeUnderside"],
+      provides:["downtube-pack-host"],
     };
   if (p.id === "tailfin-42733")
     return {
@@ -3385,6 +3391,10 @@ function normalize(
       ? v.weight_g + v.bar_clamp_weight_g
       : p.id === "tailfin-675800" ? 25 : p.id === "tailfin-642" ? 370 : p.id === "tailfin-591" ? 471 : p.id === "tailfin-20115" ? 82.5 : v.weight_g;
   const notes = [
+    FRAME_ATTACHMENT_PARTS[p.id]
+      ? "Replaces the selected attachment on the matching bag family, except the rear seatpost strap, which is an optional third strap added to the published two-strap bag mass. Each fore/aft station is one illustrative physical part; source package counts are not inferred. Frame Bag Long Strap is 29 cm; Top Tube Long Strap is 36 cm; Short Strap is 18.5 cm and also supports Frame Bags. The Keeper pack contains four loops, shown as two per station on one host. DownTube V-Mount straps are 18.5 cm (road design) or 30 cm (MTB design); the catalog label x20cm is a source-label ambiguity, while the official listing gives 20 mm width. Nominal loose lengths do not certify installed circumference, routing or fit. Source mass and installed dimensions remain unknown. Replacement-modified host mass is excluded because removed component mass is unknown; the optional rear seatpost strap preserves the two-strap base bag mass and adds its own unknown mass. Capacity and payload remain counted. The rear bag includes two18.5cm straps plus one14.5cm strap, but the spare seatpost SKU is not explicitly identified as that14.5cm strap, so no9g mass is inferred. Original estimated geometry, not manufacturer CAD."
+      : "",
+
     ["tailfin-48947", "tailfin-652020", "tailfin-655674"].includes(p.id)
       ? "Rear Fork Pack conversion is conditional on compatible 5/10 L second-generation hardware: select Pannier Upper Parts and Mini Pannier Lower Parts on that side, representing separately sourced parts or the retained original clamp/hook arm/hook. The fork conversion kit alone does not restore them. Mini lower parts require the correct screw (Gen2 12 mm; Gen1 18 mm); included fastener contents and exact purchased revision must be checked. Upper part is listed for all panniers; mini lower part is only 5/10 L. Modified bag mass excludes unknown removed hardware; capacity/payload remain. Original illustrative geometry is not fit approval."
       : "",

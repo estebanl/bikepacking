@@ -39,6 +39,12 @@ function productRequirements(item: BagItem, socket:string) {
  return /^tailfin-972100-v[12]$/.test(item.id) && /^fork(Left|Right)_0$/.test(socket) ? ['fork-mount','mini-pannier-conversion'] : item.requires??[];
 }
 function dependencies(item: BagItem, anchor: SocketAnchor, mounted: Record<string,BagItem>) {
+  const attachment=/^(frameTriangle|topTubeFront|topTubeRear|downtubeUnderside)(VMount|Strap|Keepers|SeatpostStrap)/.exec(anchor.id);
+  if(attachment) {
+    const host=mounted[attachment[1]]?.id??'';
+    const families:Record<string,RegExp>={frameTriangle:/^tailfin-(1006881|1006882)-v/,topTubeFront:/^tailfin-(1051880|732053)-v/,topTubeRear:/^tailfin-798331-v/,downtubeUnderside:/^tailfin-129268-v/};
+    if(!families[attachment[1]].test(host)) return false;
+  }
   return [...productRequirements(item,anchor.id),...(anchor.requires??[])].every(required => Object.entries(mounted).some(([id, provider]) => id!==anchor.id && (provider.id===required || provided(provider,id,mounted).includes(required)) && roleMatches(required,id) && (!required.startsWith("cargo-strap-") || strapMatches(item,provider)) && (!scoped.has(required) || (side(id)!==null && side(id)===side(anchor.id)))));
 }
 function assertClean(size: BikeSizeConfig, mounted: Record<string,BagItem>) {
@@ -120,6 +126,10 @@ test('all provisionable catalogue placements conserve mass and survive share rou
       if(host && /^tailfin-(655674|972100)-v[12]$/.test(host.id)) uncertainSockets.add(`fork${side}_0`);
     }
     for(const side of ['Left','Right']) if((mounted[`rearPannierUpper${side}`] || mounted[`rearPannierLower${side}`]) && mounted[`pannier${side}`]) uncertainSockets.add(`pannier${side}`);
+    for(const id of Object.keys(mounted)) {
+      const attachment=/^(frameTriangle|topTubeFront|topTubeRear|downtubeUnderside)(VMount|Strap|Keepers)/.exec(id);
+      if(attachment && mounted[attachment[1]]) uncertainSockets.add(attachment[1]);
+    }
     assert.equal(metrics.totalRigWeightGrams,bike.baseWeightGrams+1373+Object.entries(mounted).reduce((sum,[id,b])=>sum+(uncertainSockets.has(id) ? 0 : b.dryWeightGrams??0),0));
     assert.equal(metrics.frontAxleWeightGrams+metrics.rearAxleWeightGrams,metrics.totalRigWeightGrams);
     for(const unknown of Object.values(mounted).filter(b=>b.dryWeightGrams===null)) assert.ok(metrics.unknownWeightItemIds?.includes(unknown.id));

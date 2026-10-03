@@ -20,6 +20,7 @@ export interface SocketAnchor {
   position: [number, number, number]; // [x, y, z] in meters (Three.js units)
   rotation: [number, number, number]; // Euler angles [x, y, z] in radians
   allowedBagCategories: BagCategory[];
+  tubeAttachment?: {position:[number,number,number];rotation:[number,number,number];radius:number};
   dropperOffset?: [number, number, number]; // World-space displacement for full modeled dropper travel.
   maxVolumeLiters?: number;
   maxLoadGrams?: number;

@@ -57,7 +57,7 @@ test('191 catalog variants remain accounted for, including the internal storage 
  const counts: Record<string,number>={};
  for(const part of TAILFIN_CATALOG) counts[part.previewStatus!]=(counts[part.previewStatus!]??0)+1;
  assert.equal(TAILFIN_CATALOG.length,191);
- assert.deepEqual(counts,{'mountable':105,'implementation-pending':46,'unsupported-fit':13,'nonvisual-spare':18,'off-bike':9});
+ assert.deepEqual(counts,{'mountable':116,'implementation-pending':35,'unsupported-fit':13,'nonvisual-spare':18,'off-bike':9});
  const internal=item('732058-v1');
  assert.equal(internal.previewStatus,'nonvisual-spare');
  assert.equal(internal.compatibleSockets.length,0);

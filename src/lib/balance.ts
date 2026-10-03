@@ -5,6 +5,7 @@ import type {
   RigMetrics,
 } from "../types/index.ts";
 import { findSocket, getWheelbaseMm } from "./sockets.ts";
+import { getModifiedFrameHostSockets } from "./frameAttachments.ts";
 
 /** Included hardware has no separately verified mass to subtract from its host. */
 export function getMassUncertainHostSockets(mounted: Record<string, BagItem>): Set<string> {
@@ -12,7 +13,7 @@ export function getMassUncertainHostSockets(mounted: Record<string, BagItem>): S
     mounted.barCageReplacement?.id === "tailfin-855555-v1" ||
     mounted.barCageClampLeft?.id === "tailfin-855553-v1" ||
     mounted.barCageClampRight?.id === "tailfin-855553-v1";
-  const hosts = new Set<string>();
+  const hosts = getModifiedFrameHostSockets(mounted);
   if (hasReplacement) {
     if (mounted.barMount?.id === "tailfin-825745-v1") hosts.add("barMount");
     if (/^tailfin-825745-v[234]$/.test(mounted.handlebar?.id ?? "")) hosts.add("handlebar");

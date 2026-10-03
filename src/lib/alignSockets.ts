@@ -1,3 +1,4 @@
+import { getDownTubePackReference } from "./frameAttachmentGeometry.ts";
 import type { BikeModel, BikeSizeConfig } from "../types/index.ts";
 import { getBikeGeometry, interpolate, topTubeRadius } from "./bikeGeometry.ts";
 
@@ -22,6 +23,7 @@ export function alignFrameSocket(
     ...size,
     sockets: {
       ...size.sockets,
+      ...(size.sockets.downtubeUnderside ? {downtubeUnderside:{...size.sockets.downtubeUnderside,tubeAttachment:getDownTubePackReference(bike,size)}} : {}),
       topTubeFront: {...size.sockets.topTubeFront,position:onTube(.73),rotation:[0,0,slope]},
       ...(size.sockets.topTubeRear ? {topTubeRear:{...size.sockets.topTubeRear,position:onTube(.18),rotation:[0,0,slope] as [number,number,number]}} : {}),
       frameTriangle: {

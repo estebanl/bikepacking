@@ -1,3 +1,4 @@
+import { FRAME_ATTACHMENT_SOCKETS } from "./frameAttachments.ts";
 import { getCatalogBottleSockets } from "./catalogBottles.ts";
 import type { BikeModel, SocketAnchor } from "../types/index.ts";
 import { getBottleHardwareSockets } from "./bottleMounts.ts";
@@ -28,6 +29,7 @@ export function addHardwareSockets(bike: BikeModel) {
       ...(size.sockets.additional ?? []),
       ...getBottleHardwareSockets(bike, size),
       ...getCatalogBottleSockets(bike, size),
+      ...FRAME_ATTACHMENT_SOCKETS.map(spec=>hardware(spec.id, `${spec.hostSocket === "frameTriangle" ? "Frame bag" : spec.hostSocket === "topTubeFront" ? "Front top-tube bag" : spec.hostSocket === "topTubeRear" ? "Rear top-tube bag" : "DownTube Pack"} · ${spec.position === "seatpost" || spec.position === "distributed" ? "" : spec.position+" "}${spec.role === "vMount" ? "V-Mount cover" : spec.role === "keepers" ? "strap keepers (4)" : spec.role === "seatpostStrap" ? "optional seatpost strap" : "strap"}`, g.seatCluster, ["mount"], [spec.requiredCapability])),
       ...["rearSeatConnector","rearSeatStrap","rearTopStay"].map(id=>hardware(id, id==="rearSeatConnector" ? "Rear system · seatpost connector replacement" : id==="rearSeatStrap" ? "Rear system · seatpost strap replacement" : "Carbon rack · top stay replacement", g.seatCluster, ["mount"])),
       hardware("rearArchReplacement", "Rear system · replacement arch", g.rearAxle, ["mount"]),
       hardware("thirdPartyPannierAdapters", "Rear system · third-party adapters (pair)", g.rearAxle, ["mount"], ["pannier-mounts"]),

@@ -1,3 +1,4 @@
+import { getFrameAttachmentSpec, frameAttachmentConflictReasons } from "./frameAttachments.ts";
 import { requiredProductCapabilities, forkPackConflictReasons } from "./forkPackAssembly.ts";
 import { getForkPackHardwarePose, forkPackSide, getRearPannierPose } from "./forkPackGeometry.ts";
 import { resolveCatalogBottleAnchor } from "./catalogBottles.ts";
@@ -18,6 +19,11 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
   // Shared illustrative attachment stack. Separate the fork, backplate and bag;
   // local +X faces outboard on each side, never through the tire.
   const resolved: SocketAnchor[] = anchors.map(anchor => {
+    if(anchor.id === "downtubeUnderside" && /^tailfin-129268-v/.test(mounted[anchor.id]?.id ?? "") && anchor.tubeAttachment) {
+      const ref=anchor.tubeAttachment,[l]=equipmentDimensions(mounted[anchor.id]);
+      const offset=rotateEquipmentPoint([ref.radius+l*.46+.010,0,0],ref.rotation);
+      return {...anchor,rotation:ref.rotation,position:ref.position.map((v,i)=>v+offset[i]) as [number,number,number]};
+    }
     if (/^pannier(Left|Right)$/.test(anchor.id) && mounted.rearRack && mounted[anchor.id]) {
       const rackAnchor=anchors.find(a=>a.id==='rearRack');
       if(rackAnchor) { const pose=getRearPannierPose(mounted[anchor.id],mounted.rearRack,rackAnchor,forkPackSide(anchor.id)); return {...anchor,position:pose.position,rotation:pose.rotation}; }
@@ -64,6 +70,11 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
     return {...anchor,rotation,position:[fork.position[0],fork.position[1]+(cage ? -ch*.47+bh*.44 : 0),side*(.106+bl*.5)]};
   });
   return resolved.map(anchor => {
+    const framePart=getFrameAttachmentSpec(anchor.id);
+    if(framePart && mounted[framePart.hostSocket]) {
+      const host=mounted[framePart.hostSocket],hostAnchor=resolved.find(a=>a.id===framePart.hostSocket);
+      if(hostAnchor) { const pose=getEquipmentPlacement(host,hostAnchor); return {...anchor,position:pose.position,rotation:pose.rotation}; }
+    }
     if(/^rearPannier(Upper|Lower)(Left|Right)$/.test(anchor.id) && mounted.rearRack) {
       const side=forkPackSide(anchor.id), rackAnchor=resolved.find(a=>a.id==='rearRack');
       if(rackAnchor) { const pose=getRearPannierPose(mounted[`pannier${side}`],mounted.rearRack,rackAnchor,side); return {...anchor,position:pose.position,rotation:pose.rotation}; }
@@ -202,6 +213,7 @@ export function validateMount(
   )
     reasons.push("Conflicts with equipment already fitted.");
   reasons.push(...forkPackConflictReasons(bag,socketId,mounted));
+  reasons.push(...frameAttachmentConflictReasons(bag,socketId,mounted));
   return { allowed: reasons.length === 0, reasons };
 }
 export function sanitizeMountedBags(
