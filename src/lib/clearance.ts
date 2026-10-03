@@ -1,3 +1,4 @@
+import { requiredProductCapabilities } from "./forkPackAssembly.ts";
 import { shouldShowReferenceBottle } from "./catalogBottles.ts";
 import type {
   BikeModel,
@@ -38,7 +39,7 @@ export function evaluateClearances({
     const add = (warning: Omit<ClearanceWarning, "affectedBagIds">) =>
       warnings.push({ ...warning, affectedBagIds: [bag.id] });
     const missing = [
-      ...(bag.requires ?? []),
+      ...requiredProductCapabilities(bag,id),
       ...(socket.requires ?? []),
     ].filter((r) => !hasMountCapability(mountedBags, id, r));
     if (missing.length)

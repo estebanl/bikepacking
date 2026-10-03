@@ -1,4 +1,6 @@
 "use client";
+import { ForkPackHardwareModel } from "./ForkPackHardwareModel";
+import { isForkPackPart } from "@/lib/forkPackGeometry";
 import { RearArchModel } from "./RearArchModel";
 import { ThirdPartyAdapterModel } from "./ThirdPartyAdapterModel";
 import { CatalogBottleModel } from "./CatalogBottleModel";
@@ -201,7 +203,7 @@ function PanelShell({
 
 export interface BarSupportEndpoints { clamps: [Point3,Point3]; ends: [Point3,Point3]; orientation: [number,number,number,number] }
 
-export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts, rearArchDimensions, rackParts, bottleCageBackSign }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]}; rearArchDimensions?:Point3; bottleCageBackSign?:1|-1; rackParts?:{hideArch?:boolean;carbon?:boolean;pannierMounts?:boolean} }): ReactElement {
+export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts, rearArchDimensions, rackParts, bottleCageBackSign, forkPackHardware, convertedForkPannier }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]}; convertedForkPannier?:boolean; forkPackHardware?:{dimensions:Point3;showMount:boolean;showHook:boolean}; rearArchDimensions?:Point3; bottleCageBackSign?:1|-1; rackParts?:{hideArch?:boolean;carbon?:boolean;pannierMounts?:boolean} }): ReactElement {
   const [l, h, d] = equipmentDimensions(bag),
     kind = equipmentKind(bag);
   const fabric = useMemo(
@@ -271,6 +273,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
     "accessory",
     "spare",
   ].includes(kind);
+  if (isForkPackPart(bag) && forkPackHardware) return <ForkPackHardwareModel {...forkPackHardware}/>;
   if (isCatalogBottle(bag)) return <CatalogBottleModel item={bag} cageBackSign={bottleCageBackSign}/>;
   if (isRearArchReplacement(bag) && rearArchDimensions) return <RearArchModel dimensions={rearArchDimensions} carbon={rackParts?.carbon} pannierMounts={rackParts?.pannierMounts}/>;
   if (bag.id === "tailfin-20115-v1" && rearArchDimensions) return <ThirdPartyAdapterModel dimensions={rearArchDimensions}/>;
@@ -580,7 +583,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
               ))}
             </group>
           ))}
-          {kind === "pannier" && (
+          {kind === "pannier" && !convertedForkPannier && (
             <>
               <Box
                 position={[0, h * 0.24, -d * 0.46]}

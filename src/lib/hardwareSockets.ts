@@ -54,6 +54,8 @@ export function addHardwareSockets(bike: BikeModel) {
           size.sockets[side === "Left" ? "forkLeft" : "forkRight"][0];
         if (!fork) return [];
         return [
+          hardware(`forkPackHardware${side}`, `${side} Fork Pack · mount or conversion kit`, fork.position, ["mount"]),
+          hardware(`forkPackHook${side}`, `${side} Fork Pack · replacement lower hook`, fork.position, ["mount"]),
           ...(["Upper","Lower"] as const).map(level=>hardware(`cargoStrap${level}${side}`, `${side} cage · ${level.toLowerCase()} cargo strap`, fork.position, ["mount"], ["cargo-cage"])),
           hardware(`cargoFoot${side}`, `${side} optional cargo cage foot`, fork.position,
             ["mount"], ["cargo-cage-load-chip-host"]),
@@ -81,7 +83,7 @@ export function addHardwareSockets(bike: BikeModel) {
       if (socket.id === "rackTop") socket.requires = ["rack-top"];
     }
     for (const socket of [...size.sockets.forkLeft, ...size.sockets.forkRight])
-      socket.requires = ["fork-mount"];
+      { socket.requires = ["fork-mount"]; if(!socket.allowedBagCategories.includes("pannier")) socket.allowedBagCategories.push("pannier"); }
   }
   return bike;
 }

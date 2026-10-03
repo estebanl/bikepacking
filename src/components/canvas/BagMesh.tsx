@@ -1,6 +1,8 @@
 "use client";
 
 import * as THREE from "three";
+import { ForkPackHardwareModel } from "./equipment/ForkPackHardwareModel";
+import { isForkPackBag, isMiniPannier, isForkPackPart, isWholeForkPackKit, forkPackSide, getForkPackHardwarePose } from "@/lib/forkPackGeometry";
 import { getRearArchPose, isRearArchReplacement, archHasPannierMounts, rackHasPannierMounts } from "@/lib/rearArchReplacement";
 import { BagItem, SocketAnchor } from "@/types";
 import { useRigStore } from "@/store/useRigStore";
@@ -40,6 +42,19 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
     carbon: /Carbon/.test(bag.name),
     pannierMounts: isRearArchReplacement(bag) ? archHasPannierMounts(bag) : rackHasPannierMounts(mounted),
   };
+  const forkSide=forkPackSide(socketId);
+  const forkHostId=`fork${forkSide}_0`;
+  const forkHostAnchor=findSocket(size,forkHostId,mounted);
+  const forkPose=forkHostAnchor ? getForkPackHardwarePose(mounted[forkHostId],forkHostAnchor,forkSide) : undefined;
+  const forkMountPart=mounted[`forkPackHardware${forkSide}`];
+  const forkHookPart=mounted[`forkPackHook${forkSide}`];
+  const wholeKit=isWholeForkPackKit(forkMountPart);
+  const includedForkHardware=/^fork(Left|Right)_0$/.test(socketId) && isForkPackBag(bag);
+  const forkPackHardware=isForkPackPart(bag) && forkPose ? {
+    dimensions:forkPose.dimensions,
+    showMount:bag.id !== "tailfin-676061-v1",
+    showHook:bag.id !== "tailfin-661731-v1",
+  } : undefined;
   const kind=equipmentKind(bag);
   const isRack=kind === "rack" || kind === "aeropack";
   const tubeRadius=(socketId === "bottleMountDown" || socketId === "bottleMountSeat") ? getBottleMountPose(bike,size,socketId).radius : undefined;
@@ -87,7 +102,8 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
       name={`bag_${bag.id}_${socketId}`}
     >
       <group>
-        <EquipmentModel bag={bag} bottleCageBackSign={socketId === "bottleSeat" ? -1 : 1} rearArchDimensions={rearArchDimensions} rackParts={rackParts} barSupport={barSupport} tubeRadius={tubeRadius} rearDeck={rearDeck} barCageParts={barCageParts} barCageEnvelope={hasCageEnvelope ? getBarCageEnvelope(mounted) : undefined} strapEnvelope={bag.id.startsWith("tailfin-126220-") ? getCargoStrapEnvelope(mounted,socketId) : undefined} strapRearExtension={bag.id.startsWith("tailfin-126220-") ? getCargoStrapRearExtension(mounted,socketId) : undefined} />
+        {includedForkHardware && <ForkPackHardwareModel dimensions={[l,h,d]} showMount={!forkMountPart} showHook={!wholeKit && !forkHookPart}/>}
+        <EquipmentModel bag={bag} convertedForkPannier={/^fork(Left|Right)_0$/.test(socketId) && isMiniPannier(bag)} forkPackHardware={forkPackHardware} bottleCageBackSign={socketId === "bottleSeat" ? -1 : 1} rearArchDimensions={rearArchDimensions} rackParts={rackParts} barSupport={barSupport} tubeRadius={tubeRadius} rearDeck={rearDeck} barCageParts={barCageParts} barCageEnvelope={hasCageEnvelope ? getBarCageEnvelope(mounted) : undefined} strapEnvelope={bag.id.startsWith("tailfin-126220-") ? getCargoStrapEnvelope(mounted,socketId) : undefined} strapRearExtension={bag.id.startsWith("tailfin-126220-") ? getCargoStrapRearExtension(mounted,socketId) : undefined} />
         {/* Warnings stay legible without changing opaque textile into glowing plastic. */}
         {affected.length > 0 && (
           <mesh position={[-l * 0.27, h * 0.21, d * 0.52]}>

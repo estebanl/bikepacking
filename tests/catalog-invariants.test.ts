@@ -11,7 +11,7 @@ import { evaluateClearances } from '../src/lib/clearance.ts';
 const bikes = BIKES.filter(b => b.brand === 'Santa Cruz');
 const cases = bikes.flatMap(bike => Object.entries(bike.sizes).map(([key,size]) => ({bike,key,size})));
 const side = (id: string) => /Left/.test(id) ? 'Left' : /Right/.test(id) ? 'Right' : null;
-const scoped = new Set(['fork-mount','cargo-cage','cargo-cage-load-chip-host','cargo-strap-upper','cargo-strap-lower']);
+const scoped = new Set(['fork-mount','cargo-cage','cargo-cage-load-chip-host','cargo-strap-upper','cargo-strap-lower','fork-pack-host','mini-pannier-conversion']);
 // Independent contract oracle: no production capability/validation helper is used here.
 function compatible(item: BagItem, anchor: SocketAnchor) {
   return anchor.allowedBagCategories.includes(item.category) && item.compatibleSockets.some(id => id === anchor.id || ((id==='forkLeft'||id==='forkRight') && anchor.id.startsWith(id))) && !(item.handlebarType && anchor.handlebarType && item.handlebarType !== anchor.handlebarType);
@@ -22,6 +22,7 @@ function strapMatches(pack: BagItem, strap: BagItem) {
   return pack.volumeLiters === 1.7 ? strap.name.includes('40cm') : pack.volumeLiters === 3 ? strap.name.includes('50cm') : strap.name.includes('50cm') || strap.name.includes('65cm');
 }
 function roleMatches(required: string, socketId: string) {
+  if(required === 'fork-pack-host') return /^fork(Left|Right)_0$/.test(socketId);
   return required === 'cargo-strap-upper' ? socketId.startsWith('cargoStrapUpper') : required === 'cargo-strap-lower' ? socketId.startsWith('cargoStrapLower') : true;
 }
 function provided(provider: BagItem, socket: string, mounted: Record<string,BagItem>) {
@@ -30,8 +31,11 @@ function provided(provider: BagItem, socket: string, mounted: Record<string,BagI
  const withMounts=['tailfin-591-v1','tailfin-446-v1'].includes(mounted.rearArchReplacement.id);
  return [...original.filter(c=>c!=='pannier-mounts'),...(withMounts?['pannier-mounts']:[])];
 }
+function productRequirements(item: BagItem, socket:string) {
+ return /^tailfin-972100-v[12]$/.test(item.id) && /^fork(Left|Right)_0$/.test(socket) ? ['fork-mount','mini-pannier-conversion'] : item.requires??[];
+}
 function dependencies(item: BagItem, anchor: SocketAnchor, mounted: Record<string,BagItem>) {
-  return [...(item.requires??[]),...(anchor.requires??[])].every(required => Object.entries(mounted).some(([id, provider]) => id!==anchor.id && (provider.id===required || provided(provider,id,mounted).includes(required)) && roleMatches(required,id) && (!required.startsWith("cargo-strap-") || strapMatches(item,provider)) && (!scoped.has(required) || (side(id)!==null && side(id)===side(anchor.id)))));
+  return [...productRequirements(item,anchor.id),...(anchor.requires??[])].every(required => Object.entries(mounted).some(([id, provider]) => id!==anchor.id && (provider.id===required || provided(provider,id,mounted).includes(required)) && roleMatches(required,id) && (!required.startsWith("cargo-strap-") || strapMatches(item,provider)) && (!scoped.has(required) || (side(id)!==null && side(id)===side(anchor.id)))));
 }
 function assertClean(size: BikeSizeConfig, mounted: Record<string,BagItem>) {
   const anchors=getSocketAnchors(size,mounted);
@@ -46,7 +50,7 @@ function assertClean(size: BikeSizeConfig, mounted: Record<string,BagItem>) {
 function provision(item: BagItem, anchor: SocketAnchor, size: BikeSizeConfig, mounted: Record<string,BagItem> = {}, visiting = new Set<string>()): Record<string,BagItem> | null {
   if(visiting.has(anchor.id) || !compatible(item,anchor)) return null;
   const nextVisit=new Set(visiting).add(anchor.id); let next={...mounted};
-  for(const required of [...(item.requires??[]),...(anchor.requires??[])]) {
+  for(const required of [...productRequirements(item,anchor.id),...(anchor.requires??[])]) {
     if(dependencies({...item,requires:[required]}, {...anchor,requires:[]},next)) continue;
     let found: Record<string,BagItem>|null=null;
     for(const provider of TAILFIN_CATALOG.filter(p=>p.id===required || p.provides?.includes(required))) {
@@ -106,7 +110,12 @@ test('all provisionable catalogue placements conserve mass and survive share rou
     const replacementInstalled = !!(mounted.barCageReplacement || mounted.barCageClampLeft || mounted.barCageClampRight);
     const modifiedHost = replacementInstalled ? (mounted.barMount?.id === 'tailfin-825745-v1' ? mounted.barMount : mounted.handlebar?.id.startsWith('tailfin-825745-') ? mounted.handlebar : undefined) : undefined;
     const modifiedRear=mounted.rearArchReplacement ? mounted.rearRack : undefined;
-    assert.equal(metrics.totalRigWeightGrams,bike.baseWeightGrams+1373+Object.values(mounted).reduce((sum,b)=>sum+(b === modifiedHost || b === modifiedRear ? 0 : b.dryWeightGrams??0),0));
+    const uncertainSockets = new Set(Object.entries(mounted).filter(([,b])=>b===modifiedHost || b===modifiedRear).map(([id])=>id));
+    for(const side of ['Left','Right']) if(mounted[`forkPackHardware${side}`] || mounted[`forkPackHook${side}`]) {
+      const host=mounted[`fork${side}_0`];
+      if(host && /^tailfin-(655674|972100)-v[12]$/.test(host.id)) uncertainSockets.add(`fork${side}_0`);
+    }
+    assert.equal(metrics.totalRigWeightGrams,bike.baseWeightGrams+1373+Object.entries(mounted).reduce((sum,[id,b])=>sum+(uncertainSockets.has(id) ? 0 : b.dryWeightGrams??0),0));
     assert.equal(metrics.frontAxleWeightGrams+metrics.rearAxleWeightGrams,metrics.totalRigWeightGrams);
     for(const unknown of Object.values(mounted).filter(b=>b.dryWeightGrams===null)) assert.ok(metrics.unknownWeightItemIds?.includes(unknown.id));
     if(Object.values(mounted).some(b=>b.dryWeightGrams===null)) assert.match(generateMarkdownManifest({bike,sizeKey:key,mountedBags:mounted,metrics}),/Unknown|unknown/);
@@ -125,7 +134,7 @@ test('opposite-side hardware never satisfies side-scoped dependencies across all
   let checks=0;
   for(const {size} of cases) for(const item of TAILFIN_CATALOG) for(const anchor of getSocketAnchors(size)) {
     if(!compatible(item,anchor)||!side(anchor.id)) continue;
-    const required=[...(item.requires??[]),...(anchor.requires??[])].filter(r=>scoped.has(r));
+    const required=[...productRequirements(item,anchor.id),...(anchor.requires??[])].filter(r=>scoped.has(r));
     if(!required.length) continue;
     const valid=provision(item,anchor,size);if(!valid) continue;
     const opposite:Record<string,BagItem>={};

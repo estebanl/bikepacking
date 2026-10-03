@@ -1,3 +1,5 @@
+import { requiredProductCapabilities, forkPackConflictReasons } from "./forkPackAssembly.ts";
+import { getForkPackHardwarePose, forkPackSide } from "./forkPackGeometry.ts";
 import { resolveCatalogBottleAnchor } from "./catalogBottles.ts";
 import { getRearArchPose, effectiveMountCapabilities } from "./rearArchReplacement.ts";
 import type {
@@ -58,6 +60,11 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
     return {...anchor,rotation,position:[fork.position[0],fork.position[1]+(cage ? -ch*.47+bh*.44 : 0),side*(.106+bl*.5)]};
   });
   return resolved.map(anchor => {
+    if(/^forkPack(Hardware|Hook)(Left|Right)$/.test(anchor.id)) {
+      const side=forkPackSide(anchor.id), hostId=`fork${side}_0`;
+      const hostAnchor=resolved.find(a=>a.id===hostId);
+      if(hostAnchor) { const pose=getForkPackHardwarePose(mounted[hostId],hostAnchor,side); return {...anchor,position:pose.position,rotation:pose.rotation}; }
+    }
     if((anchor.id === "rearArchReplacement" || anchor.id === "thirdPartyPannierAdapters") && mounted.rearRack) {
       const hostAnchor=resolved.find(a=>a.id === "rearRack");
       if(hostAnchor) { const pose=getRearArchPose(mounted.rearRack,hostAnchor); return {...anchor,position:pose.position,rotation:pose.rotation}; }
@@ -88,6 +95,7 @@ export function mountRequirementLabel(required: string): string {
     "cargo-cage-load-chip-host":"Small or Large Cargo Cage",
     "cargo-strap-upper":"upper Cargo Strap", "cargo-strap-lower":"lower Cargo Strap",
     "tailfin-axle":"Tailfin axle", "udh-adapter":"UDH adapter", "rack-top":"rack top support",
+    "fork-pack-host":"same-side Fork Pack", "mini-pannier-conversion":"same-side second-generation Mini Pannier conversion kit",
     "tailfin-carbon-arch-host":"Carbon rack or Carbon rear system", "tailfin-alloy-arch-host":"Alloy rear system",
     "bar-cage-accessory":"Bar Cage accessory interface", "pannier-mounts":"pannier mounts", "bar-cage":"Bar Cage", "bar-bag-mount":"Bar Bag Mounting Kit",
     "journey-rack":"Journey Pannier Rack", "tailfin-rear-light-interface":"compatible rear light attachment",
@@ -107,12 +115,13 @@ export function hasMountCapability(
       : id.toLowerCase().includes("right")
         ? "right"
         : null;
-  const scoped = ["cargo-cage", "fork-mount", "cargo-cage-load-chip-host", "cargo-strap-upper", "cargo-strap-lower"].includes(required);
+  const scoped = ["cargo-cage", "fork-mount", "cargo-cage-load-chip-host", "cargo-strap-upper", "cargo-strap-lower", "fork-pack-host", "mini-pannier-conversion"].includes(required);
   return Object.entries(mounted).some(
     ([id, item]) =>
       id !== socketId &&
       (item.id === required || effectiveMountCapabilities(item,id,mounted).includes(required)) &&
       (!scoped || (side(id) !== null && side(id) === side(socketId))) &&
+      (required !== "fork-pack-host" || /^fork(Left|Right)_0$/.test(id)) &&
       (required !== "cargo-strap-upper" || /^cargoStrapUpper(Left|Right)$/.test(id)) &&
       (required !== "cargo-strap-lower" || /^cargoStrapLower(Left|Right)$/.test(id)),
   );
@@ -152,10 +161,10 @@ export function validateMount(
   const capabilities = new Set(
     others.flatMap((item) => [item.id, ...(item.provides ?? [])]),
   );
-  for (const required of [...(bag.requires ?? []), ...(socket.requires ?? [])])
+  for (const required of Array.from(new Set([...requiredProductCapabilities(bag,socketId), ...(socket.requires ?? [])])))
     if (!hasMountCapability(mounted, socketId, required))
       reasons.push(
-        `Requires ${mountRequirementLabel(required)}${["cargo-cage", "fork-mount", "cargo-cage-load-chip-host", "cargo-strap-upper", "cargo-strap-lower"].includes(required) ? " on this side" : ""}.`,
+        `Requires ${mountRequirementLabel(required)}${["cargo-cage", "fork-mount", "cargo-cage-load-chip-host", "cargo-strap-upper", "cargo-strap-lower", "fork-pack-host", "mini-pannier-conversion"].includes(required) ? " on this side" : ""}.`,
       );
   // Manufacturer Cage Pack FAQ specifies strap lengths; one individual strap
   // occupies each upper/lower slot. Pack mass excludes these two straps.
@@ -181,6 +190,7 @@ export function validateMount(
     )
   )
     reasons.push("Conflicts with equipment already fitted.");
+  reasons.push(...forkPackConflictReasons(bag,socketId,mounted));
   return { allowed: reasons.length === 0, reasons };
 }
 export function sanitizeMountedBags(

@@ -1,14 +1,14 @@
 # Tailfin component implementation backlog
 
-Current live-catalog classification after the rear arch, adapter and bottle batch. The ALL-components request remains open. These are renderer planning classifications, not manufacturer fit approvals or complete SKU coverage.
+Current live-catalog classification after the Fork Pack attachment pass. The ALL-components request remains open. These are renderer planning classifications, not manufacturer fit approvals or complete SKU coverage.
 
-- mountable: 95 variants
+- mountable: 99 variants
 - unsupported-fit: 13 variants
 - nonvisual-spare: 18 variants
-- implementation-pending: 56 variants
+- implementation-pending: 52 variants
 - off-bike: 9 variants
 
-Exactly 191 snapshot records are accounted for. The generic Alloy/Carbon arch records overlap their option-specific families; record counts do not imply distinct additional physical variants. Unknown source dimensions remain null; illustrative geometry uses visualDimensionsMm. Replacement previews exclude uncertain modified-host mass. Internal storage inserts and service-only parts are separate from completed exterior previews.
+Exactly 191 snapshot records are accounted for. Generic arch records overlap their option-specific families; counts do not imply additional physical variants. The Mini Pannier fork conversion preview is conditional on second-generation compatibility and covers one conversion direction. Unknown specifications remain null. Original estimated geometry and unverified fit remain explicit. Replacement previews exclude uncertain modified-host mass by physical mounting position.
 
 | Variant | Classification | Reason |
 | --- | --- | --- |
@@ -46,14 +46,11 @@ Exactly 191 snapshot records are accounted for. The generic Alloy/Carbon arch re
 | [Extended Seat Post Connector V1](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/extended-seat-post-connector/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Removable CargoPack Connector Parts v2](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/cargopack-removable-connector/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Rear Top Tube Seat Post Strap](https://www.tailfin.cc/ca/product/spares/top-tube-bag-spares/seat-post-strap/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Mini Pannier / Fork Pack Conversion Kit](https://www.tailfin.cc/ca/product/pannier-rack-top-bags/rear-pannier-bags/mini-pannier-fork-pack-conversion-kit/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Rear Top Tube V-Mount Cover](https://www.tailfin.cc/ca/product/spares/top-tube-bag-spares/rear-top-tube-v-mount-cover/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Frame Bag V-Mount](https://www.tailfin.cc/ca/product/spares/frame-bag-spares/frame-bag-v-mount/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Cargo Cage Screw Set](https://www.tailfin.cc/ca/product/spares/top-tube-bag-spares/cage-screw-set/) | nonvisual-spare | Internal structure, service kit or small fastener: no standalone exterior placement. This does not certify a replacement part's compatibility. |
 | [CargoPack Fixed Connector - Front](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/fixed-connector-front/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Fork Pack Kit](https://www.tailfin.cc/ca/product/spares/pannier-fork-bag-spares/fork-pack-kit/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Top Tube Strap Keeper - Pack of 4](https://www.tailfin.cc/ca/product/spares/top-tube-bag-spares/top-tube-strap-keeper-pack-of-4/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Fork Pack Mount](https://www.tailfin.cc/ca/product/spares/pannier-fork-bag-spares/fork-pack-mount/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Frame Bag Long Strap](https://www.tailfin.cc/ca/product/spares/frame-bag-spares/frame-bag-strap/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Pannier Lower Hook](https://www.tailfin.cc/ca/product/spares/pannier-fork-bag-spares/16l-pannier-lower-hook/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Top Tube Pack V-Mount](https://www.tailfin.cc/ca/product/spares/top-tube-bag-spares/top-tube-v-mount/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
@@ -107,4 +104,3 @@ Exactly 191 snapshot records are accounted for. The generic Alloy/Carbon arch re
 | [Top Tube Flip Buckle](https://www.tailfin.cc/ca/product/spares/top-tube-bag-spares/top-tube-flip-buckle/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Pearson Axle Adaptor](https://www.tailfin.cc/ca/product/spares/axle-spares/pearson-axle-adaptor/) | unsupported-fit | Pearson-specific axle interface is not verified for these Santa Cruz builds. |
 | [Standard Pannier Inserts](https://www.tailfin.cc/ca/product/spares/pannier-fork-bag-spares/standard-pannier-inserts/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Fork Pack Lower Hook](https://www.tailfin.cc/ca/product/spares/pannier-fork-bag-spares/fork-pack-hook/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |

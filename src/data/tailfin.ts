@@ -2995,6 +2995,12 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       requires: ["cargo-cage"],
       provides: ["cargo-strap-upper", "cargo-strap-lower"],
     };
+  if (["tailfin-661740", "tailfin-661731", "tailfin-675876"].includes(p.id))
+    return { category:"mount", productKind:"spare", visualKind:"mount", sockets:["forkPackHardwareLeft","forkPackHardwareRight"],
+      requires: p.id === "tailfin-675876" ? ["fork-mount"] : ["fork-pack-host"],
+      provides: p.id === "tailfin-675876" ? ["mini-pannier-conversion"] : [] };
+  if (p.id === "tailfin-676061")
+    return { category:"mount", productKind:"spare", visualKind:"mount", sockets:["forkPackHookLeft","forkPackHookRight"], requires:["fork-pack-host"] };
   if (["tailfin-643500", "tailfin-643499", "tailfin-643496"].includes(p.id))
     return { category:"accessory", productKind:"accessory", visualKind:"accessory", sockets:["bottleDown","bottleSeat"] };
   if (["tailfin-642", "tailfin-641", "tailfin-591", "tailfin-446", "tailfin-43567", "tailfin-43576"].includes(p.id))
@@ -3135,7 +3141,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       category: "pannier",
       productKind: "bag",
       visualKind: "pannier",
-      sockets: ["pannierLeft", "pannierRight"],
+      sockets: p.id === "tailfin-972100" ? ["pannierLeft", "pannierRight", "forkLeft_0", "forkRight_0"] : ["pannierLeft", "pannierRight"],
       requires: ["pannier-mounts"],
       provides: ["tailfin-pannier"],
     };
@@ -3179,6 +3185,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       visualKind: "fork_pack",
       sockets: ["forkLeft_0", "forkRight_0"],
       requires: ["fork-mount"],
+      provides: ["fork-pack-host"],
     };
   if (p.id === "tailfin-129268")
     return {
@@ -3369,6 +3376,13 @@ function normalize(
       ? v.weight_g + v.bar_clamp_weight_g
       : p.id === "tailfin-675800" ? 25 : p.id === "tailfin-642" ? 370 : p.id === "tailfin-591" ? 471 : p.id === "tailfin-20115" ? 82.5 : v.weight_g;
   const notes = [
+    ["tailfin-661740", "tailfin-661731", "tailfin-676061", "tailfin-675876"].includes(p.id)
+      ? "Illustrative Fork Pack hardware; source mass and dimensions unknown. Mount and lower hook are replacement parts for 5/10 L Fork Packs. Complete kits overlap individual parts and cannot be stacked on the same side. The generic hardware kit's exact contents remain unspecified. Conversion kit includes fork mount, X-clamp, lower bumper/hook and fasteners; this preview shows only the Mini Pannier-to-Fork Pack direction for compatible second-generation 5/10 L Mini Panniers, not 16 L bags. Modified bag mass is excluded because removed hardware mass is unknown. Exact fork approval remains unverified."
+      : "",
+    p.id === "tailfin-972100"
+      ? "Fork-position preview is conditional on a compatible second-generation Mini Pannier and the same-side conversion kit. This does not establish the generation of an already-owned bag. Rear pannier placement remains the normal interface; 16 L panniers are not supported for this conversion."
+      : "",
+
     ["tailfin-643500", "tailfin-643499", "tailfin-643496"].includes(p.id)
       ? "Original illustrative bottle with an unweighted reference cage, not included equipment. Bottle mass, water capacity and dimensions are unknown. Add carried water to payload manually; water capacity is not luggage capacity. Actual cage, frame boss and bottle fit remain unverified."
       : "",

@@ -7,20 +7,31 @@ import type {
 import { findSocket, getWheelbaseMm } from "./sockets.ts";
 
 /** Included hardware has no separately verified mass to subtract from its host. */
-export function getMassUncertainHostIds(mounted: Record<string, BagItem>): Set<string> {
+export function getMassUncertainHostSockets(mounted: Record<string, BagItem>): Set<string> {
   const hasReplacement =
     mounted.barCageReplacement?.id === "tailfin-855555-v1" ||
     mounted.barCageClampLeft?.id === "tailfin-855553-v1" ||
     mounted.barCageClampRight?.id === "tailfin-855553-v1";
   const hosts = new Set<string>();
   if (hasReplacement) {
-    if (mounted.barMount?.id === "tailfin-825745-v1") hosts.add(mounted.barMount.id);
-    if (/^tailfin-825745-v[234]$/.test(mounted.handlebar?.id ?? "")) hosts.add(mounted.handlebar.id);
+    if (mounted.barMount?.id === "tailfin-825745-v1") hosts.add("barMount");
+    if (/^tailfin-825745-v[234]$/.test(mounted.handlebar?.id ?? "")) hosts.add("handlebar");
   }
   if (mounted.rearRack && /^tailfin-(642|641|591|446|43567|43576)-v1$/.test(mounted.rearArchReplacement?.id ?? "")) {
-    hosts.add(mounted.rearRack.id);
+    hosts.add("rearRack");
+  }
+  for (const side of ["Left", "Right"]) {
+    const hostSocket = `fork${side}_0`;
+    const hardware = mounted[`forkPackHardware${side}`]?.id ?? "";
+    const hook = mounted[`forkPackHook${side}`]?.id;
+    if (/^tailfin-(655674|972100)-v[12]$/.test(mounted[hostSocket]?.id ?? "") &&
+      (/^tailfin-(661740|661731|675876)-v1$/.test(hardware) || hook === "tailfin-676061-v1")) hosts.add(hostSocket);
   }
   return hosts;
+}
+
+export function getMassUncertainHostIds(mounted: Record<string, BagItem>): Set<string> {
+  return new Set(Array.from(getMassUncertainHostSockets(mounted), socket => mounted[socket].id));
 }
 
 export function calculateRigMetrics(
@@ -34,15 +45,15 @@ export function calculateRigMetrics(
   const entries = Object.entries(mounted).filter(([id]) =>
     findSocket(size, id, mounted),
   );
-  const uncertainHosts = getMassUncertainHostIds(Object.fromEntries(entries));
+  const uncertainHosts = getMassUncertainHostSockets(Object.fromEntries(entries));
   const known = (value: number | null) =>
     typeof value === "number" && Number.isFinite(value) && value >= 0
       ? value
       : 0;
-  const knownDryMass = (bag: BagItem) =>
-    uncertainHosts.has(bag.id) ? 0 : known(bag.dryWeightGrams);
+  const knownDryMass = (socketId: string, bag: BagItem) =>
+    uncertainHosts.has(socketId) ? 0 : known(bag.dryWeightGrams);
   const dry = entries.reduce(
-    (sum, [, bag]) => sum + knownDryMass(bag),
+    (sum, [id, bag]) => sum + knownDryMass(id, bag),
     0,
   );
   const capacity = entries.reduce(
@@ -53,7 +64,7 @@ export function calculateRigMetrics(
   let moment = bike.baseWeightGrams * wheelbase * 0.45;
   for (const [id, bag] of entries)
     moment +=
-      (knownDryMass(bag) +
+      (knownDryMass(id, bag) +
         (capacity ? (payload * known(bag.volumeLiters)) / capacity : 0)) *
       (findSocket(size, id, mounted)!.position[0] - rear);
   if (!capacity) moment += payload * wheelbase * 0.45;
@@ -73,7 +84,7 @@ export function calculateRigMetrics(
     balanceStatus:
       ratio < 38 ? "rear_heavy" : ratio > 48 ? "front_heavy" : "balanced",
     unknownWeightItemIds: entries
-      .filter(([, b]) => b.dryWeightGrams === null || uncertainHosts.has(b.id))
+      .filter(([id, b]) => b.dryWeightGrams === null || uncertainHosts.has(id))
       .map(([, b]) => b.id),
     unknownCapacityItemIds: entries
       .filter(([, b]) => b.volumeLiters === null && !["mount", "cargo_cage", "accessory"].includes(b.category) && b.visualKind !== "rack")

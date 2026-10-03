@@ -1,4 +1,4 @@
-import { getMassUncertainHostIds } from "./balance.ts";
+import { getMassUncertainHostIds, getMassUncertainHostSockets } from "./balance.ts";
 import type { BikeModel, BagItem, RigMetrics } from "../types/index.ts";
 
 export const MAX_PAYLOAD_GRAMS = 50_000;
@@ -66,7 +66,7 @@ export function generateCsvManifest({
       bag.brand,
       bag.name,
       known(bag.volumeLiters),
-      known(getMassUncertainHostIds(mountedBags).has(bag.id) ? null : bag.dryWeightGrams),
+      known(getMassUncertainHostSockets(mountedBags).has(socketId) ? null : bag.dryWeightGrams),
       bag.waterproofRating || "N/A",
       bag.productUrl,
     ]);
@@ -130,7 +130,7 @@ export function generateMarkdownManifest({
   md += `| **Complete Bicycle** | ${bike.brand} | ${bike.name} (${sizeKey}) | - | ${(bike.baseWeightGrams / 1000).toFixed(2)} kg | - | ${bike.sourceUrl ? `[Bike Info](${bike.sourceUrl})` : "—"} |\n`;
 
   Object.entries(mountedBags).forEach(([socketId, bag]) => {
-    md += `| ${socketId} | ${bag.brand} | ${bag.name} | ${known(bag.volumeLiters, " L")} | ${known(getMassUncertainHostIds(mountedBags).has(bag.id) ? null : bag.dryWeightGrams, " g")} | ${bag.price ? `${bag.price.currency} ${bag.price.amount}` : known(bag.priceUsd, " USD")} | [View Product](${bag.productUrl}) |\n`;
+    md += `| ${socketId} | ${bag.brand} | ${bag.name} | ${known(bag.volumeLiters, " L")} | ${known(getMassUncertainHostSockets(mountedBags).has(socketId) ? null : bag.dryWeightGrams, " g")} | ${bag.price ? `${bag.price.currency} ${bag.price.amount}` : known(bag.priceUsd, " USD")} | [View Product](${bag.productUrl}) |\n`;
   });
 
   if (metrics.payloadEstimateGrams > 0) {
