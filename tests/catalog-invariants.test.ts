@@ -97,7 +97,9 @@ test('all provisionable catalogue placements conserve mass and survive share rou
     configurations++;assertClean(size,mounted);
     const metrics=calculateRigMetrics(bike,size,mounted,1373);
     for(const value of Object.values(metrics).filter(v=>typeof v==='number')) assert.ok(Number.isFinite(value));
-    assert.equal(metrics.totalRigWeightGrams,bike.baseWeightGrams+1373+Object.values(mounted).reduce((sum,b)=>sum+(b.dryWeightGrams??0),0));
+    const replacementInstalled = !!(mounted.barCageReplacement || mounted.barCageClampLeft || mounted.barCageClampRight);
+    const modifiedHost = replacementInstalled ? (mounted.barMount?.id === 'tailfin-825745-v1' ? mounted.barMount : mounted.handlebar?.id.startsWith('tailfin-825745-') ? mounted.handlebar : undefined) : undefined;
+    assert.equal(metrics.totalRigWeightGrams,bike.baseWeightGrams+1373+Object.values(mounted).reduce((sum,b)=>sum+(b === modifiedHost ? 0 : b.dryWeightGrams??0),0));
     assert.equal(metrics.frontAxleWeightGrams+metrics.rearAxleWeightGrams,metrics.totalRigWeightGrams);
     for(const unknown of Object.values(mounted).filter(b=>b.dryWeightGrams===null)) assert.ok(metrics.unknownWeightItemIds?.includes(unknown.id));
     if(Object.values(mounted).some(b=>b.dryWeightGrams===null)) assert.match(generateMarkdownManifest({bike,sizeKey:key,mountedBags:mounted,metrics}),/Unknown|unknown/);

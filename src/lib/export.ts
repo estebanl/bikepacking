@@ -1,3 +1,4 @@
+import { getMassUncertainHostIds } from "./balance.ts";
 import type { BikeModel, BagItem, RigMetrics } from "../types/index.ts";
 
 export const MAX_PAYLOAD_GRAMS = 50_000;
@@ -15,8 +16,9 @@ function unknownNote(mounted: Record<string, BagItem>): string {
   const missing = Object.entries(mounted).filter(
     ([, b]) => b.dryWeightGrams === null || b.volumeLiters === null,
   );
+  const replaced = getMassUncertainHostIds(mounted).size ? " Modified Bar Cage host mass is excluded because removed hardware mass is unknown." : "";
   return missing.length
-    ? `Known subtotals only. Unknown weight or capacity: ${missing.map(([socket, b]) => `${b.name} (${socket})`).join(", ")}. Unknown mass is omitted from axle estimates.`
+    ? `Known subtotals only. Unknown weight or capacity: ${missing.map(([socket, b]) => `${b.name} (${socket})`).join(", ")}. Unknown mass is omitted from axle estimates.${replaced}`
     : "";
 }
 
@@ -64,7 +66,7 @@ export function generateCsvManifest({
       bag.brand,
       bag.name,
       known(bag.volumeLiters),
-      known(bag.dryWeightGrams),
+      known(getMassUncertainHostIds(mountedBags).has(bag.id) ? null : bag.dryWeightGrams),
       bag.waterproofRating || "N/A",
       bag.productUrl,
     ]);
@@ -128,7 +130,7 @@ export function generateMarkdownManifest({
   md += `| **Complete Bicycle** | ${bike.brand} | ${bike.name} (${sizeKey}) | - | ${(bike.baseWeightGrams / 1000).toFixed(2)} kg | - | ${bike.sourceUrl ? `[Bike Info](${bike.sourceUrl})` : "—"} |\n`;
 
   Object.entries(mountedBags).forEach(([socketId, bag]) => {
-    md += `| ${socketId} | ${bag.brand} | ${bag.name} | ${known(bag.volumeLiters, " L")} | ${known(bag.dryWeightGrams, " g")} | ${bag.price ? `${bag.price.currency} ${bag.price.amount}` : known(bag.priceUsd, " USD")} | [View Product](${bag.productUrl}) |\n`;
+    md += `| ${socketId} | ${bag.brand} | ${bag.name} | ${known(bag.volumeLiters, " L")} | ${known(getMassUncertainHostIds(mountedBags).has(bag.id) ? null : bag.dryWeightGrams, " g")} | ${bag.price ? `${bag.price.currency} ${bag.price.amount}` : known(bag.priceUsd, " USD")} | [View Product](${bag.productUrl}) |\n`;
   });
 
   if (metrics.payloadEstimateGrams > 0) {

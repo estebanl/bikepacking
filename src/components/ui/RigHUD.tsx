@@ -1,11 +1,13 @@
 "use client";
 
 import React from "react";
+import { getMassUncertainHostIds } from "@/lib/balance";
 import { useRigStore } from "@/store/useRigStore";
 import { AlertTriangle, AlertOctagon, Scale, Activity } from "lucide-react";
 
 export function RigHUD() {
   const metrics = useRigStore((s) => s.metrics);
+  const modifiedHost = useRigStore(s=>getMassUncertainHostIds(s.mountedBags).size > 0);
   const clearanceWarnings = useRigStore((s) => s.clearanceWarnings);
   const dropperCompressed = useRigStore((s) => s.dropperPostCompressed);
   const rigidPost = useRigStore((s) => s.currentBike.seatpostType === "rigid");
@@ -112,6 +114,7 @@ export function RigHUD() {
             {unknownWeights > 0
               ? `${unknownWeights} mounted item(s) have unknown mass. The weight subtotal and axle estimate exclude that mass. `
               : ""}
+            {modifiedHost ? "The modified Bar Cage assembly is also excluded: the removed hardware mass is unknown. " : ""}
             {unknownCapacity > 0
               ? `${unknownCapacity} item(s) have unknown capacity; capacity is a known subtotal.`
               : ""}

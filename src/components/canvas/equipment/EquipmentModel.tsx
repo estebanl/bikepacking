@@ -196,7 +196,7 @@ function PanelShell({
 
 export interface BarSupportEndpoints { clamps: [Point3,Point3]; ends: [Point3,Point3]; orientation: [number,number,number,number] }
 
-export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3 }): ReactElement {
+export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]} }): ReactElement {
   const [l, h, d] = equipmentDimensions(bag),
     kind = equipmentKind(bag);
   const fabric = useMemo(
@@ -275,7 +275,9 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
       {[-1,1].map(s=><Box key={s} position={[.015+s*.010,.038,0]} size={[.005,.004,.013]} material={metal}/>)}
     </> : <mesh dispose={null} geometry={unitTube} material={buckle} position={[.015,.037,0]} rotation={[Math.PI/2,0,0]} scale={[.011,.032,.011]} castShadow/>}
   </group>;
-  if (bag.id === "tailfin-825745-v1" && barCageEnvelope) return <BarCageModel envelope={barCageEnvelope} support={barSupport}/>;
+  if (bag.id === "tailfin-855555-v1" && barCageEnvelope) return <BarCageModel envelope={barCageEnvelope}/>;
+  if (bag.id === "tailfin-855553-v1" && barCageEnvelope) return <BarCageModel envelope={barCageEnvelope} support={barSupport} hideCradle hideClamps={barCageParts?.hideClamps}/>;
+  if (bag.id === "tailfin-825745-v1" && barCageEnvelope) return <BarCageModel envelope={barCageEnvelope} support={barSupport} {...barCageParts}/>;
   if (bag.id.startsWith("tailfin-56316-")) return <CagePackModel bag={bag} fabric={fabric}/>;
   if (bag.id.startsWith("tailfin-126220-") && strapEnvelope) return <CargoStrapModel envelope={strapEnvelope} rearExtension={strapRearExtension}/>;
   if (isRearAccessory(bag)) return <RearAccessoryModel bag={bag} rearDeck={rearDeck}/>;
@@ -497,7 +499,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
         <Box position={[l*x,-h*.46-.040,0]} size={[.017,.003,.045]}/>
         <Box position={[l*x,-h*.35,d*.465]} size={[.023,.019,.006]} material={buckle}/>
       </group>)}
-      {isBarCageBundle(bag) && barCageEnvelope && <BarCageModel envelope={barCageEnvelope} support={barSupport}/>}
+      {isBarCageBundle(bag) && barCageEnvelope && <BarCageModel envelope={barCageEnvelope} support={barSupport} {...barCageParts}/>}
       {kind === "bar_roll" && (
         <>
           {[-1, 1].map((s) => (

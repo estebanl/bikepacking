@@ -1,4 +1,5 @@
 import test from 'node:test';
+import type { BagItem } from '../src/types/index.ts';
 import assert from 'node:assert/strict';
 import { BIKES } from '../src/data/bikes.ts';
 import { TAILFIN_CATALOG } from '../src/data/tailfin.ts';
@@ -56,9 +57,26 @@ test('191 catalog variants remain accounted for, including the internal storage 
  const counts: Record<string,number>={};
  for(const part of TAILFIN_CATALOG) counts[part.previewStatus!]=(counts[part.previewStatus!]??0)+1;
  assert.equal(TAILFIN_CATALOG.length,191);
- assert.deepEqual(counts,{'mountable':83,'implementation-pending':68,'unsupported-fit':13,'nonvisual-spare':18,'off-bike':9});
+ assert.deepEqual(counts,{'mountable':85,'implementation-pending':66,'unsupported-fit':13,'nonvisual-spare':18,'off-bike':9});
  const internal=item('732058-v1');
  assert.equal(internal.previewStatus,'nonvisual-spare');
  assert.equal(internal.compatibleSockets.length,0);
  assert.match(internal.previewStatusLabel!,/Internal storage/);
+});
+
+test('Bar Cage replacement parts use the existing host pose and disappear with the host',()=>{
+ for(const bike of BIKES.filter(b=>b.brand==='Santa Cruz')) for(const size of Object.values(bike.sizes)) {
+  for(const host of [{barMount:item('825745-v1')},{handlebar:item('825745-v3')}] as Record<string,BagItem>[]) {
+   const socket='barMount' in host ? 'barMount' : 'handlebar';
+   const pose=getEquipmentPlacement(host[socket]!,findSocket(size,socket,host)!);
+   for(const [id,target] of [['855555-v1','barCageReplacement'],['855553-v1','barCageClampLeft'],['855553-v1','barCageClampRight']]) {
+    const part=item(id);
+    assert.equal(validateMount(part,target,size,{}).allowed,false);
+    assert.equal(validateMount(part,target,size,host).allowed,true);
+    assert.deepEqual(findSocket(size,target,host)?.position,pose.position);
+    assert.equal(part.dryWeightGrams,null);
+    assert.equal(sanitizeMountedBags({[target]:part},size).mountedBags[target],undefined);
+   }
+  }
+ }
 });

@@ -2995,6 +2995,12 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       requires: ["cargo-cage"],
       provides: ["cargo-strap-upper", "cargo-strap-lower"],
     };
+  if (["tailfin-855555", "tailfin-855553"].includes(p.id))
+    return {
+      category: "mount", productKind: "spare", visualKind: "mount",
+      sockets: p.id === "tailfin-855555" ? ["barCageReplacement"] : ["barCageClampLeft", "barCageClampRight"],
+      requires: ["bar-cage-accessory"],
+    };
   if (["tailfin-1012933", "tailfin-1012929"].includes(p.id))
     return {
       category: "mount", productKind: "mount", visualKind: "mount",
@@ -3351,6 +3357,10 @@ function normalize(
       ? v.weight_g + v.bar_clamp_weight_g
       : p.id === "tailfin-675800" ? 25 : v.weight_g;
   const notes = [
+    ["tailfin-855555", "tailfin-855553"].includes(p.id)
+      ? "Replacement preview on an existing Bar Cage only. Original illustrative geometry replaces the corresponding cage or one clamp in the scene; included hardware, exact handing, dimensions and mass are unverified. Modified host mass is excluded from the known subtotal because the removed component mass is unknown."
+      : "",
+
     p.id === "tailfin-126220"
       ? `Sold individually; a strap is not included with Cage Packs. Source strap size ${v.dimensions_mm?.length} × ${v.dimensions_mm?.width} × ${v.dimensions_mm?.thickness} mm and mass ${v.weight_g} g describe the loose strap only. The illustrated installed loop shape is unverified.`
       : "",

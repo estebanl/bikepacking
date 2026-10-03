@@ -56,12 +56,13 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
     return {...anchor,rotation,position:[fork.position[0],fork.position[1]+(cage ? -ch*.47+bh*.44 : 0),side*(.106+bl*.5)]};
   });
   return resolved.map(anchor => {
-    if(anchor.id === "barCageAccessory") {
+    if(["barCageAccessory", "barCageReplacement", "barCageClampLeft", "barCageClampRight"].includes(anchor.id)) {
       const bundled = mounted.handlebar && isBarCageBundle(mounted.handlebar);
       const hostId = bundled ? "handlebar" : mounted.barMount?.provides?.includes("bar-cage") ? "barMount" : undefined;
       const hostAnchor=resolved.find(a=>a.id === hostId);
       const cageAnchor=hostAnchor && bundled ? {...hostAnchor,...getEquipmentPlacement(mounted.handlebar,hostAnchor)} : hostAnchor;
       if(cageAnchor) {
+        if(anchor.id !== "barCageAccessory") return {...anchor,position:cageAnchor.position,rotation:cageAnchor.rotation};
         const [l,h]=getBarCageEnvelope(mounted);
         const offset=rotateEquipmentPoint([-l*.5-.008,h*.5+.018,0],cageAnchor.rotation);
         return {...anchor,position:cageAnchor.position.map((v,i)=>v+offset[i]) as [number,number,number],rotation:cageAnchor.rotation};

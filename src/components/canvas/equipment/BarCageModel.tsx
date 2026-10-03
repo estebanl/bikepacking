@@ -14,9 +14,10 @@ function Rod({a,b,r=.004}:{a:Point3;b:Point3;r?:number}) {
 }
 /** Original U-cradle and bar clamps. Shared pose follows the separately mounted bag.
  * Hardware is illustrative; no manufacturer CAD, fit certification or added component mass. */
-export function BarCageModel({envelope,support}:{envelope:Point3;support?:BarSupportEndpoints}) {
+export function BarCageModel({envelope,support,hideCradle=false,hideClamps=[]}:{envelope:Point3;support?:BarSupportEndpoints;hideCradle?:boolean;hideClamps?:number[]}) {
  const [l,h]=envelope,back=-l*.5-.008,bottom=-h*.47-.007,top=h*.5+.018;
  return <group name="original-bar-cage-cradle">
+   {!hideCradle && <>
    {[-1,1].map(side=><group key={side}>
      <Rod a={[back,bottom,side*.09]} b={[back,top,side*.09]} r={.005}/>
      <Rod a={[back,bottom,side*.09]} b={[l*.51+.006,bottom,side*.09]}/>
@@ -25,7 +26,8 @@ export function BarCageModel({envelope,support}:{envelope:Point3;support?:BarSup
    </group>)}
    <Rod a={[back,top,-.105]} b={[back,top,.105]} r={.005}/>
    <Rod a={[back,-h*.44,-.09]} b={[back,-h*.44,.09]}/>
-   {support && support.clamps.map((a,i)=><group key={i}>
+   </>}
+   {support && support.clamps.map((a,i)=>hideClamps.includes(i) ? null : <group key={i}>
      <mesh dispose={null} geometry={ring} material={rubber} position={a} quaternion={support.orientation} castShadow/>
      <Rod a={a} b={support.ends[i]} r={.006}/>
      <mesh dispose={null} geometry={box} material={metal} position={support.ends[i]} scale={[.008,.021,.026]} castShadow/>
