@@ -1,4 +1,5 @@
 "use client";
+import { isBarCageBundle } from "@/lib/cargoStraps";
 
 import { useEffect, useMemo, type ReactElement } from "react";
 import * as THREE from "three";
@@ -496,6 +497,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
         <Box position={[l*x,-h*.46-.040,0]} size={[.017,.003,.045]}/>
         <Box position={[l*x,-h*.35,d*.465]} size={[.023,.019,.006]} material={buckle}/>
       </group>)}
+      {isBarCageBundle(bag) && barCageEnvelope && <BarCageModel envelope={barCageEnvelope} support={barSupport}/>}
       {kind === "bar_roll" && (
         <>
           {[-1, 1].map((s) => (

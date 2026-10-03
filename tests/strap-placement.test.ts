@@ -18,16 +18,47 @@ test('separate straps follow the elliptical pack and upper/lower band positions 
   assert.deepEqual(getCargoStrapEnvelope(mounted,lo.id),envelope,'strap length changes tail/mass, not the host shell');
  }
 });
-test('Bar Cage accessories require the modeled standalone cage interface and cannot survive its removal',()=>{
+test('Bar Cage accessories require a modeled cage interface and cannot survive its removal',()=>{
  const bike=BIKES.find(b=>b.brand==='Santa Cruz')!,size=Object.values(bike.sizes)[0];
  for(const id of ['1012933-v1','1012929-v1']) {
   const part=item(id),cage=item('825745-v1');
   assert.equal(validateMount(part,'barCageAccessory',size,{}).allowed,false);
   assert.equal(validateMount(part,'barCageAccessory',size,{barMount:cage}).allowed,true);
-  assert.equal(validateMount(part,'barCageAccessory',size,{handlebar:item('825745-v2')}).allowed,false);
+  assert.equal(validateMount(part,'barCageAccessory',size,{handlebar:item('825745-v2')}).allowed,true);
   assert.equal(sanitizeMountedBags({barCageAccessory:part},size).mountedBags.barCageAccessory,undefined);
   const host=getEquipmentPlacement(cage,findSocket(size,'barMount',{barMount:cage})!);
   const anchor=findSocket(size,'barCageAccessory',{barMount:cage,barCageAccessory:part})!;
   assert.equal(anchor.position[1],host.position[1]+getBarCageEnvelope({barMount:cage})[1]*.5+.018);
  }
+});
+
+test('all three bundles match separate bag envelopes, masses and accessory poses without duplicate cages',()=>{
+ const size=Object.values(BIKES.find(b=>b.brand==='Santa Cruz')!.sizes)[0];
+ const cage=item('825745-v1');
+ for(let n=2;n<=4;n++) {
+  const bundle=item(`825745-v${n}`),bag=item(`851925-v${n-1}`);
+  assert.deepEqual(equipmentDimensions(bundle),equipmentDimensions(bag));
+  assert.equal(bundle.dryWeightGrams,cage.dryWeightGrams!+bag.dryWeightGrams!);
+  assert.equal(validateMount(cage,'barMount',size,{handlebar:bundle}).allowed,false);
+  assert.equal(validateMount(bundle,'handlebar',size,{barMount:cage}).allowed,false);
+  const separate={barMount:cage,handlebar:bag};
+  for(const id of ['1012933-v1','1012929-v1']) {
+   const part=item(id),mounted={handlebar:bundle,barCageAccessory:part};
+   assert.equal(validateMount(part,'barCageAccessory',size,mounted).allowed,true);
+   assert.deepEqual(findSocket(size,'barCageAccessory',mounted)?.position,findSocket(size,'barCageAccessory',separate)?.position);
+   assert.equal(sanitizeMountedBags(mounted,size).mountedBags.barCageAccessory.id,part.id);
+   assert.equal(sanitizeMountedBags({barCageAccessory:part},size).mountedBags.barCageAccessory,undefined);
+  }
+ }
+});
+
+test('191 catalog variants remain accounted for, including the internal storage reclassification',()=>{
+ const counts: Record<string,number>={};
+ for(const part of TAILFIN_CATALOG) counts[part.previewStatus!]=(counts[part.previewStatus!]??0)+1;
+ assert.equal(TAILFIN_CATALOG.length,191);
+ assert.deepEqual(counts,{'mountable':83,'implementation-pending':68,'unsupported-fit':13,'nonvisual-spare':18,'off-bike':9});
+ const internal=item('732058-v1');
+ assert.equal(internal.previewStatus,'nonvisual-spare');
+ assert.equal(internal.compatibleSockets.length,0);
+ assert.match(internal.previewStatusLabel!,/Internal storage/);
 });

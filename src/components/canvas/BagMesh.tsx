@@ -6,7 +6,7 @@ import { useRigStore } from "@/store/useRigStore";
 import { getEquipmentPlacement, equipmentKind, rotateEquipmentPoint, type Point3 } from "@/lib/equipmentGeometry";
 import { EquipmentModel, RackSeatpostConnector, type BarSupportEndpoints } from "./equipment/EquipmentModel";
 
-import { getCargoStrapEnvelope, getCargoStrapRearExtension, getBarCageEnvelope } from "@/lib/cargoStraps";
+import { getCargoStrapEnvelope, getCargoStrapRearExtension, getBarCageEnvelope, isBarCageBundle } from "@/lib/cargoStraps";
 import { findSocket } from "@/lib/sockets";
 import { getBottleMountPose } from "@/lib/bottleMounts";
 import { getBikeGeometry } from "@/lib/bikeGeometry";
@@ -43,7 +43,7 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
   const connectorOffset=rotateEquipmentPoint(connectorLocal,placement.rotation);
   const connectorStart=connectorOffset.map((v,i)=>v+placement.position[i]) as Point3;
   let barSupport: BarSupportEndpoints | undefined;
-  if (bag.id === "tailfin-710832-v1" || bag.id === "tailfin-825745-v1") {
+  if (bag.id === "tailfin-710832-v1" || (bag.id === "tailfin-825745-v1" || isBarCageBundle(bag))) {
     const inverse=new THREE.Quaternion().setFromEuler(new THREE.Euler(...placement.rotation)).invert();
     const toLocal=(p: Point3): Point3 => new THREE.Vector3(...p).sub(new THREE.Vector3(...placement.position)).applyQuaternion(inverse).toArray() as Point3;
     const barBag=mounted.handlebar;
@@ -53,12 +53,12 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
       const rearOffset=rotateEquipmentPoint([-mountedPlacement.dimensions.length/2+.005,0,0],mountedPlacement.rotation);
       support=rearOffset.map((v,i)=>v+mountedPlacement.position[i]) as Point3;
     }
-    if (bag.id === "tailfin-825745-v1") {
+    if ((bag.id === "tailfin-825745-v1" || isBarCageBundle(bag))) {
       const [bagL,bagH]=getBarCageEnvelope(mounted);
       const offset=rotateEquipmentPoint([-bagL*.5-.008,bagH*.35,0],placement.rotation);
       support=offset.map((v,i)=>v+placement.position[i]) as Point3;
     }
-    const lateral=bag.id === "tailfin-825745-v1" ? .08 : .055;
+    const lateral=(bag.id === "tailfin-825745-v1" || isBarCageBundle(bag)) ? .08 : .055;
     barSupport={
       clamps:[toLocal([g.stemClamp[0],g.stemClamp[1]+.001,-.045]),toLocal([g.stemClamp[0],g.stemClamp[1]+.001,.045])],
       ends:[toLocal([support[0],support[1],support[2]-lateral]),toLocal([support[0],support[1],support[2]+lateral])],
@@ -73,7 +73,7 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
       name={`bag_${bag.id}_${socketId}`}
     >
       <group>
-        <EquipmentModel bag={bag} barSupport={barSupport} tubeRadius={tubeRadius} rearDeck={rearDeck} barCageEnvelope={bag.id === "tailfin-825745-v1" ? getBarCageEnvelope(mounted) : undefined} strapEnvelope={bag.id.startsWith("tailfin-126220-") ? getCargoStrapEnvelope(mounted,socketId) : undefined} strapRearExtension={bag.id.startsWith("tailfin-126220-") ? getCargoStrapRearExtension(mounted,socketId) : undefined} />
+        <EquipmentModel bag={bag} barSupport={barSupport} tubeRadius={tubeRadius} rearDeck={rearDeck} barCageEnvelope={(bag.id === "tailfin-825745-v1" || isBarCageBundle(bag)) ? getBarCageEnvelope(mounted) : undefined} strapEnvelope={bag.id.startsWith("tailfin-126220-") ? getCargoStrapEnvelope(mounted,socketId) : undefined} strapRearExtension={bag.id.startsWith("tailfin-126220-") ? getCargoStrapRearExtension(mounted,socketId) : undefined} />
         {/* Warnings stay legible without changing opaque textile into glowing plastic. */}
         {affected.length > 0 && (
           <mesh position={[-l * 0.27, h * 0.21, d * 0.52]}>

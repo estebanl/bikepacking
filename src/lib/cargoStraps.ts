@@ -35,5 +35,9 @@ export function resolveCargoStrapAnchor(anchor: SocketAnchor, anchors: SocketAnc
 
 export function getBarCageEnvelope(mounted: Record<string,BagItem>): Point3 {
  const bag=mounted.handlebar;
- return bag?.requires?.includes("bar-cage") ? equipmentDimensions(bag) : [.16,.16,.36];
+ return bag && (bag.requires?.includes("bar-cage") || isBarCageBundle(bag)) ? equipmentDimensions(bag) : [.16,.16,.36];
+}
+
+export function isBarCageBundle(bag: BagItem): boolean {
+ return /^tailfin-825745-v[234]$/.test(bag.id);
 }

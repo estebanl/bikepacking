@@ -2998,7 +2998,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
   if (["tailfin-1012933", "tailfin-1012929"].includes(p.id))
     return {
       category: "mount", productKind: "mount", visualKind: "mount",
-      sockets: ["barCageAccessory"], requires: ["bar-cage"],
+      sockets: ["barCageAccessory"], requires: ["bar-cage-accessory"],
     };
   if (p.id === "tailfin-48952")
     return { category: "mount", productKind: "mount", visualKind: "mount",
@@ -3085,7 +3085,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
         productKind: "cage",
         visualKind: "cage",
         sockets: ["barMount"],
-        provides: ["bar-cage"],
+        provides: ["bar-cage", "bar-cage-accessory"],
       };
     return {
       category: "handlebar_roll",
@@ -3093,6 +3093,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       visualKind: "bar_roll",
       sockets: ["handlebar"],
       excludes: ["bar-cage", "bar-bag-mount"],
+      provides: ["bar-cage-accessory"],
     };
   }
   if (p.id === "tailfin-851925")
@@ -3268,6 +3269,8 @@ function visualEnvelope(
     case "bar_roll": {
       const replacement = BAR_ROLL_REPLACEMENTS[p.id];
       if (replacement) return envelope(replacement.diameter, replacement.diameter, replacement.width);
+      // Bundles use the same illustrative packed envelope as their separate bags.
+      if (p.id === "tailfin-825745") return capacity <= 8 ? envelope(135,135,450) : capacity <= 11 ? envelope(165,165,455) : envelope(180,180,470);
       const diameter =
         d?.diameter ?? (capacity <= 8 ? 135 : capacity <= 11 ? 165 : 180);
       const width =
@@ -3355,10 +3358,10 @@ function normalize(
       ? `Cargo Straps are not included. Official FAQ: https://www.tailfin.cc/product/cargo-cage-system/cage-packs/cage-packs/ recommends 40 cm for 1.7 L, 50 cm for 3 L and 5 L, and 65 cm for 5 L. Published ${v.weight_g} g pack mass excludes separate cargo straps. The 5 L pack includes side compression T-Hook straps, a different part.`
       : "",
     p.id === "tailfin-1012933"
-      ? "Illustrative computer mount envelope only; source mass and dimensions are unknown. GPS/computer not included. Requires the standalone Bar Cage interface; the integrated cage-and-bag bundle accessory preview is unfinished."
+      ? "Illustrative computer mount envelope only; source mass and dimensions are unknown. GPS/computer not included. Requires a Bar Cage, either standalone or included in a cage-and-bag bundle."
       : "",
     p.id === "tailfin-1012929"
-      ? "Illustrative light mount envelope only; source mass and dimensions are unknown. Light not included. The 22 mm name is a nominal mount size, not the complete envelope. Requires the standalone Bar Cage interface; the integrated cage-and-bag bundle accessory preview is unfinished."
+      ? "Illustrative light mount envelope only; source mass and dimensions are unknown. Light not included. The 22 mm name is a nominal mount size, not the complete envelope. Requires a Bar Cage, either standalone or included in a cage-and-bag bundle."
       : "",
     p.id === "tailfin-732058"
       ? "Internal storage accessory pack: additional divider, two accessory pockets and two tool/pump loops. Source mass and dimensions are unknown; components are not modeled as exterior geometry."

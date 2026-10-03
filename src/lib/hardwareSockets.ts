@@ -28,7 +28,7 @@ export function addHardwareSockets(bike: BikeModel) {
       ...getBottleHardwareSockets(bike, size),
       hardware("rearLightMount", "Rear light or light mount", [g.rearAxle[0]-.2,g.rearAxle[1]+.4,0], ["mount","accessory"]),
       hardware("journeyMudguard", "Journey rack mudguard", [g.rearAxle[0],g.rearAxle[1]+.4,0], ["accessory"], ["journey-rack"]),
-      hardware("barCageAccessory", "Bar Cage accessory", [g.stemClamp[0]+.06,g.stemClamp[1]+.055,0], ["mount"], ["bar-cage"]),
+      hardware("barCageAccessory", "Bar Cage accessory", [g.stemClamp[0]+.06,g.stemClamp[1]+.055,0], ["mount"], ["bar-cage-accessory"]),
       hardware("rearAxleHardware", "Rear axle hardware", g.rearAxle, ["mount"]),
       hardware(
         "rearUdhHardware",

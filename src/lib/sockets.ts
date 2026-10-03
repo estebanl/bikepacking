@@ -4,7 +4,7 @@ import type {
   BikeSizeConfig,
   SocketAnchor,
 } from "../types/index.ts";
-import { resolveCargoStrapAnchor, getBarCageEnvelope } from "./cargoStraps.ts";
+import { resolveCargoStrapAnchor, getBarCageEnvelope, isBarCageBundle } from "./cargoStraps.ts";
 import { resolveRearAccessoryAnchor } from "./rearAccessoryMounts.ts";
 import { equipmentDimensions, rotateEquipmentPoint, getEquipmentPlacement } from "./equipmentGeometry.ts";
 export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, BagItem> = {}): SocketAnchor[] {
@@ -56,8 +56,11 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
     return {...anchor,rotation,position:[fork.position[0],fork.position[1]+(cage ? -ch*.47+bh*.44 : 0),side*(.106+bl*.5)]};
   });
   return resolved.map(anchor => {
-    if(anchor.id === "barCageAccessory" && mounted.barMount?.provides?.includes("bar-cage")) {
-      const cageAnchor=resolved.find(a=>a.id === "barMount");
+    if(anchor.id === "barCageAccessory") {
+      const bundled = mounted.handlebar && isBarCageBundle(mounted.handlebar);
+      const hostId = bundled ? "handlebar" : mounted.barMount?.provides?.includes("bar-cage") ? "barMount" : undefined;
+      const hostAnchor=resolved.find(a=>a.id === hostId);
+      const cageAnchor=hostAnchor && bundled ? {...hostAnchor,...getEquipmentPlacement(mounted.handlebar,hostAnchor)} : hostAnchor;
       if(cageAnchor) {
         const [l,h]=getBarCageEnvelope(mounted);
         const offset=rotateEquipmentPoint([-l*.5-.008,h*.5+.018,0],cageAnchor.rotation);
@@ -77,7 +80,7 @@ export function mountRequirementLabel(required: string): string {
     "cargo-cage-load-chip-host":"Small or Large Cargo Cage",
     "cargo-strap-upper":"upper Cargo Strap", "cargo-strap-lower":"lower Cargo Strap",
     "tailfin-axle":"Tailfin axle", "udh-adapter":"UDH adapter", "rack-top":"rack top support",
-    "pannier-mounts":"pannier mounts", "bar-cage":"Bar Cage", "bar-bag-mount":"Bar Bag Mounting Kit",
+    "bar-cage-accessory":"Bar Cage accessory interface", "pannier-mounts":"pannier mounts", "bar-cage":"Bar Cage", "bar-bag-mount":"Bar Bag Mounting Kit",
     "journey-rack":"Journey Pannier Rack", "tailfin-rear-light-interface":"compatible rear light attachment",
     "tailfin-fixed-bag-light-interface":"CargoPack or Fixed SpeedPack bag",
     "tailfin-clip-light-interface":"compatible CargoPack clip attachment",
