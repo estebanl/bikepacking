@@ -16,7 +16,7 @@ function unknownNote(mounted: Record<string, BagItem>): string {
   const missing = Object.entries(mounted).filter(
     ([, b]) => b.dryWeightGrams === null || b.volumeLiters === null,
   );
-  const replaced = getMassUncertainHostIds(mounted).size ? " Modified Bar Cage host mass is excluded because removed hardware mass is unknown." : "";
+  const replaced = getMassUncertainHostIds(mounted).size ? " Modified host assembly mass is excluded because removed hardware mass is unknown." : "";
   return missing.length
     ? `Known subtotals only. Unknown weight or capacity: ${missing.map(([socket, b]) => `${b.name} (${socket})`).join(", ")}. Unknown mass is omitted from axle estimates.${replaced}`
     : "";

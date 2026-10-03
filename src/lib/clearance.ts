@@ -1,3 +1,4 @@
+import { shouldShowReferenceBottle } from "./catalogBottles.ts";
 import type {
   BikeModel,
   BikeSizeConfig,
@@ -119,7 +120,7 @@ export function evaluateClearances({
   const illustratedBottleOverlap = frameBounds && [0, 1, 2].every(axis => frameBounds.min[axis] < bottleBounds.max[axis] && frameBounds.max[axis] > bottleBounds.min[axis]);
   if (
     frame &&
-    waterBottlesMounted &&
+    waterBottlesMounted && shouldShowReferenceBottle(mountedBags) &&
     (illustratedBottleOverlap || frame.category === "frame_full" || (frame.volumeLiters ?? 0) > 4.2)
   )
     warnings.push({

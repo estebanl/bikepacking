@@ -17,6 +17,9 @@ export function getMassUncertainHostIds(mounted: Record<string, BagItem>): Set<s
     if (mounted.barMount?.id === "tailfin-825745-v1") hosts.add(mounted.barMount.id);
     if (/^tailfin-825745-v[234]$/.test(mounted.handlebar?.id ?? "")) hosts.add(mounted.handlebar.id);
   }
+  if (mounted.rearRack && /^tailfin-(642|641|591|446|43567|43576)-v1$/.test(mounted.rearArchReplacement?.id ?? "")) {
+    hosts.add(mounted.rearRack.id);
+  }
   return hosts;
 }
 

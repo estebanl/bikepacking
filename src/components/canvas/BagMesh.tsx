@@ -1,6 +1,7 @@
 "use client";
 
 import * as THREE from "three";
+import { getRearArchPose, isRearArchReplacement, archHasPannierMounts, rackHasPannierMounts } from "@/lib/rearArchReplacement";
 import { BagItem, SocketAnchor } from "@/types";
 import { useRigStore } from "@/store/useRigStore";
 import { getEquipmentPlacement, equipmentKind, rotateEquipmentPoint, type Point3 } from "@/lib/equipmentGeometry";
@@ -32,6 +33,13 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
     const rackAnchor=findSocket(size,"rearRack",mounted);
     if(rackAnchor) rearDeck=getEquipmentPlacement(mounted.rearRack,rackAnchor).dimensions;
   }
+  const rearHostAnchor=mounted.rearRack ? findSocket(size,"rearRack",mounted) : undefined;
+  const rearArchDimensions=mounted.rearRack && rearHostAnchor ? getRearArchPose(mounted.rearRack,rearHostAnchor).dimensions : undefined;
+  const rackParts={
+    hideArch: !!mounted.rearArchReplacement,
+    carbon: /Carbon/.test(bag.name),
+    pannierMounts: isRearArchReplacement(bag) ? archHasPannierMounts(bag) : rackHasPannierMounts(mounted),
+  };
   const kind=equipmentKind(bag);
   const isRack=kind === "rack" || kind === "aeropack";
   const tubeRadius=(socketId === "bottleMountDown" || socketId === "bottleMountSeat") ? getBottleMountPose(bike,size,socketId).radius : undefined;
@@ -79,7 +87,7 @@ export function BagMesh({ socketId, bag, anchor }: BagMeshProps) {
       name={`bag_${bag.id}_${socketId}`}
     >
       <group>
-        <EquipmentModel bag={bag} barSupport={barSupport} tubeRadius={tubeRadius} rearDeck={rearDeck} barCageParts={barCageParts} barCageEnvelope={hasCageEnvelope ? getBarCageEnvelope(mounted) : undefined} strapEnvelope={bag.id.startsWith("tailfin-126220-") ? getCargoStrapEnvelope(mounted,socketId) : undefined} strapRearExtension={bag.id.startsWith("tailfin-126220-") ? getCargoStrapRearExtension(mounted,socketId) : undefined} />
+        <EquipmentModel bag={bag} bottleCageBackSign={socketId === "bottleSeat" ? -1 : 1} rearArchDimensions={rearArchDimensions} rackParts={rackParts} barSupport={barSupport} tubeRadius={tubeRadius} rearDeck={rearDeck} barCageParts={barCageParts} barCageEnvelope={hasCageEnvelope ? getBarCageEnvelope(mounted) : undefined} strapEnvelope={bag.id.startsWith("tailfin-126220-") ? getCargoStrapEnvelope(mounted,socketId) : undefined} strapRearExtension={bag.id.startsWith("tailfin-126220-") ? getCargoStrapRearExtension(mounted,socketId) : undefined} />
         {/* Warnings stay legible without changing opaque textile into glowing plastic. */}
         {affected.length > 0 && (
           <mesh position={[-l * 0.27, h * 0.21, d * 0.52]}>

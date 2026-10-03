@@ -2995,6 +2995,14 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       requires: ["cargo-cage"],
       provides: ["cargo-strap-upper", "cargo-strap-lower"],
     };
+  if (["tailfin-643500", "tailfin-643499", "tailfin-643496"].includes(p.id))
+    return { category:"accessory", productKind:"accessory", visualKind:"accessory", sockets:["bottleDown","bottleSeat"] };
+  if (["tailfin-642", "tailfin-641", "tailfin-591", "tailfin-446", "tailfin-43567", "tailfin-43576"].includes(p.id))
+    return { category:"mount", productKind:"spare", visualKind:"mount", sockets:["rearArchReplacement"],
+      requires: [/Carbon/.test(p.name) ? "tailfin-carbon-arch-host" : "tailfin-alloy-arch-host"] };
+  if (p.id === "tailfin-20115")
+    return { category:"mount", productKind:"mount", visualKind:"mount", sockets:["thirdPartyPannierAdapters"],
+      requires:["pannier-mounts"], provides:["third-party-pannier-adapters"], excludes:["tailfin-pannier"] };
   if (["tailfin-855555", "tailfin-855553"].includes(p.id))
     return {
       category: "mount", productKind: "spare", visualKind: "mount",
@@ -3061,6 +3069,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       requires: ["tailfin-axle", "udh-adapter"],
       provides: [
         "rear-rack",
+        ...(p.id === "tailfin-895075" || (fixed && /Carbon/.test(v.label)) ? ["tailfin-carbon-arch-host"] : fixed && /Alloy/.test(v.label) ? ["tailfin-alloy-arch-host"] : []),
         ...(fixed ? [] : ["rack-top"]),
         ...(panniers ? ["pannier-mounts"] : []),
         ...(p.id === "tailfin-1008020"
@@ -3128,6 +3137,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       visualKind: "pannier",
       sockets: ["pannierLeft", "pannierRight"],
       requires: ["pannier-mounts"],
+      provides: ["tailfin-pannier"],
     };
   if (p.mount_zone === "frame")
     return {
@@ -3243,6 +3253,8 @@ function visualEnvelope(
   });
   const d = v.dimensions_mm;
   if (p.id === "tailfin-126220") return envelope(140, 20, 130);
+  if (["tailfin-643500", "tailfin-643499", "tailfin-643496"].includes(p.id)) return envelope(74,230,74);
+  if (p.id === "tailfin-20115") return envelope(180,30,220);
   if (p.id === "tailfin-1012933") return envelope(60, 25, 35);
   if (p.id === "tailfin-1012929") return envelope(40, 30, 45);
   if (p.id === "tailfin-1029289") return envelope(400, 30, 65);
@@ -3355,8 +3367,18 @@ function normalize(
     v.weight_g !== null &&
     v.bar_clamp_weight_g !== undefined
       ? v.weight_g + v.bar_clamp_weight_g
-      : p.id === "tailfin-675800" ? 25 : v.weight_g;
+      : p.id === "tailfin-675800" ? 25 : p.id === "tailfin-642" ? 370 : p.id === "tailfin-591" ? 471 : p.id === "tailfin-20115" ? 82.5 : v.weight_g;
   const notes = [
+    ["tailfin-643500", "tailfin-643499", "tailfin-643496"].includes(p.id)
+      ? "Original illustrative bottle with an unweighted reference cage, not included equipment. Bottle mass, water capacity and dimensions are unknown. Add carried water to payload manually; water capacity is not luggage capacity. Actual cage, frame boss and bottle fit remain unverified."
+      : "",
+    ["tailfin-642", "tailfin-641", "tailfin-591", "tailfin-446", "tailfin-43567", "tailfin-43576"].includes(p.id)
+      ? "Replacement arch preview for the matching material rear-system family; Journey rack is excluded. Original estimated geometry, exact model fit and dimensions unverified. The modified host mass is excluded because removed component mass is unknown. Generic arch records share the same source family and have unspecified mount options; their preview cannot support panniers. Alloy-specific source mass: without mounts 370 g; with mounts 471 g."
+      : "",
+    p.id === "tailfin-20115"
+      ? "Sold as a pair; official mass 82.5 g and rod diameter 10 mm. Illustrative rail length and attachment position unverified. Requires pannier mounts; T1 rack excluded. Third-party bag/inserts are not included, and QL3.1 compatibility is not established. This adapter occupies the conventional pannier interface and cannot be combined with modeled Tailfin panniers."
+      : "",
+
     ["tailfin-855555", "tailfin-855553"].includes(p.id)
       ? "Replacement preview on an existing Bar Cage only. Original illustrative geometry replaces the corresponding cage or one clamp in the scene; included hardware, exact handing, dimensions and mass are unverified. Modified host mass is excluded from the known subtotal because the removed component mass is unknown."
       : "",

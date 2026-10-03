@@ -1,3 +1,5 @@
+import { resolveCatalogBottleAnchor } from "./catalogBottles.ts";
+import { getRearArchPose, effectiveMountCapabilities } from "./rearArchReplacement.ts";
 import type {
   BagItem,
   BikeModel,
@@ -56,6 +58,11 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
     return {...anchor,rotation,position:[fork.position[0],fork.position[1]+(cage ? -ch*.47+bh*.44 : 0),side*(.106+bl*.5)]};
   });
   return resolved.map(anchor => {
+    if((anchor.id === "rearArchReplacement" || anchor.id === "thirdPartyPannierAdapters") && mounted.rearRack) {
+      const hostAnchor=resolved.find(a=>a.id === "rearRack");
+      if(hostAnchor) { const pose=getRearArchPose(mounted.rearRack,hostAnchor); return {...anchor,position:pose.position,rotation:pose.rotation}; }
+    }
+    if(anchor.id === "bottleDown" || anchor.id === "bottleSeat") return resolveCatalogBottleAnchor(anchor,size,mounted);
     if(["barCageAccessory", "barCageReplacement", "barCageClampLeft", "barCageClampRight"].includes(anchor.id)) {
       const bundled = mounted.handlebar && isBarCageBundle(mounted.handlebar);
       const hostId = bundled ? "handlebar" : mounted.barMount?.provides?.includes("bar-cage") ? "barMount" : undefined;
@@ -81,6 +88,7 @@ export function mountRequirementLabel(required: string): string {
     "cargo-cage-load-chip-host":"Small or Large Cargo Cage",
     "cargo-strap-upper":"upper Cargo Strap", "cargo-strap-lower":"lower Cargo Strap",
     "tailfin-axle":"Tailfin axle", "udh-adapter":"UDH adapter", "rack-top":"rack top support",
+    "tailfin-carbon-arch-host":"Carbon rack or Carbon rear system", "tailfin-alloy-arch-host":"Alloy rear system",
     "bar-cage-accessory":"Bar Cage accessory interface", "pannier-mounts":"pannier mounts", "bar-cage":"Bar Cage", "bar-bag-mount":"Bar Bag Mounting Kit",
     "journey-rack":"Journey Pannier Rack", "tailfin-rear-light-interface":"compatible rear light attachment",
     "tailfin-fixed-bag-light-interface":"CargoPack or Fixed SpeedPack bag",
@@ -103,7 +111,7 @@ export function hasMountCapability(
   return Object.entries(mounted).some(
     ([id, item]) =>
       id !== socketId &&
-      (item.id === required || item.provides?.includes(required)) &&
+      (item.id === required || effectiveMountCapabilities(item,id,mounted).includes(required)) &&
       (!scoped || (side(id) !== null && side(id) === side(socketId))) &&
       (required !== "cargo-strap-upper" || /^cargoStrapUpper(Left|Right)$/.test(id)) &&
       (required !== "cargo-strap-lower" || /^cargoStrapLower(Left|Right)$/.test(id)),

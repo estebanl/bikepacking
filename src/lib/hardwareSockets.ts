@@ -1,3 +1,4 @@
+import { getCatalogBottleSockets } from "./catalogBottles.ts";
 import type { BikeModel, SocketAnchor } from "../types/index.ts";
 import { getBottleHardwareSockets } from "./bottleMounts.ts";
 import { getBikeGeometry } from "./bikeGeometry.ts";
@@ -26,6 +27,9 @@ export function addHardwareSockets(bike: BikeModel) {
     size.sockets.additional = [
       ...(size.sockets.additional ?? []),
       ...getBottleHardwareSockets(bike, size),
+      ...getCatalogBottleSockets(bike, size),
+      hardware("rearArchReplacement", "Rear system · replacement arch", g.rearAxle, ["mount"]),
+      hardware("thirdPartyPannierAdapters", "Rear system · third-party adapters (pair)", g.rearAxle, ["mount"], ["pannier-mounts"]),
       hardware("rearLightMount", "Rear light or light mount", [g.rearAxle[0]-.2,g.rearAxle[1]+.4,0], ["mount","accessory"]),
       hardware("journeyMudguard", "Journey rack mudguard", [g.rearAxle[0],g.rearAxle[1]+.4,0], ["accessory"], ["journey-rack"]),
       ...(["barCageReplacement", "barCageClampLeft", "barCageClampRight"] as const).map(id=>hardware(id,

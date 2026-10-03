@@ -100,7 +100,7 @@ test('exported manifests mark modified host weight unknown and explain the exclu
  const mountedBags={handlebar:item('825745-v3'),barCageClampLeft:item('855553-v1')};
  const data={bike,sizeKey:'M',mountedBags,metrics:calculateRigMetrics(bike,size,mountedBags,0)};
  for(const manifest of [generateCsvManifest(data),generateMarkdownManifest(data)]) {
-  assert.match(manifest,/Modified Bar Cage host mass is excluded/);
+  assert.match(manifest,/Modified host assembly mass is excluded/);
   const hostRow=manifest.split('\n').find(line=>line.includes(mountedBags.handlebar.name)&&!line.includes('Specification'))!;
   assert.match(hostRow,/Unknown/);
   assert.doesNotMatch(hostRow,/532/);

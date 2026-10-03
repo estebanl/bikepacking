@@ -1,14 +1,14 @@
 # Tailfin component implementation backlog
 
-Current live-catalog classification after the Bar Cage replacement preview batch. The ALL-components request remains open. These are renderer planning classifications, not manufacturer fit approvals or complete SKU coverage.
+Current live-catalog classification after the rear arch, adapter and bottle batch. The ALL-components request remains open. These are renderer planning classifications, not manufacturer fit approvals or complete SKU coverage.
 
-- mountable: 85 variants
+- mountable: 95 variants
 - unsupported-fit: 13 variants
 - nonvisual-spare: 18 variants
-- implementation-pending: 66 variants
+- implementation-pending: 56 variants
 - off-bike: 9 variants
 
-Exactly 191 snapshot variant records are accounted for. Unknown source dimensions remain null; illustrative geometry uses visualDimensionsMm. Spare Bar Cage and Single Clamp are replacement previews on an existing assembly, with uncertain modified-host mass excluded. Internal storage inserts and service-only parts are separate from completed exterior previews.
+Exactly 191 snapshot records are accounted for. The generic Alloy/Carbon arch records overlap their option-specific families; record counts do not imply distinct additional physical variants. Unknown source dimensions remain null; illustrative geometry uses visualDimensionsMm. Replacement previews exclude uncertain modified-host mass. Internal storage inserts and service-only parts are separate from completed exterior previews.
 
 | Variant | Classification | Reason |
 | --- | --- | --- |
@@ -19,7 +19,6 @@ Exactly 191 snapshot variant records are accounted for. Unknown source dimension
 | [Long Top Tube Bag Accessory Pack](https://www.tailfin.cc/ca/product/accessories/long-top-tube-bag-accessory-pack/) | nonvisual-spare | Internal divider, pockets and tool loops are storage inserts, not a visible exterior component. |
 | [Bar Bag System Accessories](https://www.tailfin.cc/ca/product/accessories/bar-bag-accessories/bar-bag-system-accessories/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [QR Axle](https://www.tailfin.cc/ca/product/axles/qr-axle/) | unsupported-fit | QR axle interface is not supported by the selected thru-axle Santa Cruz builds. |
-| [Third-Party Pannier Adaptors](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/third-party-pannier-adaptors/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Women's Logo T-Shirt - Black/Teal](https://www.tailfin.cc/ca/product/hats-bottles-apparel/t-shirts/womens-logo-t-shirt-black-teal/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Women's Logo T-Shirt - Black/White](https://www.tailfin.cc/ca/product/hats-bottles-apparel/t-shirts/womens-logo-t-shirt-black-white/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Mens Logo T-Shirt - Black/Teal](https://www.tailfin.cc/ca/product/hats-bottles-apparel/t-shirts/mens-logo-t-shirt-black-teal/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
@@ -28,9 +27,6 @@ Exactly 191 snapshot variant records are accounted for. Unknown source dimension
 | [Packing Cubes · 3.5L](https://www.tailfin.cc/ca/product/accessories/packing-cubes/packing-cubes/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Packing Cubes · 2.5L](https://www.tailfin.cc/ca/product/accessories/packing-cubes/packing-cubes/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [X35 E-Bike Adaptor Fast-Release Set](https://www.tailfin.cc/ca/product/accessories/rack-aeropack-accessories/x35-e-bike-adaptor-fast-release-set/) | unsupported-fit | X35 e-bike interface is outside these Santa Cruz builds. |
-| [Logo Bottle - Black/Teal](https://www.tailfin.cc/ca/product/hats-bottles-apparel/bottles/logo-bottle-black-teal/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Logo Bottle - Black](https://www.tailfin.cc/ca/product/hats-bottles-apparel/bottles/tailfin-bottle-black/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Logo Bottle - Smoke](https://www.tailfin.cc/ca/product/hats-bottles-apparel/bottles/logo-bottle-smoke/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Pannier Shoulder Strap](https://www.tailfin.cc/ca/product/accessories/rack-bag-accessories/pannier-shoulder-strap/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Pannier Laptop Holsters](https://www.tailfin.cc/ca/product/accessories/rack-bag-accessories/pannier-laptop-holsters/) | off-bike | Merchandise or an accessory used away from the mounted rig; no exterior bike preview is planned. |
 | [Seat Post Connector](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/seat-post-connector-2/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
@@ -107,14 +103,8 @@ Exactly 191 snapshot variant records are accounted for. Unknown source dimension
 | [Fast Release Dropouts](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/quick-release-dropouts/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Removable CargoPack Connector Parts v1](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/ap-trunk-connector-parts/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Fixed CargoPack Connector Parts v1](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/aeropack-connector-parts/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Spare Alloy Arch (without mounts)](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/alloy-arch/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Spare Carbon Arch (without mounts)](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/carbon-arch/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Spare Alloy Arch (with mounts)](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/alloy-arch/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Spare Carbon Arch (with mounts)](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/carbon-arch/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Bar Bag Hardware](https://www.tailfin.cc/ca/product/spares/bar-system-spares/bar-bag-hardware/) | nonvisual-spare | Internal structure, service kit or small fastener: no standalone exterior placement. This does not certify a replacement part's compatibility. |
 | [Top Tube Flip Buckle](https://www.tailfin.cc/ca/product/spares/top-tube-bag-spares/top-tube-flip-buckle/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Pearson Axle Adaptor](https://www.tailfin.cc/ca/product/spares/axle-spares/pearson-axle-adaptor/) | unsupported-fit | Pearson-specific axle interface is not verified for these Santa Cruz builds. |
 | [Standard Pannier Inserts](https://www.tailfin.cc/ca/product/spares/pannier-fork-bag-spares/standard-pannier-inserts/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
 | [Fork Pack Lower Hook](https://www.tailfin.cc/ca/product/spares/pannier-fork-bag-spares/fork-pack-hook/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Alloy Arch](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/alloy-arch/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |
-| [Carbon Arch](https://www.tailfin.cc/ca/product/spares/rack-aeropack-spares/carbon-arch/) | implementation-pending | Visible bike component: geometry, attachment and dependencies remain to be implemented. Unknown dimensions are not a reason to call this complete. |

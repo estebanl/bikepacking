@@ -1,4 +1,9 @@
 "use client";
+import { RearArchModel } from "./RearArchModel";
+import { ThirdPartyAdapterModel } from "./ThirdPartyAdapterModel";
+import { CatalogBottleModel } from "./CatalogBottleModel";
+import { isCatalogBottle } from "@/lib/catalogBottles";
+import { isRearArchReplacement } from "@/lib/rearArchReplacement";
 import { isBarCageBundle } from "@/lib/cargoStraps";
 
 import { useEffect, useMemo, type ReactElement } from "react";
@@ -196,7 +201,7 @@ function PanelShell({
 
 export interface BarSupportEndpoints { clamps: [Point3,Point3]; ends: [Point3,Point3]; orientation: [number,number,number,number] }
 
-export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]} }): ReactElement {
+export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts, rearArchDimensions, rackParts, bottleCageBackSign }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]}; rearArchDimensions?:Point3; bottleCageBackSign?:1|-1; rackParts?:{hideArch?:boolean;carbon?:boolean;pannierMounts?:boolean} }): ReactElement {
   const [l, h, d] = equipmentDimensions(bag),
     kind = equipmentKind(bag);
   const fabric = useMemo(
@@ -266,6 +271,9 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
     "accessory",
     "spare",
   ].includes(kind);
+  if (isCatalogBottle(bag)) return <CatalogBottleModel item={bag} cageBackSign={bottleCageBackSign}/>;
+  if (isRearArchReplacement(bag) && rearArchDimensions) return <RearArchModel dimensions={rearArchDimensions} carbon={rackParts?.carbon} pannierMounts={rackParts?.pannierMounts}/>;
+  if (bag.id === "tailfin-20115-v1" && rearArchDimensions) return <ThirdPartyAdapterModel dimensions={rearArchDimensions}/>;
   if (bag.id === "tailfin-1012933-v1" || bag.id === "tailfin-1012929-v1") return <group name="illustrative-empty-bar-cage-accessory">
     <Box position={[0,.004,0]} size={[.022,.008,.027]} material={metal}/>
     <Rod a={[0,.004,0]} b={[.015,.028,0]} radius={.005} material={metal}/>
@@ -285,7 +293,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
     return (
       <group>
         <group position={[0, -h * 0.15, 0]}>
-          <RackModel dimensions={[l * 0.96, h * 0.65, d * 0.68]} />
+          <RackModel dimensions={[l * 0.96, h * 0.65, d * 0.68]} {...rackParts}/>
         </group>
         <group position={[0, h * 0.32, 0]}>
           <EquipmentModel
@@ -302,7 +310,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
         </group>
       </group>
     );
-  if (kind === "rack") return <RackModel dimensions={[l, h, d]} />;
+  if (kind === "rack") return <RackModel dimensions={[l, h, d]} {...rackParts}/>;
   if (bag.id.startsWith("tailfin-42733-")) return <group name="illustrative-fork-collars">
     {/* Shared socket places local X outboard from the fork leg to cage backplate. */}
     {[-1,1].map(side=><group key={side}>
@@ -598,63 +606,33 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
   );
 }
 
-function RackModel({ dimensions: [l, h, d] }: { dimensions: Point3 }) {
-  const archOutline = useMemo(
-    () => [
-      [l * 0.06, -h * 0.46],
-      [l * 0.13, -h * 0.46],
-      [l * 0.0, h * 0.4],
-      [-l * 0.07, h * 0.45],
-      [-l * 0.13, h * 0.45],
-      [-l * 0.06, h * 0.36],
-    ],
-    [l, h],
-  );
+function RackModel({ dimensions, hideArch = false, carbon = false, pannierMounts = true }: {
+  dimensions: Point3;
+  hideArch?: boolean;
+  carbon?: boolean;
+  pannierMounts?: boolean;
+}) {
+  const [l, h, d] = dimensions;
   return (
     <group>
-      {/* Original single arch construction, slim deck rails and axle attachment feet. */}
+      {!hideArch && <RearArchModel dimensions={dimensions} carbon={carbon} pannierMounts={pannierMounts} />}
+      {/* Deck rails and crossbars stay with the host when its arch is replaced. */}
       {[-1, 1].map((s) => (
-        <group key={s}>
-          <group position={[0, 0, s * d * 0.4]}>
-            <PanelShell outline={archOutline} depth={0.012} material={metal} />
-          </group>
-          <Rod
-            a={[-l * 0.43, h * 0.44, s * d * 0.33]}
-            b={[l * 0.44, h * 0.44, s * d * 0.33]}
-            radius={0.006}
-            material={metal}
-          />
-          <Box
-            position={[l * 0.095, -h * 0.455, s * d * 0.4]}
-            size={[0.026, 0.022, 0.022]}
-            material={buckle}
-          />
-          <Rod
-            a={[l * 0.095, -h * 0.455, s * d * 0.39]}
-            b={[l * 0.095, -h * 0.455, s * d * 0.47]}
-            radius={0.005}
-            material={silver}
-          />
-          <Box
-            position={[-l * 0.065, h * 0.36, s * d * 0.44]}
-            size={[0.04, 0.019, 0.017]}
-            material={buckle}
-          />
-        </group>
-      ))}
-      {[-0.4, -0.08, 0.4].map((x) => (
-        <Rod
-          key={x}
-          a={[l * x, h * 0.44, -d * 0.36]}
-          b={[l * x, h * 0.44, d * 0.36]}
-          radius={0.005}
-          material={metal}
+        <Rod key={s}
+          a={[-l * 0.43, h * 0.44, s * d * 0.33]}
+          b={[l * 0.44, h * 0.44, s * d * 0.33]}
+          radius={0.006} material={metal}
         />
       ))}
-      <Box
-        position={[l * 0.44, h * 0.45, 0]}
-        size={[0.025, 0.024, 0.048]}
-        material={buckle}
+      {[-0.4, -0.08, 0.4].map((x) => (
+        <Rod key={x}
+          a={[l * x, h * 0.44, -d * 0.36]}
+          b={[l * x, h * 0.44, d * 0.36]}
+          radius={0.005} material={metal}
+        />
+      ))}
+      <Box position={[l * 0.44, h * 0.45, 0]}
+        size={[0.025, 0.024, 0.048]} material={buckle}
       />
     </group>
   );

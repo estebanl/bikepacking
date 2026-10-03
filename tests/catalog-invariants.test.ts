@@ -24,8 +24,14 @@ function strapMatches(pack: BagItem, strap: BagItem) {
 function roleMatches(required: string, socketId: string) {
   return required === 'cargo-strap-upper' ? socketId.startsWith('cargoStrapUpper') : required === 'cargo-strap-lower' ? socketId.startsWith('cargoStrapLower') : true;
 }
+function provided(provider: BagItem, socket: string, mounted: Record<string,BagItem>) {
+ const original=provider.provides??[];
+ if(socket !== 'rearRack' || !mounted.rearArchReplacement) return original;
+ const withMounts=['tailfin-591-v1','tailfin-446-v1'].includes(mounted.rearArchReplacement.id);
+ return [...original.filter(c=>c!=='pannier-mounts'),...(withMounts?['pannier-mounts']:[])];
+}
 function dependencies(item: BagItem, anchor: SocketAnchor, mounted: Record<string,BagItem>) {
-  return [...(item.requires??[]),...(anchor.requires??[])].every(required => Object.entries(mounted).some(([id, provider]) => id!==anchor.id && (provider.id===required || provider.provides?.includes(required)) && roleMatches(required,id) && (!required.startsWith("cargo-strap-") || strapMatches(item,provider)) && (!scoped.has(required) || (side(id)!==null && side(id)===side(anchor.id)))));
+  return [...(item.requires??[]),...(anchor.requires??[])].every(required => Object.entries(mounted).some(([id, provider]) => id!==anchor.id && (provider.id===required || provided(provider,id,mounted).includes(required)) && roleMatches(required,id) && (!required.startsWith("cargo-strap-") || strapMatches(item,provider)) && (!scoped.has(required) || (side(id)!==null && side(id)===side(anchor.id)))));
 }
 function assertClean(size: BikeSizeConfig, mounted: Record<string,BagItem>) {
   const anchors=getSocketAnchors(size,mounted);
@@ -99,7 +105,8 @@ test('all provisionable catalogue placements conserve mass and survive share rou
     for(const value of Object.values(metrics).filter(v=>typeof v==='number')) assert.ok(Number.isFinite(value));
     const replacementInstalled = !!(mounted.barCageReplacement || mounted.barCageClampLeft || mounted.barCageClampRight);
     const modifiedHost = replacementInstalled ? (mounted.barMount?.id === 'tailfin-825745-v1' ? mounted.barMount : mounted.handlebar?.id.startsWith('tailfin-825745-') ? mounted.handlebar : undefined) : undefined;
-    assert.equal(metrics.totalRigWeightGrams,bike.baseWeightGrams+1373+Object.values(mounted).reduce((sum,b)=>sum+(b === modifiedHost ? 0 : b.dryWeightGrams??0),0));
+    const modifiedRear=mounted.rearArchReplacement ? mounted.rearRack : undefined;
+    assert.equal(metrics.totalRigWeightGrams,bike.baseWeightGrams+1373+Object.values(mounted).reduce((sum,b)=>sum+(b === modifiedHost || b === modifiedRear ? 0 : b.dryWeightGrams??0),0));
     assert.equal(metrics.frontAxleWeightGrams+metrics.rearAxleWeightGrams,metrics.totalRigWeightGrams);
     for(const unknown of Object.values(mounted).filter(b=>b.dryWeightGrams===null)) assert.ok(metrics.unknownWeightItemIds?.includes(unknown.id));
     if(Object.values(mounted).some(b=>b.dryWeightGrams===null)) assert.match(generateMarkdownManifest({bike,sizeKey:key,mountedBags:mounted,metrics}),/Unknown|unknown/);

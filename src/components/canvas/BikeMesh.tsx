@@ -2,6 +2,7 @@
 import * as THREE from "three";
 import { useRigStore } from "@/store/useRigStore";
 import { getBikeGeometry, interpolate, topTubeRadius, type Point3 } from "@/lib/bikeGeometry";
+import { shouldShowReferenceBottle } from "@/lib/catalogBottles";
 import { getReferenceBottlePose } from "@/lib/bottleMounts";
 import { WheelMesh } from "./WheelMesh";
 import { DrivetrainMesh } from "./DrivetrainMesh";
@@ -192,7 +193,7 @@ export function BikeMesh() {
           lateral(interpolate(hb, bb, 0.6), 0.026),
         ]}
       />
-      {bottles && (
+      {bottles && shouldShowReferenceBottle(mounted) && (
         <group
           position={referenceBottle.position}
           rotation={referenceBottle.rotation}

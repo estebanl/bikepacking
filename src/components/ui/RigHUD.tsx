@@ -114,7 +114,7 @@ export function RigHUD() {
             {unknownWeights > 0
               ? `${unknownWeights} mounted item(s) have unknown mass. The weight subtotal and axle estimate exclude that mass. `
               : ""}
-            {modifiedHost ? "The modified Bar Cage assembly is also excluded: the removed hardware mass is unknown. " : ""}
+            {modifiedHost ? "Modified host assemblies are also excluded: removed hardware masses are unknown. " : ""}
             {unknownCapacity > 0
               ? `${unknownCapacity} item(s) have unknown capacity; capacity is a known subtotal.`
               : ""}
@@ -236,7 +236,7 @@ export function RigHUD() {
                 : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700"
             }`}
           >
-            Bottles: {waterBottlesMounted ? "Mounted" : "Removed"}
+            Reference bottle: {waterBottlesMounted ? "Shown" : "Hidden"}
           </button>
         </div>
       </div>
