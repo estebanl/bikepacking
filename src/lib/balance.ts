@@ -20,12 +20,20 @@ export function getMassUncertainHostSockets(mounted: Record<string, BagItem>): S
   if (mounted.rearRack && /^tailfin-(642|641|591|446|43567|43576)-v1$/.test(mounted.rearArchReplacement?.id ?? "")) {
     hosts.add("rearRack");
   }
+  if (mounted.rearRack && (mounted.rearSeatConnector?.id === "tailfin-1032164-v1" ||
+    /^tailfin-(1032167|48964)-v1$/.test(mounted.rearSeatStrap?.id ?? "") ||
+    mounted.rearTopStay?.id === "tailfin-56062-v1")) hosts.add("rearRack");
   for (const side of ["Left", "Right"]) {
     const hostSocket = `fork${side}_0`;
     const hardware = mounted[`forkPackHardware${side}`]?.id ?? "";
     const hook = mounted[`forkPackHook${side}`]?.id;
     if (/^tailfin-(655674|972100)-v[12]$/.test(mounted[hostSocket]?.id ?? "") &&
       (/^tailfin-(661740|661731|675876)-v1$/.test(hardware) || hook === "tailfin-676061-v1")) hosts.add(hostSocket);
+    const rearHostSocket = `pannier${side}`;
+    const rearHost = mounted[rearHostSocket];
+    if (rearHost && (/^tailfin-655674-v[12]$/.test(rearHost.id) ||
+      mounted[`rearPannierUpper${side}`]?.id === "tailfin-48947-v1" ||
+      mounted[`rearPannierLower${side}`]?.id === "tailfin-652020-v1")) hosts.add(rearHostSocket);
   }
   return hosts;
 }

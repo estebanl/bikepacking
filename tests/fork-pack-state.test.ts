@@ -15,6 +15,64 @@ const bike = BIKES.find(b => b.id === 'santa-cruz-blur-2027')!, size = bike.size
 const hook = item('676061-v1'), mount = item('661731-v1');
 const kit = item('661740-v1'), conversion = item('675876-v1');
 const forkMount = TAILFIN_CATALOG.find(p => p.provides?.includes('fork-mount'))!;
+const upper = item('48947-v1'), lower = item('652020-v1');
+
+test('rear Fork Packs need original-style upper and lower parts on the same side, never the front kit', () => {
+  for (const side of ['Left', 'Right']) for (const variant of [1, 2]) {
+    const other = side === 'Left' ? 'Right' : 'Left', pack = item(`655674-v${variant}`);
+    const rack = { rearRack: item('895075-v1') };
+    const parts = { [`rearPannierUpper${side}`]: upper, [`rearPannierLower${side}`]: lower };
+    assert.deepEqual(requiredProductCapabilities(pack, `pannier${side}`), ['pannier-mounts', 'rear-pannier-upper', 'rear-mini-lower']);
+    assert.equal(validateMount(pack, `pannier${side}`, size, { ...rack, ...parts }).allowed, true);
+    for (const incomplete of [ {}, { [`rearPannierUpper${side}`]: upper }, { [`rearPannierLower${side}`]: lower },
+      { [`rearPannierUpper${other}`]: upper, [`rearPannierLower${other}`]: lower }, { [`forkPackHardware${side}`]: conversion }]) {
+      assert.equal(validateMount(pack, `pannier${side}`, size, { ...rack, ...incomplete }).allowed, false);
+    }
+    assert.equal(validateMount(item('972100-v1'), `fork${side}_0`, size, { ...rack, ...parts, [`forkMount${side}`]: forkMount }).allowed, false);
+  }
+});
+
+test('Mini lower parts reject 16/22L panniers in both orders, while upper parts fit all panniers', () => {
+  for (const side of ['Left', 'Right']) for (const variant of [1, 2]) {
+    const bag = item(`968191-v${variant}`), rack = { rearRack: item('895075-v1') };
+    assert.equal(validateMount(lower, `rearPannierLower${side}`, size, { ...rack, [`pannier${side}`]: bag }).allowed, false);
+    assert.equal(validateMount(bag, `pannier${side}`, size, { ...rack, [`rearPannierLower${side}`]: lower }).allowed, false);
+    assert.equal(validateMount(upper, `rearPannierUpper${side}`, size, { ...rack, [`pannier${side}`]: bag }).allowed, true);
+    assert.equal(validateMount(lower, `rearPannierLower${side}`, size, rack).allowed, true);
+  }
+});
+
+test('rear replacement mass follows physical sockets and converted Fork Packs never reuse their original mass', () => {
+  for (const side of ['Left', 'Right']) {
+    const other = side === 'Left' ? 'Right' : 'Left', mini = item('972100-v1');
+    const mounted: Record<string, BagItem> = { [`pannier${side}`]: mini, [`pannier${other}`]: mini, [`rearPannierUpper${side}`]: upper, [`rearPannierLower${side}`]: lower };
+    const metrics = calculateRigMetrics(bike, size, mounted, 1500);
+    assert.equal(metrics.totalBagsDryWeightGrams, mini.dryWeightGrams);
+    assert.equal(metrics.totalCapacityLiters, 10);
+    assert.deepEqual(metrics.unknownWeightItemIds, [mini.id, upper.id, lower.id]);
+    assert.deepEqual(getMassUncertainHostSockets(mounted), new Set([`pannier${side}`]));
+    delete mounted[`rearPannierUpper${side}`]; delete mounted[`rearPannierLower${side}`];
+    assert.equal(calculateRigMetrics(bike, size, mounted, 0).totalBagsDryWeightGrams, mini.dryWeightGrams! * 2);
+    for (const variant of [1, 2]) {
+      const pack = item(`655674-v${variant}`);
+      const converted = { [`pannier${side}`]: pack, [`fork${side}_0`]: pack, [`rearPannierUpper${side}`]: upper, [`rearPannierLower${side}`]: lower };
+      assert.equal(calculateRigMetrics(bike, size, converted, 1000).totalBagsDryWeightGrams, pack.dryWeightGrams);
+      assert.deepEqual(getMassUncertainHostSockets({ [`pannier${side}`]: pack }), new Set([`pannier${side}`]));
+    }
+  }
+  assert.equal(getMassUncertainHostSockets({ rearPannierUpperLeft: upper, rearPannierLowerLeft: lower }).size, 0);
+});
+
+test('sourced rear hardware survives URL roundtrip and either missing required part removes a converted Fork Pack', () => {
+  const mounted: Record<string, BagItem> = { rearAxleHardware: item('34167-v1'), rearUdhHardware: item('664853-v1'), rearRack: item('895075-v1'), rearPannierUpperLeft: upper, rearPannierLowerLeft: lower, pannierLeft: item('655674-v1') };
+  assert.equal(sanitizeMountedBags(mounted, size).removed.length, 0);
+  const query = serializeRigToUrlQuery({ bikeId: bike.id, sizeKey: 'M', mountedBags: mounted, payloadGrams: 1000, dropper: false, bottles: false });
+  assert.deepEqual(Object.keys(sanitizeMountedBags(deserializeRigFromUrlQuery(query, TAILFIN_CATALOG).mountedBags, size).mountedBags).sort(), Object.keys(mounted).sort());
+  for (const removed of ['rearRack', 'rearPannierUpperLeft', 'rearPannierLowerLeft']) {
+    const next = { ...mounted }; delete next[removed];
+    assert.equal(sanitizeMountedBags(next, size).mountedBags.pannierLeft, undefined);
+  }
+});
 
 test('Mini Pannier requirements change only at the fork, retaining rear pannier requirements', () => {
   for (const id of ['972100-v1', '972100-v2']) {

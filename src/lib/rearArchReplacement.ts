@@ -9,7 +9,7 @@ export function rackHasPannierMounts(mounted: Record<string,BagItem>): boolean {
  return isRearArchReplacement(mounted.rearArchReplacement) ? archHasPannierMounts(mounted.rearArchReplacement) : !!mounted.rearRack?.provides?.includes('pannier-mounts');
 }
 export function effectiveMountCapabilities(item: BagItem, socketId: string, mounted: Record<string,BagItem>): string[] {
- const capabilities = item.provides ?? [];
+ const capabilities = (item.provides ?? []).filter(c=>c !== "tailfin-pannier" || /^pannier(Left|Right)$/.test(socketId));
  if(socketId !== 'rearRack' || !isRearArchReplacement(mounted.rearArchReplacement)) return capabilities;
  return [...capabilities.filter(c=>c!=='pannier-mounts'),...(archHasPannierMounts(mounted.rearArchReplacement)?['pannier-mounts']:[])];
 }

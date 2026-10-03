@@ -2968,6 +2968,13 @@ const BAR_ROLL_REPLACEMENTS: Record<string, { handlebarType: "flat" | "drop"; di
 
 function placement(p: SourceProduct, v: SourceVariant): Placement {
   const base = referencePlacement(p.catalog_section === "spares");
+  if (["tailfin-48947", "tailfin-652020"].includes(p.id))
+    return {category:"mount",productKind:"spare",visualKind:"mount",sockets:p.id==="tailfin-48947" ? ["rearPannierUpperLeft","rearPannierUpperRight"] : ["rearPannierLowerLeft","rearPannierLowerRight"],
+      requires:["pannier-mounts"],provides:[p.id==="tailfin-48947" ? "rear-pannier-upper" : "rear-mini-lower"], excludes:["third-party-pannier-adapters"]};
+  if (["tailfin-1032164", "tailfin-1032167", "tailfin-48964", "tailfin-56062"].includes(p.id))
+    return {category:"mount",productKind:"spare",visualKind:"mount",
+      sockets:[p.id === "tailfin-1032164" ? "rearSeatConnector" : p.id === "tailfin-56062" ? "rearTopStay" : "rearSeatStrap"],
+      requires:[p.id === "tailfin-1032164" ? "rear-rack" : p.id === "tailfin-1032167" ? "journey-rack" : p.id === "tailfin-56062" ? "carbon-rack-top-stay" : "legacy-rear-seat-strap"]};
   if (p.id === "tailfin-1029289")
     return {
       category: "accessory", productKind: "accessory", visualKind: "fender",
@@ -3075,6 +3082,8 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       requires: ["tailfin-axle", "udh-adapter"],
       provides: [
         "rear-rack",
+        ...(p.id === "tailfin-895075" ? ["carbon-rack-top-stay"] : []),
+        ...(p.id === "tailfin-895075" || p.mount_zone === "rear-system" ? ["legacy-rear-seat-strap"] : []),
         ...(p.id === "tailfin-895075" || (fixed && /Carbon/.test(v.label)) ? ["tailfin-carbon-arch-host"] : fixed && /Alloy/.test(v.label) ? ["tailfin-alloy-arch-host"] : []),
         ...(fixed ? [] : ["rack-top"]),
         ...(panniers ? ["pannier-mounts"] : []),
@@ -3183,9 +3192,9 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       category: "fork_cage_bag",
       productKind: "bag",
       visualKind: "fork_pack",
-      sockets: ["forkLeft_0", "forkRight_0"],
+      sockets: ["forkLeft_0", "forkRight_0", "pannierLeft", "pannierRight"],
       requires: ["fork-mount"],
-      provides: ["fork-pack-host"],
+      provides: ["fork-pack-host", "tailfin-pannier"],
     };
   if (p.id === "tailfin-129268")
     return {
@@ -3376,8 +3385,16 @@ function normalize(
       ? v.weight_g + v.bar_clamp_weight_g
       : p.id === "tailfin-675800" ? 25 : p.id === "tailfin-642" ? 370 : p.id === "tailfin-591" ? 471 : p.id === "tailfin-20115" ? 82.5 : v.weight_g;
   const notes = [
+    ["tailfin-48947", "tailfin-652020", "tailfin-655674"].includes(p.id)
+      ? "Rear Fork Pack conversion is conditional on compatible 5/10 L second-generation hardware: select Pannier Upper Parts and Mini Pannier Lower Parts on that side, representing separately sourced parts or the retained original clamp/hook arm/hook. The fork conversion kit alone does not restore them. Mini lower parts require the correct screw (Gen2 12 mm; Gen1 18 mm); included fastener contents and exact purchased revision must be checked. Upper part is listed for all panniers; mini lower part is only 5/10 L. Modified bag mass excludes unknown removed hardware; capacity/payload remain. Original illustrative geometry is not fit approval."
+      : "",
+
+    ["tailfin-1032164", "tailfin-1032167", "tailfin-48964", "tailfin-56062"].includes(p.id)
+      ? "Replacement of included rear-system hardware, not an additional complete attachment. Seat Post Connector is listed for all rear systems; Long Seat Post Strap is the Journey-specific option, while v1 strap is listed as included with Carbon Rack/CargoPack/SpeedPack. Carbon Top Stay is only for Carbon Pannier Rack; two source length options require exact fit selection and this generic snapshot record does not select one. Its listed 93.2 g is not normalized because option-specific mass is unspecified. Source mass/dimensions remain unknown here; modified host is excluded from known mass because removed-part mass is unknown. Original estimated geometry attaches only to the fixed outer seatpost; no dropper or exact frame fit approval is implied."
+      : "",
+
     ["tailfin-661740", "tailfin-661731", "tailfin-676061", "tailfin-675876"].includes(p.id)
-      ? "Illustrative Fork Pack hardware; source mass and dimensions unknown. Mount and lower hook are replacement parts for 5/10 L Fork Packs. Complete kits overlap individual parts and cannot be stacked on the same side. The generic hardware kit's exact contents remain unspecified. Conversion kit includes fork mount, X-clamp, lower bumper/hook and fasteners; this preview shows only the Mini Pannier-to-Fork Pack direction for compatible second-generation 5/10 L Mini Panniers, not 16 L bags. Modified bag mass is excluded because removed hardware mass is unknown. Exact fork approval remains unverified."
+      ? "Illustrative Fork Pack hardware; source mass and dimensions unknown. Mount and lower hook are replacement parts for 5/10 L Fork Packs. Complete kits overlap individual parts and cannot be stacked on the same side. The generic hardware kit's exact contents remain unspecified. Conversion kit includes fork mount, X-clamp, lower bumper/hook and fasteners; forward preview requires compatible second-generation 5/10 L Mini Panniers; 16 L bags are excluded. Reverse conversion requires the original retained Mini Pannier clamp, hook arm, lower hook and correct screws, or separately selected compatible upper/lower replacement parts. The generic kit snapshot does not verify a reverse-kit package. Modified bag mass is excluded because removed hardware mass is unknown. Exact fork approval remains unverified."
       : "",
     p.id === "tailfin-972100"
       ? "Fork-position preview is conditional on a compatible second-generation Mini Pannier and the same-side conversion kit. This does not establish the generation of an already-owned bag. Rear pannier placement remains the normal interface; 16 L panniers are not supported for this conversion."

@@ -28,6 +28,7 @@ export function addHardwareSockets(bike: BikeModel) {
       ...(size.sockets.additional ?? []),
       ...getBottleHardwareSockets(bike, size),
       ...getCatalogBottleSockets(bike, size),
+      ...["rearSeatConnector","rearSeatStrap","rearTopStay"].map(id=>hardware(id, id==="rearSeatConnector" ? "Rear system · seatpost connector replacement" : id==="rearSeatStrap" ? "Rear system · seatpost strap replacement" : "Carbon rack · top stay replacement", g.seatCluster, ["mount"])),
       hardware("rearArchReplacement", "Rear system · replacement arch", g.rearAxle, ["mount"]),
       hardware("thirdPartyPannierAdapters", "Rear system · third-party adapters (pair)", g.rearAxle, ["mount"], ["pannier-mounts"]),
       hardware("rearLightMount", "Rear light or light mount", [g.rearAxle[0]-.2,g.rearAxle[1]+.4,0], ["mount","accessory"]),
@@ -54,6 +55,8 @@ export function addHardwareSockets(bike: BikeModel) {
           size.sockets[side === "Left" ? "forkLeft" : "forkRight"][0];
         if (!fork) return [];
         return [
+          hardware(`rearPannierUpper${side}`, `${side} rear pannier · upper clamp replacement`, g.rearAxle, ["mount"], ["pannier-mounts"]),
+          hardware(`rearPannierLower${side}`, `${side} Mini Pannier · lower hook and bar`, g.rearAxle, ["mount"], ["pannier-mounts"]),
           hardware(`forkPackHardware${side}`, `${side} Fork Pack · mount or conversion kit`, fork.position, ["mount"]),
           hardware(`forkPackHook${side}`, `${side} Fork Pack · replacement lower hook`, fork.position, ["mount"]),
           ...(["Upper","Lower"] as const).map(level=>hardware(`cargoStrap${level}${side}`, `${side} cage · ${level.toLowerCase()} cargo strap`, fork.position, ["mount"], ["cargo-cage"])),
@@ -79,7 +82,7 @@ export function addHardwareSockets(bike: BikeModel) {
       if (socket.id === "rearRack")
         socket.requires = ["tailfin-axle", "udh-adapter"];
       if (socket.id === "pannierLeft" || socket.id === "pannierRight")
-        socket.requires = ["pannier-mounts"];
+        { socket.requires = ["pannier-mounts"]; if(!socket.allowedBagCategories.includes("fork_cage_bag")) socket.allowedBagCategories.push("fork_cage_bag"); }
       if (socket.id === "rackTop") socket.requires = ["rack-top"];
     }
     for (const socket of [...size.sockets.forkLeft, ...size.sockets.forkRight])

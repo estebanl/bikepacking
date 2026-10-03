@@ -649,18 +649,3 @@ function WebbingSegment({a,b}: {a: Point3; b: Point3}) {
   },[...a,...b]);
   return <mesh dispose={null} geometry={unitBox} material={webbing} position={transform.center} quaternion={transform.rotation} scale={[.017,transform.length,.003]} castShadow/>;
 }
-
-/** Connects the modeled rack deck to the fixed outer seatpost, independent of dropper travel.
- * These original visual parts do not certify connector length, clamp or suspension compatibility.
- */
-export function RackSeatpostConnector({a,b,seatAngle}: {a: Point3; b: Point3; seatAngle: number}) {
-  return <group name="illustrative-rack-seatpost-connector">
-    <Rod a={a} b={b} radius={.006} material={metal}/>
-    <Box position={a} size={[.022,.018,.029]} material={buckle}/>
-    <group position={b} rotation={[0,0,Math.PI/2-seatAngle]}>
-      <mesh dispose={null} rotation={[Math.PI/2,0,0]} geometry={clampRing} material={buckle} castShadow/>
-      <Box position={[-.016,0,0]} size={[.018,.023,.026]} material={metal}/>
-      <Rod a={[-.018,0,-.018]} b={[-.018,0,.018]} radius={.003} material={silver}/>
-    </group>
-  </group>;
-}

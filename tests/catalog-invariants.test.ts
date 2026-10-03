@@ -11,7 +11,7 @@ import { evaluateClearances } from '../src/lib/clearance.ts';
 const bikes = BIKES.filter(b => b.brand === 'Santa Cruz');
 const cases = bikes.flatMap(bike => Object.entries(bike.sizes).map(([key,size]) => ({bike,key,size})));
 const side = (id: string) => /Left/.test(id) ? 'Left' : /Right/.test(id) ? 'Right' : null;
-const scoped = new Set(['fork-mount','cargo-cage','cargo-cage-load-chip-host','cargo-strap-upper','cargo-strap-lower','fork-pack-host','mini-pannier-conversion']);
+const scoped = new Set(['fork-mount','cargo-cage','cargo-cage-load-chip-host','cargo-strap-upper','cargo-strap-lower','fork-pack-host','mini-pannier-conversion','rear-pannier-upper','rear-mini-lower']);
 // Independent contract oracle: no production capability/validation helper is used here.
 function compatible(item: BagItem, anchor: SocketAnchor) {
   return anchor.allowedBagCategories.includes(item.category) && item.compatibleSockets.some(id => id === anchor.id || ((id==='forkLeft'||id==='forkRight') && anchor.id.startsWith(id))) && !(item.handlebarType && anchor.handlebarType && item.handlebarType !== anchor.handlebarType);
@@ -22,6 +22,9 @@ function strapMatches(pack: BagItem, strap: BagItem) {
   return pack.volumeLiters === 1.7 ? strap.name.includes('40cm') : pack.volumeLiters === 3 ? strap.name.includes('50cm') : strap.name.includes('50cm') || strap.name.includes('65cm');
 }
 function roleMatches(required: string, socketId: string) {
+  if(required === 'mini-pannier-conversion') return /^forkPackHardware(Left|Right)$/.test(socketId);
+  if(required === 'rear-pannier-upper') return /^rearPannierUpper(Left|Right)$/.test(socketId);
+  if(required === 'rear-mini-lower') return /^rearPannierLower(Left|Right)$/.test(socketId);
   if(required === 'fork-pack-host') return /^fork(Left|Right)_0$/.test(socketId);
   return required === 'cargo-strap-upper' ? socketId.startsWith('cargoStrapUpper') : required === 'cargo-strap-lower' ? socketId.startsWith('cargoStrapLower') : true;
 }
@@ -32,6 +35,7 @@ function provided(provider: BagItem, socket: string, mounted: Record<string,BagI
  return [...original.filter(c=>c!=='pannier-mounts'),...(withMounts?['pannier-mounts']:[])];
 }
 function productRequirements(item: BagItem, socket:string) {
+ if(/^tailfin-655674-v[12]$/.test(item.id) && /^pannier(Left|Right)$/.test(socket)) return ['pannier-mounts','rear-pannier-upper','rear-mini-lower'];
  return /^tailfin-972100-v[12]$/.test(item.id) && /^fork(Left|Right)_0$/.test(socket) ? ['fork-mount','mini-pannier-conversion'] : item.requires??[];
 }
 function dependencies(item: BagItem, anchor: SocketAnchor, mounted: Record<string,BagItem>) {
@@ -109,12 +113,13 @@ test('all provisionable catalogue placements conserve mass and survive share rou
     for(const value of Object.values(metrics).filter(v=>typeof v==='number')) assert.ok(Number.isFinite(value));
     const replacementInstalled = !!(mounted.barCageReplacement || mounted.barCageClampLeft || mounted.barCageClampRight);
     const modifiedHost = replacementInstalled ? (mounted.barMount?.id === 'tailfin-825745-v1' ? mounted.barMount : mounted.handlebar?.id.startsWith('tailfin-825745-') ? mounted.handlebar : undefined) : undefined;
-    const modifiedRear=mounted.rearArchReplacement ? mounted.rearRack : undefined;
+    const modifiedRear=(mounted.rearArchReplacement || mounted.rearSeatConnector || mounted.rearSeatStrap || mounted.rearTopStay) ? mounted.rearRack : undefined;
     const uncertainSockets = new Set(Object.entries(mounted).filter(([,b])=>b===modifiedHost || b===modifiedRear).map(([id])=>id));
     for(const side of ['Left','Right']) if(mounted[`forkPackHardware${side}`] || mounted[`forkPackHook${side}`]) {
       const host=mounted[`fork${side}_0`];
       if(host && /^tailfin-(655674|972100)-v[12]$/.test(host.id)) uncertainSockets.add(`fork${side}_0`);
     }
+    for(const side of ['Left','Right']) if((mounted[`rearPannierUpper${side}`] || mounted[`rearPannierLower${side}`]) && mounted[`pannier${side}`]) uncertainSockets.add(`pannier${side}`);
     assert.equal(metrics.totalRigWeightGrams,bike.baseWeightGrams+1373+Object.entries(mounted).reduce((sum,[id,b])=>sum+(uncertainSockets.has(id) ? 0 : b.dryWeightGrams??0),0));
     assert.equal(metrics.frontAxleWeightGrams+metrics.rearAxleWeightGrams,metrics.totalRigWeightGrams);
     for(const unknown of Object.values(mounted).filter(b=>b.dryWeightGrams===null)) assert.ok(metrics.unknownWeightItemIds?.includes(unknown.id));
