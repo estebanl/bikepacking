@@ -10,6 +10,7 @@ const rubber = new THREE.MeshStandardMaterial({ color: "#101516", roughness: 0.9
 const silver = new THREE.MeshStandardMaterial({ color: "#9ca9ae", metalness: 0.86, roughness: 0.28 });
 const box = new THREE.BoxGeometry(1, 1, 1);
 const tube = new THREE.CylinderGeometry(1, 1, 1, 12);
+const insertRing = new THREE.TorusGeometry(.009, .001, 6, 24);
 const screw = new THREE.CylinderGeometry(0.0035, 0.0035, 0.0025, 6);
 
 function Block({position,size,material=metal}:{position:Point3;size:Point3;material?:THREE.Material}) {
@@ -30,13 +31,17 @@ function Rod({a,b,r=.004}:{a:Point3;b:Point3;r?:number}) {
  * Upper and lower replacement parts can independently suppress included pieces.
  * Callers suppress any old built-in bag hooks; this model adds no mass itself.
  */
-export function RearPannierHardwareModel({dimensions:[l,h,d],showUpper=true,showLower=true}:{dimensions:Point3;showUpper?:boolean;showLower?:boolean}) {
+export function RearPannierHardwareModel({dimensions:[l,h,d],showUpper=true,showLower=true,showInserts=true}:{dimensions:Point3;showUpper?:boolean;showLower?:boolean;showInserts?:boolean}) {
  const top=h*.30,back=-d*.46,railZ=-d*.5-.014,span=Math.min(l*.29,.085);
  const bridgeDepth=back-railZ;
  return <group name="original-rear-pannier-attachment-hardware">
+  {showInserts && <group name="rear-pannier-standard-clamp-inserts">
+   {[-1,1].map(side=><mesh key={side} dispose={null} geometry={insertRing} material={rubber}
+    position={[side*span,top,railZ]} rotation={[0,Math.PI/2,0]} castShadow/>)}
+  </group>}
   {showUpper && <group name="rear-pannier-upper-mount">
   {/* Carrier rail seats on the arch receiver at its centre. */}
-  <Rod a={[-span-.012,top,railZ]} b={[span+.012,top,railZ]} r={.005}/>
+  <Rod a={[-span-.012,top,railZ]} b={[span+.012,top,railZ]} r={.008}/>
   <Block position={[0,top,railZ]} size={[.029,.023,.018]} material={polymer}/>
   {[-1,1].map(side=><group key={side}>
    {/* Each bag clamp wraps over the carrier rail, with an inboard return. */}

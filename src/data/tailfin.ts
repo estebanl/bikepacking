@@ -1,4 +1,5 @@
 import { AXLE_SPARE_PARTS } from "../lib/axleSpareAssembly.ts";
+import { EXTERIOR_SERVICE_PARTS } from "../lib/exteriorServiceParts.ts";
 import { REAR_ARCH_HARDWARE_PARTS } from "../lib/rearArchHardware.ts";
 import { FRAME_ATTACHMENT_PARTS } from "../lib/frameAttachments.ts";
 import type { BagItem, BagCategory } from "../types/index.ts";
@@ -2971,6 +2972,8 @@ const BAR_ROLL_REPLACEMENTS: Record<string, { handlebarType: "flat" | "drop"; di
 
 function placement(p: SourceProduct, v: SourceVariant): Placement {
   const base = referencePlacement(p.catalog_section === "spares");
+  const exterior=EXTERIOR_SERVICE_PARTS[p.id];
+  if(exterior) return {category:"mount",productKind:"spare",visualKind:"mount",sockets:exterior.socketIds,requires:exterior.requiredCapabilities};
   const axleSpare=AXLE_SPARE_PARTS[p.id];
   if(axleSpare) return {category:"mount",productKind:"spare",visualKind:"mount",sockets:[axleSpare.socketId],requires:[axleSpare.requiredCapability]};
   const rearArchHardware=REAR_ARCH_HARDWARE_PARTS[p.id];
@@ -3150,6 +3153,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       visualKind: "trunk",
       sockets: ["rackTop"],
       requires: ["rack-top"],
+      ...(p.id === "tailfin-930095" ? { provides: ["speedpack-removable-host"] } : {}),
       ...(p.id === "tailfin-670"
         ? { provides: ["tailfin-rear-light-interface", "tailfin-fixed-bag-light-interface", "tailfin-clip-light-interface"] }
         : {}),
@@ -3161,7 +3165,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       visualKind: "pannier",
       sockets: p.id === "tailfin-972100" ? ["pannierLeft", "pannierRight", "forkLeft_0", "forkRight_0"] : ["pannierLeft", "pannierRight"],
       requires: ["pannier-mounts"],
-      provides: ["tailfin-pannier"],
+      provides: ["tailfin-pannier", "rear-pannier-insert-host", ...(p.id === "tailfin-968191" ? ["current-large-pannier-host"] : [])],
     };
   if (p.mount_zone === "frame")
     return {
@@ -3179,7 +3183,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       sockets: [
         p.mount_zone === "rear-top-tube" ? "topTubeRear" : "topTubeFront",
       ],
-      provides:[p.mount_zone === "rear-top-tube" ? "rear-top-tube-host" : "front-top-tube-host"],
+      provides:[p.mount_zone === "rear-top-tube" ? "rear-top-tube-host" : "front-top-tube-host", ...(p.id === "tailfin-1051880" && /Flip/.test(v.label) ? ["flip-top-tube-host"] : [])],
     };
   if (p.id === "tailfin-32010" || p.id === "tailfin-46283")
     return {
@@ -3205,7 +3209,7 @@ function placement(p: SourceProduct, v: SourceVariant): Placement {
       visualKind: "fork_pack",
       sockets: ["forkLeft_0", "forkRight_0", "pannierLeft", "pannierRight"],
       requires: ["fork-mount"],
-      provides: ["fork-pack-host", "tailfin-pannier"],
+      provides: ["fork-pack-host", "tailfin-pannier", "rear-pannier-insert-host"],
     };
   if (p.id === "tailfin-129268")
     return {
@@ -3398,6 +3402,15 @@ function normalize(
       ? v.weight_g + v.bar_clamp_weight_g
       : p.id === "tailfin-675800" ? 25 : p.id === "tailfin-642" ? 370 : p.id === "tailfin-591" ? 471 : p.id === "tailfin-20115" ? 82.5 : p.id === "tailfin-129215" ? 18 : v.weight_g;
   const notes = [
+    p.id === "tailfin-917654"
+      ? "Removable SpeedPack connector preview requires the removable 930095 bag on a complete rack, never the fixed bare-arch kit. The official 930095 page lists 430 g but does not specify whether that assembly mass includes or excludes its connector. The connector drawing is a functional reference, not proof of included package contents. Connector kit mass and removed component mass are unknown; selecting this modification conservatively excludes the 430 g host from known gear mass while capacity and payload remain counted. Exact revision, installed dimensions and fit remain unverified."
+      : "",
+    p.id === "tailfin-930095"
+      ? "Official listed bag mass is 430 g; the source does not specify whether this includes or excludes the connector. The rendered connector is a functional reference and does not establish package contents. Selecting the separate connector modification excludes the host mass conservatively because kit mass and removed component mass are unknown."
+      : "",
+    EXTERIOR_SERVICE_PARTS[p.id] && p.id !== "tailfin-917654"
+      ? "Replacement of an included exterior component; removed component mass is unknown, so only the modified physical bag is excluded from known gear mass while capacity and payload remain counted. Pannier lower hook fits current 16/22 L panniers, not Mini or legacy SL/UD bags. Standard16mm inserts require a current same-side rear Tailfin pannier/clamp; converted Fork Packs also require their sourced upper clamp. Removable SpeedPack connector requires the removable 930095 bag on a complete rack, never the fixed bare-arch kit. Flip buckle is only for1.1L/1.5L Flip variants. Exact product revision, rail fit and installation remain unverified; spare masses and installed dimensions are unknown."
+      : "",
     REAR_ARCH_HARDWARE_PARTS[p.id]
       ? "Replaces included rear arch hardware; removed component mass is unknown, so the modified rear system is excluded from known mass. Bumpers require matching Carbon or Alloy material and pannier mounts; Journey is excluded. Official Carbon bumper pair mass is18g; other spare masses and installed dimensions remain unknown. Each Fast Release Dropout selection is one physical side; the bushing kit is four pieces, two small and two large, illustrated as one of each per side. Base included dropout bodies support a selected bushing kit without requiring duplicate replacement bodies. Exact generation, fastening and physical fit remain unverified. Geometry is illustrative, not manufacturer CAD."
       : "",

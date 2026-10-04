@@ -32,6 +32,9 @@ export function addHardwareSockets(bike: BikeModel) {
       ...FRAME_ATTACHMENT_SOCKETS.map(spec=>hardware(spec.id, `${spec.hostSocket === "frameTriangle" ? "Frame bag" : spec.hostSocket === "topTubeFront" ? "Front top-tube bag" : spec.hostSocket === "topTubeRear" ? "Rear top-tube bag" : "DownTube Pack"} · ${spec.position === "seatpost" || spec.position === "distributed" ? "" : spec.position+" "}${spec.role === "vMount" ? "V-Mount cover" : spec.role === "keepers" ? "strap keepers (4)" : spec.role === "seatpostStrap" ? "optional seatpost strap" : "strap"}`, g.seatCluster, ["mount"], [spec.requiredCapability])),
       ...["rearSeatConnector","rearSeatStrap","rearTopStay"].map(id=>hardware(id, id==="rearSeatConnector" ? "Rear system · seatpost connector replacement" : id==="rearSeatStrap" ? "Rear system · seatpost strap replacement" : "Carbon rack · top stay replacement", g.seatCluster, ["mount"])),
       hardware("rearArchReplacement", "Rear system · replacement arch", g.rearAxle, ["mount"]),
+      hardware("rackTopConnector", "Removable SpeedPack · connector replacement", g.rearAxle, ["mount"]),
+      hardware("topTubeFlipBuckle", "Flip Top Tube Pack · buckle replacement", g.seatCluster, ["mount"]),
+      ...(["Left", "Right"] as const).map(side=>hardware(`rearPannierInserts${side}`, `${side} rear pannier · standard16mm clamp inserts`, g.rearAxle, ["mount"])),
       hardware("rearArchBumpers", "Rear arch · matching bumper pair", g.rearAxle, ["mount"]),
       hardware("rearDropoutLeft", "Rear arch · left Fast Release Dropout", g.rearAxle, ["mount"]),
       hardware("rearDropoutRight", "Rear arch · right Fast Release Dropout", g.rearAxle, ["mount"]),
@@ -64,7 +67,7 @@ export function addHardwareSockets(bike: BikeModel) {
         if (!fork) return [];
         return [
           hardware(`rearPannierUpper${side}`, `${side} rear pannier · upper clamp replacement`, g.rearAxle, ["mount"], ["pannier-mounts"]),
-          hardware(`rearPannierLower${side}`, `${side} Mini Pannier · lower hook and bar`, g.rearAxle, ["mount"], ["pannier-mounts"]),
+          hardware(`rearPannierLower${side}`, `${side} rear pannier · matching lower hook hardware`, g.rearAxle, ["mount"], ["pannier-mounts"]),
           hardware(`forkPackHardware${side}`, `${side} Fork Pack · mount or conversion kit`, fork.position, ["mount"]),
           hardware(`forkPackHook${side}`, `${side} Fork Pack · replacement lower hook`, fork.position, ["mount"]),
           ...(["Upper","Lower"] as const).map(level=>hardware(`cargoStrap${level}${side}`, `${side} cage · ${level.toLowerCase()} cargo strap`, fork.position, ["mount"], ["cargo-cage"])),

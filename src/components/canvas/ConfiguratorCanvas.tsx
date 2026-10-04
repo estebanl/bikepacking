@@ -1,6 +1,5 @@
 "use client";
 
-import { PCFSoftShadowMap } from "three";
 import React, { Suspense, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useRigStore } from "@/store/useRigStore";
@@ -29,10 +28,9 @@ export function ConfiguratorCanvas() {
   return (
     <div className="w-full h-full relative bg-[#e8ede9] select-none">
       <Canvas
-        shadows={{type: PCFSoftShadowMap}}
         dpr={[1, 1.5]}
         camera={{ position: [1.5, 1.25, 1.7], fov: 45 }}
-        gl={{ antialias: true, alpha: false }}
+        gl={{ antialias: true, alpha: true }}
       >
         <color attach="background" args={["#e8ede9"]} />
         <fog attach="fog" args={["#e8ede9", 5, 12]} />
@@ -41,20 +39,10 @@ export function ConfiguratorCanvas() {
         {/* --- PBR Studio Lighting Setup --- */}
         <hemisphereLight args={["#ffffff", "#c4c7c0", 1.65]} />
         <ambientLight intensity={0.45} />
-        {/* Broad neutral studio key with a restrained contact shadow */}
+        {/* Neutral studio key; the floor contact projection is cached separately. */}
         <directionalLight
           position={[2, 6, 3]}
           intensity={2.1}
-          castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-          shadow-bias={-0.0001}
-          shadow-normalBias={0.002}
-          shadow-camera-left={-2}
-          shadow-camera-right={2}
-          shadow-camera-top={2}
-          shadow-camera-bottom={-2}
-          shadow-radius={3}
         />
         {/* Rim Back Highlight Light (defines tubing and alloy rims) */}
         <directionalLight

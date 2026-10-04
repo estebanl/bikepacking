@@ -11,7 +11,7 @@ import { evaluateClearances } from '../src/lib/clearance.ts';
 const bikes = BIKES.filter(b => b.brand === 'Santa Cruz');
 const cases = bikes.flatMap(bike => Object.entries(bike.sizes).map(([key,size]) => ({bike,key,size})));
 const side = (id: string) => /Left/.test(id) ? 'Left' : /Right/.test(id) ? 'Right' : null;
-const scoped = new Set(['fork-mount','cargo-cage','cargo-cage-load-chip-host','cargo-strap-upper','cargo-strap-lower','fork-pack-host','mini-pannier-conversion','rear-pannier-upper','rear-mini-lower']);
+const scoped = new Set(['fork-mount','cargo-cage','cargo-cage-load-chip-host','cargo-strap-upper','cargo-strap-lower','fork-pack-host','mini-pannier-conversion','rear-pannier-upper','rear-mini-lower','current-large-pannier-host','rear-pannier-insert-host']);
 // Independent contract oracle: no production capability/validation helper is used here.
 function compatible(item: BagItem, anchor: SocketAnchor) {
   return anchor.allowedBagCategories.includes(item.category) && item.compatibleSockets.some(id => id === anchor.id || ((id==='forkLeft'||id==='forkRight') && anchor.id.startsWith(id))) && !(item.handlebarType && anchor.handlebarType && item.handlebarType !== anchor.handlebarType);
@@ -22,6 +22,9 @@ function strapMatches(pack: BagItem, strap: BagItem) {
   return pack.volumeLiters === 1.7 ? strap.name.includes('40cm') : pack.volumeLiters === 3 ? strap.name.includes('50cm') : strap.name.includes('50cm') || strap.name.includes('65cm');
 }
 function roleMatches(required: string, socketId: string) {
+  if(['current-large-pannier-host','rear-pannier-insert-host'].includes(required)) return /^pannier(Left|Right)$/.test(socketId);
+  if(required==='speedpack-removable-host') return socketId==='rackTop';
+  if(required==='flip-top-tube-host') return socketId==='topTubeFront';
   if(required === 'mini-pannier-conversion') return /^forkPackHardware(Left|Right)$/.test(socketId);
   if(required === 'rear-pannier-upper') return /^rearPannierUpper(Left|Right)$/.test(socketId);
   if(required === 'rear-mini-lower') return /^rearPannierLower(Left|Right)$/.test(socketId);
@@ -123,6 +126,9 @@ test('all provisionable catalogue placements conserve mass and survive share rou
     const uncertainSockets = new Set(Object.entries(mounted).filter(([,b])=>b===modifiedHost || b===modifiedRear).map(([id])=>id));
     if(mounted.rearAxleHardware && (mounted.rearAxleNds || mounted.rearAxleDs || mounted.rearAxleSpacers)) uncertainSockets.add('rearAxleHardware');
     if(mounted.rearUdhHardware && mounted.rearUdhHanger) uncertainSockets.add('rearUdhHardware');
+    if(mounted.rackTopConnector && mounted.rackTop) uncertainSockets.add('rackTop');
+    if(mounted.topTubeFlipBuckle && mounted.topTubeFront) uncertainSockets.add('topTubeFront');
+    for(const side of ['Left','Right']) if(mounted[`rearPannierInserts${side}`] && mounted[`pannier${side}`]) uncertainSockets.add(`pannier${side}`);
     for(const side of ['Left','Right']) if(mounted[`forkPackHardware${side}`] || mounted[`forkPackHook${side}`]) {
       const host=mounted[`fork${side}_0`];
       if(host && /^tailfin-(655674|972100)-v[12]$/.test(host.id)) uncertainSockets.add(`fork${side}_0`);

@@ -1,4 +1,6 @@
 import { axleSpareConflictReasons } from "./axleSpareAssembly.ts";
+import { exteriorServicePartConflictReasons } from "./exteriorServiceParts.ts";
+import { REMOVABLE_RACK_TOP_CONNECTOR_HEIGHT } from "./serviceHardwareGeometry.ts";
 import { rearArchHardwareConflictReasons } from "./rearArchHardware.ts";
 import { getFrameAttachmentSpec, frameAttachmentConflictReasons } from "./frameAttachments.ts";
 import { requiredProductCapabilities, forkPackConflictReasons } from "./forkPackAssembly.ts";
@@ -37,7 +39,8 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
         const [,bagHeight] = equipmentDimensions(mounted.rackTop);
         // Shared rendered floor sits on the 6mm deck rail, including its thickness.
         const underside = /fixed connector/i.test(mounted.rackTop.name) ? Math.max(softTrunkBaseOffset(bagHeight),bagHeight*.49+.009) : softTrunkBaseOffset(bagHeight);
-        return {...anchor,rotation:rack.rotation,position:[rack.position[0],rack.position[1]+rack.dimensions.height*.44+.006+underside,rack.position[2]]};
+        const connectorStack = mounted.rackTop.id === "tailfin-930095-v1" ? REMOVABLE_RACK_TOP_CONNECTOR_HEIGHT : 0;
+        return {...anchor,rotation:rack.rotation,position:[rack.position[0],rack.position[1]+rack.dimensions.height*.44+.006+underside+connectorStack,rack.position[2]]};
       }
     }
     if (anchor.id === "barMount" && mounted.barMount?.id === "tailfin-825745-v1") {
@@ -72,12 +75,17 @@ export function getSocketAnchors(size: BikeSizeConfig, mounted: Record<string, B
     return {...anchor,rotation,position:[fork.position[0],fork.position[1]+(cage ? -ch*.47+bh*.44 : 0),side*(.106+bl*.5)]};
   });
   return resolved.map(anchor => {
+    const exteriorHost = anchor.id === "rackTopConnector" ? "rackTop" : anchor.id === "topTubeFlipBuckle" ? "topTubeFront" : undefined;
+    if(exteriorHost && mounted[exteriorHost]) {
+      const hostAnchor=resolved.find(a=>a.id===exteriorHost);
+      if(hostAnchor) {const pose=getEquipmentPlacement(mounted[exteriorHost],hostAnchor); return {...anchor,position:pose.position,rotation:pose.rotation};}
+    }
     const framePart=getFrameAttachmentSpec(anchor.id);
     if(framePart && mounted[framePart.hostSocket]) {
       const host=mounted[framePart.hostSocket],hostAnchor=resolved.find(a=>a.id===framePart.hostSocket);
       if(hostAnchor) { const pose=getEquipmentPlacement(host,hostAnchor); return {...anchor,position:pose.position,rotation:pose.rotation}; }
     }
-    if(/^rearPannier(Upper|Lower)(Left|Right)$/.test(anchor.id) && mounted.rearRack) {
+    if(/^rearPannier(Upper|Lower|Inserts)(Left|Right)$/.test(anchor.id) && mounted.rearRack) {
       const side=forkPackSide(anchor.id), rackAnchor=resolved.find(a=>a.id==='rearRack');
       if(rackAnchor) { const pose=getRearPannierPose(mounted[`pannier${side}`],mounted.rearRack,rackAnchor,side); return {...anchor,position:pose.position,rotation:pose.rotation}; }
     }
@@ -136,12 +144,15 @@ export function hasMountCapability(
       : id.toLowerCase().includes("right")
         ? "right"
         : null;
-  const scoped = ["cargo-cage", "fork-mount", "cargo-cage-load-chip-host", "cargo-strap-upper", "cargo-strap-lower", "fork-pack-host", "mini-pannier-conversion", "rear-pannier-upper", "rear-mini-lower"].includes(required);
+  const scoped = ["cargo-cage", "fork-mount", "cargo-cage-load-chip-host", "cargo-strap-upper", "cargo-strap-lower", "fork-pack-host", "mini-pannier-conversion", "rear-pannier-upper", "rear-mini-lower", "current-large-pannier-host", "rear-pannier-insert-host"].includes(required);
   return Object.entries(mounted).some(
     ([id, item]) =>
       id !== socketId &&
       (item.id === required || effectiveMountCapabilities(item,id,mounted).includes(required)) &&
       (!scoped || (side(id) !== null && side(id) === side(socketId))) &&
+      (!["current-large-pannier-host", "rear-pannier-insert-host"].includes(required) || /^pannier(Left|Right)$/.test(id)) &&
+      (required !== "speedpack-removable-host" || id === "rackTop") &&
+      (required !== "flip-top-tube-host" || id === "topTubeFront") &&
       (required !== "fork-pack-host" || /^fork(Left|Right)_0$/.test(id)) &&
       (required !== "mini-pannier-conversion" || /^forkPackHardware(Left|Right)$/.test(id)) &&
       (required !== "rear-pannier-upper" || /^rearPannierUpper(Left|Right)$/.test(id)) &&
@@ -216,6 +227,7 @@ export function validateMount(
     reasons.push("Conflicts with equipment already fitted.");
   reasons.push(...forkPackConflictReasons(bag,socketId,mounted));
   reasons.push(...axleSpareConflictReasons(bag,socketId,mounted));
+  reasons.push(...exteriorServicePartConflictReasons(bag,socketId,mounted));
   reasons.push(...rearArchHardwareConflictReasons(bag,socketId,mounted));
   reasons.push(...frameAttachmentConflictReasons(bag,socketId,mounted));
   return { allowed: reasons.length === 0, reasons };
@@ -237,7 +249,7 @@ export function sanitizeMountedBags(
   let changed = true;
   while (changed) {
     changed = false;
-    for (const [socket, item] of Object.entries(mountedBags)) {
+    for (const [socket, item] of Object.entries(mountedBags).sort(([a],[b]) => Number(/^rearPannierLower(Left|Right)$/.test(b)) - Number(/^rearPannierLower(Left|Right)$/.test(a)))) {
       const result = validateMount(item, socket, size, mountedBags);
       if (!result.allowed) {
         delete mountedBags[socket];

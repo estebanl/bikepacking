@@ -1,5 +1,7 @@
 "use client";
 import { ForkPackHardwareModel } from "./ForkPackHardwareModel";
+import { SeatPackDetails } from "./SeatPackDetails";
+import { SoftPanelShell, SoftPanelZipper, softPanelDepthAt } from "./SoftPanelShell";
 import { SoftLuggageModel } from "./SoftLuggageModel";
 import { isForkPackPart } from "@/lib/forkPackGeometry";
 import { RearArchModel } from "./RearArchModel";
@@ -208,7 +210,7 @@ type RackParts = Partial<Omit<RearArchHardwareProps,"dimensions">> & { hideArch?
 
 export interface BarSupportEndpoints { clamps: [Point3,Point3]; ends: [Point3,Point3]; orientation: [number,number,number,number] }
 
-export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts, rearArchDimensions, rackParts, bottleCageBackSign, forkPackHardware, convertedForkPannier, hideTubeAttachments }: { bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]}; hideTubeAttachments?:boolean; convertedForkPannier?:boolean; forkPackHardware?:{dimensions:Point3;showMount:boolean;showHook:boolean}; rearArchDimensions?:Point3; bottleCageBackSign?:1|-1; rackParts?:RackParts }): ReactElement {
+export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnvelope, strapRearExtension, barCageEnvelope, barCageParts, rearArchDimensions, rackParts, bottleCageBackSign, forkPackHardware, convertedForkPannier, hideTubeAttachments, seatPackAttachment }: { seatPackAttachment?:{rail:Point3;post:Point3}; bag: BagItem; barSupport?: BarSupportEndpoints; tubeRadius?: number; rearDeck?: RearDeckDimensions; strapEnvelope?: Point3; strapRearExtension?: number; barCageEnvelope?: Point3; barCageParts?: {hideCradle?:boolean;hideClamps?:number[]}; hideTubeAttachments?:boolean; convertedForkPannier?:boolean; forkPackHardware?:{dimensions:Point3;showMount:boolean;showHook:boolean}; rearArchDimensions?:Point3; bottleCageBackSign?:1|-1; rackParts?:RackParts }): ReactElement {
   const [l, h, d] = equipmentDimensions(bag),
     kind = equipmentKind(bag);
   const fabric = useMemo(
@@ -458,6 +460,10 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
       {[-1,1].map(side=><Box key={side} position={[0,-h*.49,side*d*.23]} size={[l*.36,.018,.014]} material={buckle}/>)}
     </group>}
   </group>;
+  if(kind === "seat_pack") return <group>
+    <SoftPanelShell outline={outline} depth={d*.9} material={fabric}/>
+    <SeatPackDetails outline={outline} dimensions={[l,h,d]} attachment={seatPackAttachment}/>
+  </group>;
   const frame = kind === "frame" || kind === "half_frame";
   const roll = [
     "fork_pack",
@@ -469,7 +475,7 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
   ].includes(kind);
   return (
     <group>
-      <PanelShell outline={outline} depth={d * 0.9} material={fabric} />
+      <SoftPanelShell outline={outline} depth={d * 0.9} material={fabric} />
       {/* Reinforced underside and small separate reflective ID patch. */}
       <Box position={[0, -h * 0.44, 0]} size={[l * 0.69, 0.006, d * 0.88]} />
       {[-1, 1].map((s) => (
@@ -482,19 +488,16 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
       ))}
       {(frame || kind === "top_tube") && (
         <>
-          {[-1, 1].map((s) => (
+          {!/^tailfin-1051880-v(3|5)$/.test(bag.id) && [-1, 1].map((s) => (
             <group key={s}>
+              <SoftPanelZipper outline={outline} depth={d*.9} length={l*.78} y={h*.18} side={s} material={webbing}/>
               <Box
-                position={[0, h * 0.18, s * d * 0.46]}
-                size={[l * 0.78, 0.006, 0.0025]}
-              />
-              <Box
-                position={[l * 0.26, h * 0.145, s * d * 0.47]}
+                position={[l * 0.26, h * 0.145, s * (softPanelDepthAt(outline,d*.9,l*.26,h*.145)+.002)]}
                 size={[0.016, 0.018, 0.003]}
                 material={buckle}
               />
               <Box
-                position={[l * 0.24, h * 0.13, s * d * 0.49]}
+                position={[l * 0.24, h * 0.13, s * (softPanelDepthAt(outline,d*.9,l*.24,h*.13)+.004)]}
                 size={[0.024, 0.004, 0.003]}
                 material={seam}
               />
@@ -525,11 +528,15 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
         <>
           {/* Folded waterproof closure, flat woven compression straps, acetal buckles. */}
           {[0, 1, 2].map((i) => (
-            <Box
+            <mesh
+              dispose={null}
               key={i}
+              geometry={unitTube}
               position={[0, h * (0.43 + i * 0.018), 0]}
-              size={[l * 0.71, 0.005, d * (0.86 - i * 0.1)]}
+              rotation={[0, 0, Math.PI / 2]}
+              scale={[0.0035, l * 0.71, d * (0.43 - i * 0.05)]}
               material={i === 1 ? webbing : fabric}
+              castShadow
             />
           ))}
           {[-0.3, 0.3].map((x) => (
@@ -574,9 +581,6 @@ export function EquipmentModel({ bag, barSupport, tubeRadius, rearDeck, strapEnv
                 />
               ))}
             </>
-          )}
-          {kind === "seat_pack" && (
-            <Box position={[l * 0.4, 0, 0]} size={[0.055, h * 0.5, d * 0.4]} />
           )}
         </>
       )}

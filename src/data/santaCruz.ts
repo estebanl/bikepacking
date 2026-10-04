@@ -75,7 +75,8 @@ function sockets(
       ...anchor(
         "seatpost",
         "Saddle rails",
-        [g.saddleBase[0] - 0.15, g.saddleBase[1] - 0.065, 0],
+        // Estimated saddle-pack nose sits behind the post and below the rails.
+        [g.saddleBase[0] - 0.015, g.saddleBase[1] - 0.11, 0],
         ["seat_pack"],
         bike.seatpostType === "rigid" ? "Rigid seatpost reference build; rear tire clearance remains unverified." : "Dropper preview moves 120 mm, not the full manufacturer stroke. Check actual full travel and rear tire clearance.",
       ),
