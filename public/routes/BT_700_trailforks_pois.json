@@ -1,0 +1,4895 @@
+[
+  {
+    "name": "Castle Glen",
+    "description": "No Trespassing sign is just to cover their liability. Public can access this trail.",
+    "lat": 44.47412877717289,
+    "lon": -80.31567941892304,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Creemore",
+    "description": "Various services",
+    "lat": 44.326107,
+    "lon": -80.10593,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Access trail to beach",
+    "description": "",
+    "lat": 44.52639564608187,
+    "lon": -80.32751934364347,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Steep, rough downhill",
+    "description": "",
+    "lat": 44.49572201095356,
+    "lon": -80.37449445193522,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Steep Downhill",
+    "description": "",
+    "lat": 44.38643777660255,
+    "lon": -80.55726000000001,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Mostly easy trail riding but a few tougher spots",
+    "description": "",
+    "lat": 44.44555116455312,
+    "lon": -80.30965845069497,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "For a short-cut, riders can choose to continue on Cape Rd to meet up with the route a little further along.",
+    "lat": 44.779265082009516,
+    "lon": -80.95973771993562,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Busy Road Crossing",
+    "description": "",
+    "lat": 44.61339011622886,
+    "lon": -81.08039158159471,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Switchbacks",
+    "description": "Take caution on steep downhill switchbacks. Dismount when needed. ",
+    "lat": 44.428603511891716,
+    "lon": -80.30737785043877,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Downhill Trail",
+    "description": "Mostly easy riding ",
+    "lat": 44.42788179061574,
+    "lon": -80.3033922408044,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Start of hard climbing",
+    "description": "",
+    "lat": 44.45751878205813,
+    "lon": -80.31018919012905,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Riders who want some easier and shorter riding from here can take this route. Rail trail to Stayner. ",
+    "lat": 44.50368752217378,
+    "lon": -80.21440361173731,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Riders can choose to remain on rail trail. ",
+    "lat": 44.32051876252787,
+    "lon": -81.3273273498126,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "This trail offers a short-cut through town.",
+    "lat": 44.426933580485525,
+    "lon": -81.38642457417058,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Can choose to stay on rail trail here.",
+    "lat": 43.934570000000015,
+    "lon": -79.8435,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Holiday Inn",
+    "description": "",
+    "lat": 44.49896725855314,
+    "lon": -80.19618061338417,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Tim Hortons",
+    "description": "",
+    "lat": 44.4788876932589,
+    "lon": -80.21382697120976,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Stream water can be filtered ",
+    "description": "",
+    "lat": 44.20721155344856,
+    "lon": -80.07464296531887,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Glencairn Conservation Area",
+    "description": "Probably OK for stealth camping down by the river. ",
+    "lat": 44.30157949926157,
+    "lon": -80.02020369339114,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Life's a Slice",
+    "description": "Pizza restaurant",
+    "lat": 44.35792558596227,
+    "lon": -79.97284901004623,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.50023363252089,
+    "lon": -80.18868656158479,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.49627798898314,
+    "lon": -80.22328582881165,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.516136288584626,
+    "lon": -80.26065758018962,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Riverdale Farm & Forest",
+    "description": "River tenting spaces and off-grid cabins. Showers, outhouse, kitchen and cooking utensils firewood, river swimming and in seasonal produce are available.\nContact Susan at 905 838 5499 or email susan.riverdale@gmail.com for more information",
+    "lat": 43.7970458993166,
+    "lon": -79.93296165025008,
+    "trailforks_type": "Toilet"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Riders who want to skip the trails in Palgrave Conservation Area can take Duffy's Lane southeast to meet up with route.",
+    "lat": 43.95666128819934,
+    "lon": -79.86756776441177,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Little Ed's Ski & Bike",
+    "description": "",
+    "lat": 44.501969544250265,
+    "lon": -80.23589800329009,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Kamikaze Bikes",
+    "description": "",
+    "lat": 44.50108370437024,
+    "lon": -80.231534395005,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Riders can choose to turn here to bypass the loop in Collingwood",
+    "lat": 44.50426042513112,
+    "lon": -80.23932978743646,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Side Launch Brewing Company",
+    "description": "",
+    "lat": 44.498853332433455,
+    "lon": -80.2474269365024,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Circle K Convenience Store",
+    "description": "",
+    "lat": 44.52906702814613,
+    "lon": -80.33270183040712,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Beach",
+    "description": "",
+    "lat": 44.540908844242345,
+    "lon": -80.40692478001672,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Beach",
+    "description": "",
+    "lat": 44.52688543533596,
+    "lon": -80.32686912697203,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Riders can choose to remain on doubletrack",
+    "description": "",
+    "lat": 43.92267980019125,
+    "lon": -79.8286615982661,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Trail option",
+    "description": "Riders can choose to take the more challenging (and perhaps fun!) Sugar Shack trail here. ",
+    "lat": 43.92254550308567,
+    "lon": -79.83062269814928,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Woo Wu",
+    "description": "",
+    "lat": 43.92269543976636,
+    "lon": -79.82871573002299,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Collingwood ",
+    "description": "All Services",
+    "lat": 44.5029399123689,
+    "lon": -80.22779291754175,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Food Basics Grocery Store",
+    "description": "",
+    "lat": 43.58969368404219,
+    "lon": -80.56194083357187,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Elmira",
+    "description": "Various food services",
+    "lat": 43.5983626114339,
+    "lon": -80.55885873745036,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Kitchen Kuttings ",
+    "description": "General store and cafe",
+    "lat": 43.599092646214096,
+    "lon": -80.55856905887676,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Public Restrooms",
+    "description": "Water available",
+    "lat": 43.59961685859648,
+    "lon": -80.55398916173263,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Rural Roots Brewing Company",
+    "description": "",
+    "lat": 43.589114645713074,
+    "lon": -80.56055839195457,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Lost Bear Market",
+    "description": "",
+    "lat": 43.79671695004798,
+    "lon": -79.93378888428948,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 43.86574553509361,
+    "lon": -79.87060679141092,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Caledon Manor",
+    "description": "",
+    "lat": 43.902272534618284,
+    "lon": -79.86404074374246,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Tom's Family Restaurant",
+    "description": "",
+    "lat": 43.87103148964044,
+    "lon": -79.86823037564935,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "June Motel",
+    "description": "",
+    "lat": 44.398134284801515,
+    "lon": -80.53409752784394,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Coywolf Coffee",
+    "description": "",
+    "lat": 43.79474967453173,
+    "lon": -79.93143796920776,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Orton Park",
+    "description": "Community park with port-a-potty, picnic shelter. Probably nobody would mind if you stealth camped here.",
+    "lat": 43.783986972071766,
+    "lon": -80.22756189974797,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "John Muir Lookout",
+    "description": "Lookout area can be a great place to camp. Shelter, tables and outhouse. Lots of grassy area to tent on. ",
+    "lat": 44.461181782308415,
+    "lon": -80.55437329925701,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Tenting area",
+    "description": "Good camping area among the cedar trees. Stream water at bridge can be filtered. ",
+    "lat": 44.37311701264817,
+    "lon": -80.54201804319612,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "BT Host",
+    "description": "Landowners can provide camping space for riders on their lovely property. Contact them to determine availability and exact location. \nwilliambrettthomas@gmail.com\nedenlianne@gmail.com\n416-570-6043\nEdenlianne@gmail.com",
+    "lat": 44.39656972748935,
+    "lon": -80.46977267591248,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Belwood Super Snax",
+    "description": "Burgers, fries, etc.",
+    "lat": 43.79234879652747,
+    "lon": -80.32068745903901,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "BT Host",
+    "description": "Local Belwood resident is offering camping space for riders. Contact Dustin to determine availability. 519 575 1569\ndustin.garrick@uwaterloo.ca",
+    "lat": 43.7913845812267,
+    "lon": -80.32474295906952,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "BT Host",
+    "description": "Local resident is offering overnight camping space for riders. Contact Alice to determine availability. gtamassagetherapist@gmail.com",
+    "lat": 44.35593489063225,
+    "lon": -80.15103191802847,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Riders can choose to stay on doubletrack here",
+    "lat": 43.95926646445741,
+    "lon": -79.86004555997386,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "BT Host",
+    "description": "Landowner is offering space on his property for riders to camp. Contact Felicite to confirm availability and location. felicite@windsongfarm.ca",
+    "lat": 43.981776336212576,
+    "lon": -80.02802262324848,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "BT Host",
+    "description": "Landowner is offering space on his property for riders to camp. Contact Jay to confirm availability and location. Phone/ txt 416-938-4411",
+    "lat": 43.97465360915302,
+    "lon": -80.0258317088682,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Riders who want to avoid the Oak Ridges and Palgrave trail option can take this gravel route to Palgrave.",
+    "lat": 43.94600799805946,
+    "lon": -79.97010809338661,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "BT Host",
+    "description": "Landowner can offer camping space on his farm party. Great host. Contact Scott to determine availability. holmesldscp@gmail.com or text at 519 940 1932 ",
+    "lat": 44.358726072276944,
+    "lon": -80.25749828130807,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Tenting spots",
+    "description": "Some crown land along this road that could serve for tenting spots",
+    "lat": 44.45987496867331,
+    "lon": -80.5280356810914,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Route Altenrative",
+    "description": "Riders can turn left here and take main road for a short-cut. ",
+    "lat": 44.44064000000002,
+    "lon": -80.55009000000001,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Riders can choose to stay on main road here instead of turning right and taking the trail option.",
+    "lat": 44.396286853206874,
+    "lon": -80.43502155570815,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Bunkie ",
+    "description": "Local rider can provide a bunkie use for riders. Can sleep four snuggly. Use this contact info to determine availability and exact location.\n 647 308 2503\ntitilafleur@gmail.com",
+    "lat": 44.389792500092916,
+    "lon": -80.46385389381453,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "1 guest bedroom available. Can also contact directly at: mbtettero@gmail.com",
+    "lat": 44.4131589839723,
+    "lon": -80.68208903633813,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "Can also contact directly at mbtettero@gmail.com",
+    "lat": 44.41380273425566,
+    "lon": -80.68226069771508,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Small Cave",
+    "description": "",
+    "lat": 44.04112159625328,
+    "lon": -80.07052527698006,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Good Fellas Pizza",
+    "description": "Friday\n\t\n\n    11a.m.\u201310p.m.\n\n\t\nSaturday\n\t\n\n    11a.m.\u201310p.m.\n\n\t\nSunday\n\t\n\n    11a.m.\u20139p.m.\n\n\t\nMonday\n\t\n\n    Closed\n\n\t\nTuesday\n\t\n\n    11a.m.\u20139p.m.\n\n\t\nWednesday\n\t\n\n    11a.m.\u20139p.m.\n\n\t\nThursday\n\t\n\n    11a.m.\u201310p.m.",
+    "lat": 44.26570804234588,
+    "lon": -80.55523355096732,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Mr. Sub",
+    "description": "Friday\n\t\n\n    5:30a.m.\u20138p.m.\n\n\t\nSaturday\n\t\n\n    6:30a.m.\u20138p.m.\n\n\t\nSunday\n\t\n\n    6:30a.m.\u20138p.m.\n\n\t\nMonday\n\t\n\n    5:30a.m.\u20138p.m.\n\n\t\nTuesday\n\t\n\n    5:30a.m.\u20138p.m.\n\n\t\nWednesday\n\t\n\n    5:30a.m.\u20138p.m.\n\n\t\nThursday\n\t\n\n    5:30a.m.\u20138p.m.",
+    "lat": 44.26602304586962,
+    "lon": -80.5557002553359,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Higher Grounds",
+    "description": "Open 7 days a week. Also bakery and other food options like sandwiches and samosas. 7am to 5pm\n(519) 924-0001",
+    "lat": 44.267794520312506,
+    "lon": -80.55843782150836,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Maxwell Meats Variety Store",
+    "description": "Thursday\n\t\n\n    8a.m.\u20137p.m.\n\n\t\nFriday\n\t\n\n    8a.m.\u20138p.m.\n\n\t\nSaturday\n\t\n\n    8a.m.\u20137p.m.\n\n\t\nSunday\n\t\n\n    8a.m.\u20137p.m.\n\n\t\nMonday\n\t\n\n    8a.m.\u20137p.m.\n\n\t\nTuesday\n\t\n\n    8a.m.\u20137p.m.\n\n\t\nWednesday\n\t\n\n    8a.m.\u20137p.m.",
+    "lat": 44.28370608350085,
+    "lon": -80.51970096875492,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Bottle refill station at bathroom",
+    "description": "",
+    "lat": 43.71627049786763,
+    "lon": -80.37644915120029,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Caledon Hills Cycling Shop Cafe",
+    "description": "Cafe in bike shop\nSaturday\t8a.m.\u20134p.m.\nSunday\t8a.m.\u20131p.m.\nMonday\tClosed\nTuesday\t8:30a.m.\u20134p.m.\nWednesday\t8:30a.m.\u20134p.m.\nThursday\t8:30a.m.\u20134p.m.\nFriday\t8:30a.m.\u20134p.m.",
+    "lat": 43.79573958726537,
+    "lon": -79.9320789398065,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Vintage Cafe",
+    "description": "",
+    "lat": 43.823952786088164,
+    "lon": -79.946755987536,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Ultramar Gas Station",
+    "description": "24hrs",
+    "lat": 43.823263873870324,
+    "lon": -79.94618735922484,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Kimber Valley Farms",
+    "description": "Off-grid cabin\n519 379 5071\nkimbervalleyfarms@gmail.com",
+    "lat": 44.4505770261548,
+    "lon": -80.50487753261156,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Riders can miss the upcoming singletract section by turning left here on main road.",
+    "lat": 44.38361009060796,
+    "lon": -80.41387196907742,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Singletrack",
+    "description": "Mostly fast and flowy but some rocky and bumpy spots",
+    "lat": 44.38849855733796,
+    "lon": -80.39897128251567,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Heart's Restaurant",
+    "description": "Tuesday\nClosed\n\nWednesday\nClosed\n\nThursday\n12\u20138:30p.m.\n\nFriday\n12\u20138:30p.m.\n\nSaturday\n12\u20138:30p.m.\n\nSunday\n12\u20136p.m.\n\nMonday\n3\u20138p.m.",
+    "lat": 44.38690203563051,
+    "lon": -80.53688078562554,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "BT Host",
+    "description": "Landowner can provide secure camping space. Washroom facilities also available. About a 15 min bike ride from route. Contact for availability: brettonscottdavis@gmail.com\n226-820-3151",
+    "lat": 43.72150585580391,
+    "lon": -80.19240993918919,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "BT Host",
+    "description": "Land owner can offer camping space to riders. Even the possibility of an RV to crash in. Can also provide a water refill. Contact to determine availability. werdna.monahan@gmail.com or call or tx at 705-446-5332\n19 Station Street.",
+    "lat": 44.35357895081913,
+    "lon": -80.1771962410736,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Doubletrack can be rough in spots",
+    "description": "",
+    "lat": 44.52997450636293,
+    "lon": -80.53709177971116,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Webwood nature reserve",
+    "description": "Easy walk to pleasant waterfall",
+    "lat": 44.495225617499074,
+    "lon": -80.54569775479479,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Nordic Highlands",
+    "description": "Riders can camp at this outdoor centre. Reservations need to be made by contacting ski@highlandsnordic.ca \n$10 per person. No indoor service but an outdoor tap and port-a-potty",
+    "lat": 44.38299598409282,
+    "lon": -80.225769006461,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Shepherd's Pub",
+    "description": "Good food as well",
+    "lat": 43.681183970748776,
+    "lon": -80.42941981833827,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Elora Ski & Bike",
+    "description": "Tuesday\n12\u20138PM\n\nWednesday\n12\u20138PM\n\nThursday\n12\u20138PM\n\nFriday\n12\u20138PM\n\nSaturday\n10AM\u20136PM\n\nSunday\nClosed\n\nMonday\nClosed",
+    "lat": 43.68463871003987,
+    "lon": -80.43166695433654,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Geddes Market Grocery Store",
+    "description": "tuesday\n8AM\u20137PM\n\nWednesday\n8AM\u20137PM\n\nThursday\n8AM\u20137PM\n\nFriday\n8AM\u20137PM\n\nSaturday\n8AM\u20136PM\n\nSunday\n10AM\u20136PM\n\nMonday\n8AM\u20137PM",
+    "lat": 43.68424108134336,
+    "lon": -80.43132899600066,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Uphill section can be busy with traffic",
+    "description": "",
+    "lat": 43.82157460380488,
+    "lon": -79.99209100236789,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "The Farmer's House",
+    "description": "House Rental. Could be an option for a group of riders. ",
+    "lat": 44.47434708097079,
+    "lon": -80.55358106620398,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Rocklyn Inn B&B",
+    "description": "(905) 440-6300\ntherocklyninn@gmail.com",
+    "lat": 44.4659661211266,
+    "lon": -80.58944102596352,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Rocklyn General Store",
+    "description": "Various groceries and baked good. If you call ahead I believe you can order pizza.\n647-472-6917\nThursday\n8a.m.\u20138p.m.\n\nFriday\n8a.m.\u20138p.m.\n\nSaturday\n8a.m.\u20138p.m.\n\nSunday\n9a.m.\u20133p.m.\n\nMonday\nClosed\n\nTuesday\n8a.m.\u20138p.m.\n\nWednesday\n8a.m.\u20138p.m.",
+    "lat": 44.46728347659676,
+    "lon": -80.59097845348839,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Silver Springs Retreat",
+    "description": "Can offer a 3 bedroom until for around $400. So potentially a good option for a group of riders. contact Michael Cohen drmacohen@gmail.com",
+    "lat": 44.339093236983786,
+    "lon": -80.45535084339514,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Bunkie Rental",
+    "description": "Land owner offering a bunkie on his land for riders. Contact Ben for availability and details. \nbcullen@cullensfoods.com\n (647) 909 0352\n",
+    "lat": 44.24453916820616,
+    "lon": -80.5371576467862,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Jolley's Dairy Bar",
+    "description": "Various groceries plus ice cream\n9am to 9pm",
+    "lat": 44.262700644102004,
+    "lon": -80.54945358056949,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Outing Club Cabin",
+    "description": "Riders can request booking space in this cabin. $20 per night. The entire cabin can also be booked by a group of riders if not being used. Booking details at utoc.ca or contact cabin@utoc.ca",
+    "lat": 44.41779696013709,
+    "lon": -80.44349549766713,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Harvest Moon",
+    "description": "Tuesday - Saturday: 8am - 7:30pm\nSunday: 8am - 7pm\nClosed on Monday",
+    "lat": 43.54497893576423,
+    "lon": -80.55218261225187,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Hemlock Barn",
+    "description": "Restaurant Hours:\n\nMonday \u2013 Sunday \n\n11:00AM \u2013 8:00PM",
+    "lat": 43.51603498870248,
+    "lon": -80.56390285491943,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "BT 700 Host",
+    "description": "Local rider can provide tenting space on property. Use this contact info to determine availability and exact location.\n 647 308 2503\ntitilafleur@gmail.com",
+    "lat": 44.39008383767117,
+    "lon": -80.4630859877347,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Tenting Spot",
+    "description": "Area down by the water could be a good stealth camping spot. Look for doubletrack entrance off of the rail trail. ",
+    "lat": 43.73628035906908,
+    "lon": -80.34093873494736,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Riders can choose to stay on Lower Valley Rd instead of taking the Bruce side trail. ",
+    "lat": 44.291984962713876,
+    "lon": -80.54010282048924,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Airbnb Bunkie",
+    "description": "",
+    "lat": 44.337158177199406,
+    "lon": -80.23076728306226,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Bike stand",
+    "description": "Bike stand with repair tools and pump in park.",
+    "lat": 44.027476881282524,
+    "lon": -80.07102498288513,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Caledon Hill Brew Pub",
+    "description": "Food also available\n\nMonday\n\t\n\n    Closed\n\n\t\nTuesday\n\t\n\n    Closed\n\n\t\nWednesday\n\t\n\n    12\u20138PM\n\n\t\nThursday\n\t\n\n    12\u20138PM\n\n\t\nFriday\n\t\n\n    12\u20138PM\n\n\t\nSaturday\n\t\n\n    12\u20138PM\n\n\t\nSunday\n\t\n\n    12\u20134PM",
+    "lat": 43.950733982386716,
+    "lon": -79.83653129575904,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Cycling Elements",
+    "description": "Reports of very helpful service\n519 307 4100\nSunday: Closed.   Monday: Closed.   Tuesday: 10am-6pm.  Wednesday: 10am-6pm.   Thursday: 10am-6pm.   Friday: 10am-6pm.   Saturday: 10am-4pm.",
+    "lat": 43.919595115883865,
+    "lon": -80.09261114689053,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Hockley Valley Resort",
+    "description": "",
+    "lat": 43.9788534599894,
+    "lon": -80.04495558269343,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Savvy Flesherton",
+    "description": "Craft Beers and Espresso\n \nFriday\n9\u202fAM\u20134\u202fPM\n\nSaturday\n9\u202fAM\u20134\u202fPM\n\nSunday\n10\u202fAM\u20134\u202fPM\n\nMonday\n9\u202fAM\u20134\u202fPM",
+    "lat": 44.26591779286175,
+    "lon": -80.54613648965089,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Dam",
+    "description": "Some potential good spots for stealth camping  on either side of dam",
+    "lat": 43.535521999740844,
+    "lon": -80.57281576904586,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Belwood dam",
+    "description": "",
+    "lat": 43.73447513045947,
+    "lon": -80.33719336346212,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Belwood Conservation Area",
+    "description": "Swimming and picnic area",
+    "lat": 43.73418489610526,
+    "lon": -80.33419421255891,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Pizza Delight",
+    "description": "",
+    "lat": 43.70682123198096,
+    "lon": -80.37722757399385,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Gus Social",
+    "description": "Indian Restaurant\nSaturday\n12\u20138PM\n\nSunday\n12\u20138PM\n\nMonday\nClosed\n\nTuesday\n12\u20138PM\n\nWednesday\n12\u20138PM\n\nThursday\n12\u20138PM\n\nFriday\n12\u20138PM",
+    "lat": 43.70560357259937,
+    "lon": -80.3780107790262,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Underground Kitchen",
+    "description": "",
+    "lat": 43.70514985242806,
+    "lon": -80.3782092624933,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Brew House on the Grand B&B",
+    "description": "519-843-8871",
+    "lat": 43.7057270297461,
+    "lon": -80.37709078133409,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "The Blue Bruce B&B",
+    "description": "",
+    "lat": 43.55671466348635,
+    "lon": -80.58611692340703,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Those Pizza Guys",
+    "description": "",
+    "lat": 43.54028803935958,
+    "lon": -80.55412813893965,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Hillside Variety Store",
+    "description": "Wednesday\n8:30AM\u20136PM\n\nThursday\n8:30AM\u20136PM\n\nFriday\n8:30AM\u20136PM\n\nSaturday\n8:30AM\u20136PM\n\nSunday\nClosed\n\nMonday\nClosed\n\nTuesday\n8:30AM\u20136PM",
+    "lat": 43.53617201012344,
+    "lon": -80.55402146518341,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "BT 700 Host",
+    "description": "Landowner offering up space for secure tenting. Contact zachtatem@gmail.com for details.  Or text Zach at 416-669-1123",
+    "lat": 44.05110517573178,
+    "lon": -80.14911567440278,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Nordic Highlands",
+    "description": "24 hr water access - tap under lower deck. Port-a-potty also available in lower area.",
+    "lat": 44.38255598250213,
+    "lon": -80.22464606003595,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Water Refill",
+    "description": "Riders can obtain water from Duntroon Highlands Golf",
+    "lat": 44.379087631264674,
+    "lon": -80.22405108022785,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Mono Cliffs Camping",
+    "description": "",
+    "lat": 44.06973557866147,
+    "lon": -80.06811939450101,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "BT 700 Host",
+    "description": "Land owner offering area on his land for riders to camp on. Contact Ben for availability and details such as price. No amenities are available. \nbcullen@cullensfoods.com\n (647) 909 0352",
+    "lat": 44.24586332961559,
+    "lon": -80.53611129855874,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "The Crazy Canuck ",
+    "description": "Tuesday\n9AM\u20137:30PM\n\nWednesday\n9AM\u20137:30PM\n\nThursday\n9AM\u20137:30PM\n\nFriday\n9AM\u20137:30PM\n\nSaturday\n8AM\u20137:30PM\n\nSunday\n9AM\u20137:30PM\n\nMonday\nClosed",
+    "lat": 43.509036919779064,
+    "lon": -80.55770122517745,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Jack's Family Restaurant",
+    "description": "Tuesday\n9AM\u20137:30PM\n\nWednesday\n9AM\u20137:30PM\n\nThursday\n9AM\u20137:30PM\n\nFriday\n9AM\u20137:30PM\n\nSaturday\n8AM\u20137:30PM\n\nSunday\n9AM\u20137:30PM\n\nMonday\nClosed",
+    "lat": 43.50838373887317,
+    "lon": -80.55654251088302,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Mono Hike",
+    "description": "If you want to take a half-day off the bike this is a fantastic hike in the park. ",
+    "lat": 44.031447261680626,
+    "lon": -80.06455515996745,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Port-a-Potty",
+    "description": "",
+    "lat": 44.41599240112694,
+    "lon": -80.44339054764052,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Metcalfe Rock",
+    "description": "",
+    "lat": 44.41708811648017,
+    "lon": -80.43998633331297,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Spring Water",
+    "description": "Water out of pipe can be used for drinking but probably best to filter",
+    "lat": 44.417074637978985,
+    "lon": -80.44058686886139,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Spring Water",
+    "description": "Pipe with spring water flowing out. Located about 300m north of 20 sideroad and Prince of Wales intersection. ",
+    "lat": 44.200351354402194,
+    "lon": -80.16443301912187,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Lake Camping",
+    "description": "If you want a lovely secluded camping spot continue on this forest road (side rd 3) to the small lake. When you get to the lake make a right along the grassy double track and you'll come to a fire pit by an old abandoned cabin. ",
+    "lat": 44.39834079279942,
+    "lon": -80.42571032626145,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Mono Cliffs Inn",
+    "description": "Take out options available\n\nWednesday\n12\u20138PM\n\nThursday\n12\u20138PM\n\nFriday\n12\u20139PM\n\nSaturday\n12\u20139PM\n\nSunday\n12\u20138PM\n\nMonday\nClosed\n\nTuesday\nClosed",
+    "lat": 44.02803363956862,
+    "lon": -80.07042630406384,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Port-a-potty style toilets. No running water.",
+    "description": "",
+    "lat": 44.05129579563414,
+    "lon": -80.07790080268113,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Stream water can be treated",
+    "description": "",
+    "lat": 43.82176841611687,
+    "lon": -79.98935492035905,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Washrooms at parking lot for park",
+    "description": "",
+    "lat": 44.046279682294504,
+    "lon": -80.06131855869357,
+    "trailforks_type": "Parking"
+  },
+  {
+    "name": "You can take this trail for a short out-and-back to pretty lake",
+    "description": "",
+    "lat": 44.029842813856284,
+    "lon": -80.0692028820337,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Tenting spot",
+    "description": "For a secluded tenting/hammock area when you exit the park at the blue gate look for a trail across the road on left hand side. Cross the wooden bridge and after walking alongside the creek for about 150 meters you'll see a little opening in the trees on the right hand side. In among the pine trees is a large open area that would be great for tents and there is even a picnic table. Stream water can be treated. ",
+    "lat": 44.02772342767752,
+    "lon": -80.06836536734819,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Spring Water",
+    "description": "Pipe with spring water flowing through it. About halfway up the short steep climb on the right. Perhaps best to treat it. ",
+    "lat": 44.022087146361,
+    "lon": -80.05531727367149,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Water Tap",
+    "description": "There is a outside water tap on the community centre but says not potable so would need to be treated. ",
+    "lat": 44.026642118912605,
+    "lon": -80.07167678693799,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Pom Pom Treats",
+    "description": "Ice cream shop. Vegan options available and ice cream sandwiches\n1pm to 6pm",
+    "lat": 44.56213607444378,
+    "lon": -80.45269011722938,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Route Host",
+    "description": "Local family can provide tenting space on their beautiful property.  Contact Patti to determine availability and exact location. \n416 917 0714\n519 942 0135(landline)\npattipowell@me.com",
+    "lat": 44.03564060907535,
+    "lon": -80.08220204393349,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Duntroon Highlands Golf Club",
+    "description": "Cafe can offer food and drinks to riders for a 15% discount. Just say you are riding the BT700 route.\nHours:\n\nTuesday \u2013 Friday 9am \u2013 8pm\nSaturday \u2013 Monday 9am \u2013 6pm",
+    "lat": 44.37962234038229,
+    "lon": -80.2239857891893,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "BT Host",
+    "description": "Local rider is willing to let riders crash on his couch when available. Contact Alan Wood to arrange. \nalanjdwood@gmail.com\n(905) 616-7218",
+    "lat": 44.5571395178892,
+    "lon": -80.44676255155991,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Gas station convenience store",
+    "description": "",
+    "lat": 43.78473799990698,
+    "lon": -80.13592660743883,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "River",
+    "description": "Water can be treated.",
+    "lat": 43.82287993731723,
+    "lon": -80.01940416912585,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "River",
+    "description": "Water can be filtered and it's a great swimming hole.",
+    "lat": 44.17235118492812,
+    "lon": -80.1509829907146,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Stream",
+    "description": "Good water source for filtering or to cool down in.",
+    "lat": 44.314533781322645,
+    "lon": -80.42613488920404,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Port-a-potty",
+    "description": "",
+    "lat": 44.28528359668617,
+    "lon": -80.54288105703307,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Dar's Country Market",
+    "description": "Sunday10:00AM \u2013 5:00PM\nMonday10:00AM \u2013 6:00PM\nTuesday10:00AM \u2013 6:00PM\nWednesday10:00AM \u2013 6:00PM\nThursday9:00AM \u2013 6:00PM\nFriday9:00AM \u2013 6:00PM\nSaturday9:00AM \u2013 6:00PM",
+    "lat": 43.67406525028205,
+    "lon": -80.4256821672569,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "Open 24 hours",
+    "lat": 43.67533010886274,
+    "lon": -80.42643455359314,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Vito's Pizza",
+    "description": "",
+    "lat": 43.67700042913013,
+    "lon": -80.42881635519836,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Subway",
+    "description": "",
+    "lat": 43.67718665854076,
+    "lon": -80.42912212702606,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Gorge Country Kitchen",
+    "description": "",
+    "lat": 43.67494022771176,
+    "lon": -80.42593029829834,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Elora Gorge Lookout",
+    "description": "",
+    "lat": 43.68266110025673,
+    "lon": -80.43425881865915,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Route Detour",
+    "description": "If you wish not to ride the Glen Haffy/Oak Ridges trails further south you can take this easier route alternative to Palgrave. ",
+    "lat": 44.02623998080932,
+    "lon": -79.98773292347433,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Chalet",
+    "description": "24 hr water access. Plus a few taps around the camping areas. ",
+    "lat": 43.9271243898447,
+    "lon": -79.82246669103996,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Lost & Found Cafe",
+    "description": "8am to 6pm",
+    "lat": 43.681116591479906,
+    "lon": -80.43054441617343,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Horizon Restaurant",
+    "description": "Monday\n7AM\u20133PM\nTuesday\n7AM\u20133PM\nWednesday\n7AM\u20133PM\nThursday\n7AM\u20133PM\nFriday\n7AM\u20133PM\nSaturday\n7AM\u20133PM\nSunday\n7AM\u20133PM",
+    "lat": 43.70591477611593,
+    "lon": -80.37835323360751,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Vault Coffee Bar",
+    "description": "Monday\n7AM\u20135PM\nTuesday\n7AM\u20135PM\nWednesday\n7AM\u20135PM\nThursday\n7AM\u20135PM\nFriday\n7AM\u20135PM\nSaturday\n8AM\u20135PM\nSunday\n9AM\u20134PM",
+    "lat": 43.70584109567854,
+    "lon": -80.37819766548465,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "Open 24 hours",
+    "lat": 43.706526761271476,
+    "lon": -80.37765645322416,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "FreshCo Grocery Store",
+    "description": "8am to 8pm",
+    "lat": 43.71388081185325,
+    "lon": -80.39105676946257,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Subway",
+    "description": "",
+    "lat": 43.77043767403027,
+    "lon": -80.06442417301636,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Hortons",
+    "description": "Open 24hrs",
+    "lat": 43.781259210596126,
+    "lon": -80.07828053010874,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Subway",
+    "description": "",
+    "lat": 43.86957106063641,
+    "lon": -79.86680758623102,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Jimmy's Restaurant",
+    "description": "",
+    "lat": 43.96561097079224,
+    "lon": -79.8871235586559,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Chico's Pizza",
+    "description": "4 to 9pm",
+    "lat": 43.968475819589564,
+    "lon": -79.87326190246694,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Horton's ",
+    "description": "Open 24hrs",
+    "lat": 43.946876281544306,
+    "lon": -79.97188261550467,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Busy road crossing",
+    "description": "",
+    "lat": 44.098309554309424,
+    "lon": -80.10646857057705,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Harvey's",
+    "description": "",
+    "lat": 44.264320517904274,
+    "lon": -80.54740674466223,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Water from stream can be treated",
+    "description": "",
+    "lat": 44.28086463544257,
+    "lon": -80.54406509134785,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Water from creek can be treated",
+    "description": "",
+    "lat": 44.285834065980765,
+    "lon": -80.54346427652851,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Beaver River B&B",
+    "description": "",
+    "lat": 44.546434722819036,
+    "lon": -80.46459310630563,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Good Grief Coffee Roasters",
+    "description": "",
+    "lat": 44.561361122697086,
+    "lon": -80.45363273434486,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Horton's ",
+    "description": "4am to 12pm",
+    "lat": 44.564025163762174,
+    "lon": -80.45620679855347,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Caledon Trailway",
+    "description": "",
+    "lat": 43.9194686998161,
+    "lon": -79.84136382077865,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Start of a challenging hilly ride to Forks of the Credit Park. If you need an easier option here is gps routing for a ride that continues on the rail trail to Inglewood and then onto the park via McLaren Rd. ",
+    "lat": 43.82204776290604,
+    "lon": -79.92035536501261,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Steep rocky downhill",
+    "description": "",
+    "lat": 43.823143045964244,
+    "lon": -80.01829317849746,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Trail",
+    "description": "A couple tricky uphills and downhill",
+    "lat": 43.830853682874974,
+    "lon": -79.98016609189915,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Look for tunnel under road",
+    "description": "",
+    "lat": 43.84017235351101,
+    "lon": -79.9679993696397,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Pine River Log Home B&B",
+    "description": "15198060554",
+    "lat": 44.16075195228359,
+    "lon": -80.17263641959124,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Good Grief Coffee Roasters",
+    "description": "Closed Monday. Open till 4pm.",
+    "lat": 44.56156046326113,
+    "lon": -80.45338479554607,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Water Station",
+    "description": "On the south side of the Kimberley Hall/Librarythere is 24 hr water bottle refill station. \n",
+    "lat": 44.384108316063426,
+    "lon": -80.53593742181663,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Kimberly General Store",
+    "description": "Wed-Fri (10am to 6pm), Sat (8am-6pm), Sun (10am - 5pm) Closed Monday and Tuesday\nA fridge with cold drinks (and often baked goods) is available outside on the front porch during closed hours and pay is by the honor system.",
+    "lat": 44.38400436832161,
+    "lon": -80.53617096751412,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tenting Spot",
+    "description": "Clearing here by stream would be a good place for overnight tenting. This is crown land.\n",
+    "lat": 44.280929924349266,
+    "lon": -80.54414908552997,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "BT 700 Host",
+    "description": "Local cyclists are interested in hosting BT 700 riders for an evening. Tenting in backyard and washroom access. Contact charlotte.schwartzentruber@sympatico.ca or john.holmes@sympatico.ca to determine availability. 519-503-2523",
+    "lat": 44.57235685106122,
+    "lon": -80.47151319947886,
+    "trailforks_type": "Toilet"
+  },
+  {
+    "name": "Pop's Pizza",
+    "description": "Open till 8pm Mon-Thursday, 9pm Fri-Sat",
+    "lat": 43.53118626069983,
+    "lon": -80.5547157521878,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Hortons",
+    "description": "",
+    "lat": 43.53184071659929,
+    "lon": -80.55523570279473,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Ice Cream Salon",
+    "description": "",
+    "lat": 43.538002468300654,
+    "lon": -80.55398579339379,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Jacob's Grill Restaurant",
+    "description": "Monday:\n11:30 AM - 9:00 PM\nTuesday:\n11:30 AM - 9:00 PM\nWednesday:\n11:30 AM - 9:00 PM\nThursday:\n11:30 AM - 10:00 PM\nFriday:\n11:30 AM - 10:00 PM\nSaturday:\n11:30 AM - 10:00 PM\nSunday:\n11:30 AM - 3:00 PM",
+    "lat": 43.53909553890412,
+    "lon": -80.5535018700469,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Route Detour",
+    "description": "If not going into Mono Mills and need to detour away from the trails in Glen Haffy Conseravation area you can go east on Side Rd 5 to Mono Adjiala Townline Rd. Go south on this road to Hwy 9 and jog over to Glen Haffy Side Rd. ",
+    "lat": 43.97531784110119,
+    "lon": -79.97430741468473,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Kim's Place Restaurant",
+    "description": "",
+    "lat": 44.25642423288589,
+    "lon": -80.54094057315122,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Gilbert's To Go",
+    "description": "",
+    "lat": 44.30942259964704,
+    "lon": -80.39700070625719,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Busy road",
+    "description": "Stay on shoulder on right hand side of road until you enter trails. ",
+    "lat": 43.94776724422954,
+    "lon": -79.96375820258754,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Long climb with a couple steep pitches",
+    "description": "",
+    "lat": 44.16452277302193,
+    "lon": -80.14595726173377,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Farmers Market",
+    "description": "Brissell Park. Saturdays beginning in early May.",
+    "lat": 43.684315989417016,
+    "lon": -80.4237424680245,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Hortons",
+    "description": "Open 24hrs",
+    "lat": 43.781398639795604,
+    "lon": -80.07779372680045,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Steep rocky downhill",
+    "description": "",
+    "lat": 44.054791690273156,
+    "lon": -80.07763601534703,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Busy Road",
+    "description": "Can take path on side of road",
+    "lat": 43.94632388277471,
+    "lon": -79.97034437576355,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Very Busy Road",
+    "description": "Please ride on gravel shoulder",
+    "lat": 43.960156226781685,
+    "lon": -79.98049710660956,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Starbucks",
+    "description": "5:30am to 8pm (Mon-Friday)\n7:30 am to 8pm (Sat/Sun)",
+    "lat": 43.945982416171056,
+    "lon": -79.9706742598944,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Dew Drop Inn",
+    "description": "",
+    "lat": 44.00871474114322,
+    "lon": -80.07389768665678,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Boho Beaver Cabin",
+    "description": "",
+    "lat": 44.467893775022524,
+    "lon": -80.5037589419861,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Uni Camp",
+    "description": "Cottages and Dorms available for rent. Some restrictions may apply during their kids camp. Make sure to tell them you are riding the BT 700 bike route.\n519 925 6432 \nbookings@unicampofontario.ca",
+    "lat": 44.213939831138255,
+    "lon": -80.16776832517331,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Uni Camp",
+    "description": "Camping sites available for $26. Some restrictions may apply during their kids camp.  Make sure to tell them you are riding the BT 700 bike route.\n 519 925 6432 \nbookings@unicampofontario.ca",
+    "lat": 44.21484722011721,
+    "lon": -80.16791852887815,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Tenting Option",
+    "description": "Flat area by creek is a good area to pitch a tent. Riders recommend this spot",
+    "lat": 44.17200010276059,
+    "lon": -80.15103200642307,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Entering Mono Provincial Park. ",
+    "description": "Except for one tricky downhill section the trails in the park are fast, flowy and so much fun.",
+    "lat": 44.06397053508358,
+    "lon": -80.08180163950522,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Rocky Uphill",
+    "description": "Steep and rocky. A free butter tart for riders who make it clean.",
+    "lat": 44.3151246147557,
+    "lon": -80.42598695869447,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Wild Camping",
+    "description": "Flat spots after small bridge could be a nice place to rest for a night. ",
+    "lat": 44.31470864183869,
+    "lon": -80.42615617841864,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Wild Camping",
+    "description": "Lots of potential tent sites along Lower Valley Road.",
+    "lat": 44.344753094121955,
+    "lon": -80.53839069517426,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Wild Camping",
+    "description": "Flat area by old chairlifts on Sideroad 7A is a great tenting spot.  Space for multiple tents. Plus, fantastic view. But don't go down to Kimberly first as it's a very tough climb back up to this camping spot. ",
+    "lat": 44.38701410301003,
+    "lon": -80.55793138114797,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Good view of valley below",
+    "description": "",
+    "lat": 44.387118567990804,
+    "lon": -80.55780263511525,
+    "trailforks_type": "Viewpoint"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "  If needed an easier bypass would be to turn right here on sideroad 25 to 7th line. Take 7th south to meet up with the route.",
+    "lat": 44.49728216914952,
+    "lon": -80.52761454491224,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "This section features a rough doubletrack. If needed, a detour would be to continue on 3rd Line to meet up with Old Mail Rd.",
+    "lat": 44.53179376669153,
+    "lon": -80.53568716181849,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Tim Hortons",
+    "description": "5am to 9pm",
+    "lat": 43.96841867000338,
+    "lon": -79.87403869628906,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Wild Camping",
+    "description": "Probably can find a little spot down this trail to pitch a tent or string up a hammock. ",
+    "lat": 44.01942973755276,
+    "lon": -80.02929727908287,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Water Refill ",
+    "description": "Can fill up water bottles at Eagle Adventures. There is also 24 hour water access: The outside tap is inside the  doors for the stairs to the lower level. SE corner of Lodge. Or you can drink from the hose found on the right side of lodge.",
+    "lat": 44.44786536098524,
+    "lon": -80.43764658018375,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Aid Station",
+    "description": "Linda and Craig can provide assistance to riders as needed such as water, bike repair tools, hose for washing bike etc.  House located besides Mono Cliffs Inn.",
+    "lat": 44.028162622791605,
+    "lon": -80.07180601324853,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Water Refill ",
+    "description": "Riders can obtain drinking water at cabin with 677225 address sign. Cabin (black with white trim) is located on the left about halfway up the steep climb. Just go around  closed gate (wooden gate has openings) and the tap with a shower attached is on left (west) side of the cabin.",
+    "lat": 44.16297871505673,
+    "lon": -80.14510921576982,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Cedars of Lake Eugenia",
+    "description": "Cabins and Chalet\n1 800 747-7014\ninfo@cedarsresort.com",
+    "lat": 44.30737472526081,
+    "lon": -80.48147617147896,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Winroa Gardens",
+    "description": "Cheap ice cream, lots of baked goods and sandwiches. Closed Sunday",
+    "lat": 43.56979713504862,
+    "lon": -80.46597193434269,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "BT 700 Parking",
+    "description": "Contact me if you need  free multi-day parking in St. Jacobs",
+    "lat": 43.53856592173528,
+    "lon": -80.55072472080117,
+    "trailforks_type": "Parking"
+  },
+  {
+    "name": "West Montrose Family Camp",
+    "description": "519-669-2129 ",
+    "lat": 43.5901699995606,
+    "lon": -80.47422196937146,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Short trail down to waterfall",
+    "description": "",
+    "lat": 43.82228160820278,
+    "lon": -80.02087071245302,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Squire John's",
+    "description": "",
+    "lat": 44.52284202541456,
+    "lon": -80.29317696887665,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Bike Tool Stand",
+    "description": "Bike tools available in front of brewery",
+    "lat": 44.3250812564419,
+    "lon": -80.10540449744002,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Ansaku B&B",
+    "description": "519-986-7422",
+    "lat": 44.420701644231364,
+    "lon": -80.56336422033962,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Mono Community Centre",
+    "description": "24 hr port -a-potty",
+    "lat": 44.026915120870775,
+    "lon": -80.07132724022142,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Cool Scoop Ice Cream Parlour",
+    "description": "",
+    "lat": 43.79556438633339,
+    "lon": -80.01362446634909,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Common Good Cafe and General Store",
+    "description": "",
+    "lat": 43.79407747720657,
+    "lon": -80.0146007904305,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Higher Ground Coffee Co.",
+    "description": "",
+    "lat": 43.79448018541491,
+    "lon": -80.01438760375083,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "BT Host - Tailwinds B&B",
+    "description": "Tailwinds B&B has land for BT 700 riders to pitch a tent. $20 for each tent and $5 for a shower.  They also have a camping shelter that can sleep two people. (519) 855-3242",
+    "lat": 43.7844929865704,
+    "lon": -80.14494285071476,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Foodland Grocery Store",
+    "description": "7am to 10pm",
+    "lat": 43.7902694130768,
+    "lon": -80.14458879912479,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Wild Camping",
+    "description": "Fishing area off of dirt road probably a good area to pitch a tent. See Overlander link. ",
+    "lat": 44.163550198761456,
+    "lon": -80.1611699835268,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Wild Camping",
+    "description": "See link for information on camping spot.  Look for dirt road turn off of the main road and then there are some clearings that could work for stealth camping.",
+    "lat": 44.40652945607903,
+    "lon": -80.43737033113997,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 43.602639158834165,
+    "lon": -80.55984438279881,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 43.86618740953578,
+    "lon": -79.86319604962966,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Agostino's Fine Foods",
+    "description": "Great prepared foods like sandwiches and baked goods. ",
+    "lat": 43.86899482831738,
+    "lon": -79.86497282981873,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Detour",
+    "description": "Keep riding straight if you need supplies at the Hockley Valley store.",
+    "lat": 44.028310862445515,
+    "lon": -79.98824281037537,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Private Camping",
+    "description": "Landowner at marker 677225 has offered BT 700 riders the option of camping on his cabin property for an evening. Beautiful area. Water from tap on left side of cabin is drinkable and can be used for showering.  Electrical outlets on cabin also work. \nLocated half way up the big climb on the east side just after you cross a creek if you are traveling south. \n\nReach the cabin owner at johndondertman@gmail.com or text/call him at 416 6059548 for permission and the lock combo.\n",
+    "lat": 44.16230255820973,
+    "lon": -80.14390664816818,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "BT 700 Host",
+    "description": "Hyo-Nee and Craig can provide tenting space for riders. Contact them to see if this is available.\n367004 Mono Centre Rd\n647-692-9232 / 416-908-2341\nhyoeun.shin@icloud.com\ncfleetwood@me.com\nThey are also warmshowers hosts\n\n",
+    "lat": 44.02790420274114,
+    "lon": -80.0717834411339,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Superburger",
+    "description": "",
+    "lat": 44.09141857365267,
+    "lon": -80.13958345606915,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Public Library",
+    "description": "Wifi Access",
+    "lat": 44.258758124879435,
+    "lon": -80.54464674009068,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Flesherton Famers' Market",
+    "description": "Open Saturdays",
+    "lat": 44.25914232070727,
+    "lon": -80.54355239881261,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.541771310864874,
+    "lon": -80.46085878508893,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.54216894636817,
+    "lon": -80.46085878508893,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Ashanti Coffee",
+    "description": "",
+    "lat": 44.56121705132948,
+    "lon": -80.45350371147123,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Eagle Adventures/Bowering Guesthouse",
+    "description": "Tenting spots available as well as showers and fire pits. 705-888-2551\nboweringr@gmail.com\nPlus the owner Richard is the nicest guy around. A highly recommended overnight spot",
+    "lat": 44.447889240564436,
+    "lon": -80.4399952107251,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Hillsburgh Library",
+    "description": "Wifi Access",
+    "lat": 43.78578687937902,
+    "lon": -80.14266055669651,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Jess for You Cafe",
+    "description": "Rumor of amazing butter tarts! Monday\n6AM\u20133PM\nTuesday\n6AM\u20135PM\nWednesday\n6AM\u20135PM\nThursday\n6AM\u20135PM\nFriday\n6AM\u20136PM\nSaturday\n8AM\u20134PM\nSunday\nClosed",
+    "lat": 43.790811554191556,
+    "lon": -80.14486533250675,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Hillsburgh House B&B",
+    "description": "1 (519) 855-9487",
+    "lat": 43.78758729632785,
+    "lon": -80.14207315292225,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Tailwinds B&B",
+    "description": "Cycling friendly accommodation.  Discount on rooms for BT participants  ",
+    "lat": 43.78427610778984,
+    "lon": -80.1453776344286,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Grand River Viewpoint",
+    "description": "",
+    "lat": 43.68960677551602,
+    "lon": -80.39920122067588,
+    "trailforks_type": "Viewpoint"
+  },
+  {
+    "name": "Foodland Grocery Store",
+    "description": "",
+    "lat": 43.585967960362446,
+    "lon": -80.56178268776637,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Holiday Inn Express",
+    "description": "BT 700 riders can obtain a special room rate by reserving using the link on this page: http://www.bt700.ca/bt-friends.html\n",
+    "lat": 43.5091769822566,
+    "lon": -80.55633472801578,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "St. Jacob's Farmers Market",
+    "description": "Tuesday (summer), Thursday and Saturday.",
+    "lat": 43.511810489447036,
+    "lon": -80.55627973304973,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Queensway Landing B&B",
+    "description": "",
+    "lat": 43.53839227327231,
+    "lon": -80.55511348094285,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Bauman House B&B",
+    "description": "",
+    "lat": 43.538851142393106,
+    "lon": -80.55556945647538,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "EcoCafe",
+    "description": "Bike Friendly Cafe. Strong supporter of the BT 700. Red tractor is th official start and end point of BT700 ",
+    "lat": 43.540648887550965,
+    "lon": -80.5536463126117,
+    "trailforks_type": "Trailhead"
+  },
+  {
+    "name": "Stone Crock Bakery",
+    "description": "Great butter tarts\n\nThursday\t8a.m.\u20135p.m.\nFriday\t8a.m.\u20135p.m.\nSaturday\t8a.m.\u20135p.m.\nSunday\t11a.m.\u20135p.m.\nMonday\t8a.m.\u20135p.m.\nTuesday\t8a.m.\u20135p.m.\nWednesday\t8a.m.\u20135p.m.",
+    "lat": 43.5392160881985,
+    "lon": -80.5534617185599,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Breadalbane  Inn",
+    "description": "",
+    "lat": 43.70203030599808,
+    "lon": -80.38169264149263,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Walmart",
+    "description": "",
+    "lat": 43.71248493159765,
+    "lon": -80.38933157276705,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "White Garden B&B",
+    "description": "",
+    "lat": 43.68736721493387,
+    "lon": -80.42581079982745,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Sweet Ella's B&B",
+    "description": " 519-846-8195",
+    "lat": 43.6822675930224,
+    "lon": -80.42766157966594,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Drew House B&B",
+    "description": "519-846-2226 ",
+    "lat": 43.68465133446968,
+    "lon": -80.42435259552394,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Block Three Brewing",
+    "description": "11-5 Sunday - Wednesday\n\n11-6 Thursday\n\n11-8 Friday - Saturday",
+    "lat": 43.54029410844303,
+    "lon": -80.55286757887922,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Elora Cataract Trail",
+    "description": "",
+    "lat": 43.823051453412724,
+    "lon": -80.02123658135821,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Oak Ridges Trail",
+    "description": "Caution on any bridge sections in the next couple sections of trail. Some areas might be a bit overgrown - watch for any hidden obstacles like tree stumps. ",
+    "lat": 43.933728403518344,
+    "lon": -79.9297642943717,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Pizza Tme",
+    "description": "",
+    "lat": 43.945260625893546,
+    "lon": -79.96959836061069,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "Open 24hrs",
+    "lat": 43.94673337653785,
+    "lon": -79.97165590498065,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Glen Haffy Trails",
+    "description": "Start of a fun stretch of not-to-technical singletrack. There are a couple uphill kickers. Look for trail entrance behind the metal road guard. ",
+    "lat": 43.948176157958585,
+    "lon": -79.96289573699414,
+    "trailforks_type": "Trailhead"
+  },
+  {
+    "name": "Trail Bumps",
+    "description": "A short section of step ups that will require bike pushing. But after this most of the trail is great. ",
+    "lat": 43.94829090032328,
+    "lon": -79.962668424931,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Hockley General Store",
+    "description": "Prepared meals, bakery, groceries, beer.  Open seven days a week.",
+    "lat": 44.021649435952234,
+    "lon": -79.96898824171552,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Steep, loose downhill",
+    "description": "",
+    "lat": 44.02141149990424,
+    "lon": -80.02079509155647,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Wild Camping",
+    "description": "A couple spots where it would be possible to pitch a tent or string up a hammock on this double track section. ",
+    "lat": 44.02197884457792,
+    "lon": -80.01711783297799,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "The Liberty Inn",
+    "description": "",
+    "lat": 43.825199749978836,
+    "lon": -80.02118812548089,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Bailey's Ice Cream Shop",
+    "description": "",
+    "lat": 43.768347755436906,
+    "lon": -80.06158384379637,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Holtom's Bakery",
+    "description": "8am to 6pm (Wed-Sat)\n8am to 5pm (Sun)\nClosed Mon, Tues",
+    "lat": 43.769337522094,
+    "lon": -80.06278815564406,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Grocery Store",
+    "description": "",
+    "lat": 43.769844989057795,
+    "lon": -80.06484272774946,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tin Roof Cafe",
+    "description": " 519-833-2187 ",
+    "lat": 43.76624685274845,
+    "lon": -80.05829572677612,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Main Street Ice Cream",
+    "description": "",
+    "lat": 43.87160278559081,
+    "lon": -79.86913179613941,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Gabe's Country Bake Shoppe",
+    "description": "Excellent slices of pizza.\nMon-Fri\t8am-8pm\nSat\t9am-6pm\nSun\t9am-6pm",
+    "lat": 43.86983589762246,
+    "lon": -79.86659479387731,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Foodland Grocery",
+    "description": "Open 24hrs",
+    "lat": 43.86627401239047,
+    "lon": -79.86082804449529,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Palgrave Variety",
+    "description": "8am to 10pm",
+    "lat": 43.95040796478082,
+    "lon": -79.83643715713993,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Albion Conservation Area",
+    "description": "To register a campsite, continue on main road through the park to the check-in building by Hwy 50.",
+    "lat": 43.934215553918804,
+    "lon": -79.83226278570226,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Goodlot Brewery",
+    "description": "Worth the detour. Open Thurs-Sunday. Food trucks Thursday and Friday evenings and during the day Saturday and Sunday. ",
+    "lat": 43.819727652958086,
+    "lon": -80.06089210510254,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Caledon Hills Cycling",
+    "description": "Saturday\t10a.m.\u20135p.m.\nSunday\tClosed\nMonday\tClosed\nTuesday\t10a.m.\u20136p.m.\nWednesday\t10a.m.\u20136p.m.\nThursday\t10a.m.\u20136p.m.\nFriday\t10a.m.\u20136p.m.",
+    "lat": 43.7957978734699,
+    "lon": -79.93267866254871,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Elora Bread Company",
+    "description": "Sunday - 10am-4pm\nMonday - Closed\nTuesday - 10am-5pm\nWednesday - 10am-5pm\nThursday - 10am-5pm\nFriday - 10am-5pm\nSaturday - 10am-4pm",
+    "lat": 43.68180902015587,
+    "lon": -80.42977523456187,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Fergus Library",
+    "description": "",
+    "lat": 43.704811305490516,
+    "lon": -80.37845458273597,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "The  Bicycle Taylor",
+    "description": "By appointment only",
+    "lat": 43.70658468225349,
+    "lon": -80.37713225369163,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Brew House on the Grand",
+    "description": "",
+    "lat": 43.70576838463179,
+    "lon": -80.37722076658912,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Zehr's Grocery Store",
+    "description": "",
+    "lat": 43.69793640383845,
+    "lon": -80.36914463524528,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Best Western",
+    "description": "",
+    "lat": 43.71331687357679,
+    "lon": -80.38829326629639,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Wreckless Eric",
+    "description": "6am to 4pm (Mon - Fri)\n8am to 4pm (Sat-Sun)",
+    "lat": 43.68197084937304,
+    "lon": -80.43010168558487,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Village Inn Elora",
+    "description": "1 888 733 3567",
+    "lat": 43.67690328563569,
+    "lon": -80.42832533233172,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "The Elora cafe",
+    "description": "Tuesday\n8AM\u20134PM\n\nWednesday\n8AM\u20134PM\n\nThursday\n8AM\u20134PM\n\nFriday\n8AM\u20135PM\n\nSaturday\n8AM\u20136PM\n\nSunday\n8AM\u20135PM\n\nMonday\n8AM\u20134PM",
+    "lat": 43.68432448660546,
+    "lon": -80.43144084253309,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Elora Brewing Company",
+    "description": "Monday - Thursday 11 am - 11 pm\nFriday - Saturday 11 am -  1 am\nSunday11 am - 9 pm",
+    "lat": 43.68352263150248,
+    "lon": -80.43026211498204,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Highland Pines",
+    "description": "(519) 843-2537\n1 (877) 211-7044",
+    "lat": 43.77446977862532,
+    "lon": -80.343840705307,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Elora Gorge Conservation Area",
+    "description": "",
+    "lat": 43.67106753751267,
+    "lon": -80.44274889790502,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Belwood Country Market",
+    "description": "Awesome baked goods including famed butter tarts for low $$\nAlso some prepared foods and sandwiches",
+    "lat": 43.79230271190044,
+    "lon": -80.32125905874221,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Kissing Bridge",
+    "description": "Ontario's last remaining historic covered bridge. Built in 1881, As seen in the remake of Stephen King's IT - Seriously! ",
+    "lat": 43.58546537361558,
+    "lon": -80.48139069865738,
+    "trailforks_type": "Bridge"
+  },
+  {
+    "name": "Lost Acre Variety",
+    "description": "Cheap buttertarts and lots of other tasty eats. Closed Sunday and Monday",
+    "lat": 43.58666581708707,
+    "lon": -80.48251283000354,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Elora Gorge Viewpoint",
+    "description": "",
+    "lat": 43.68183249133333,
+    "lon": -80.4349618365901,
+    "trailforks_type": "Viewpoint"
+  },
+  {
+    "name": "Feversham General Store",
+    "description": "",
+    "lat": 44.34034838902859,
+    "lon": -80.37402915999138,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Hogg's Falls",
+    "description": "Excellent place to camp behind parking lot by the stream. Very tranquil. And a port-a-potty. This is crown land.",
+    "lat": 44.28552147106622,
+    "lon": -80.54315142593384,
+    "trailforks_type": "Parking"
+  },
+  {
+    "name": "Wild Camping",
+    "description": "Flat spot by the river in the woods could make for a nice tenting spot.",
+    "lat": 44.29277476718517,
+    "lon": -80.54014388947036,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Tenting Spot",
+    "description": "Riders recommend flat spot here for camping with good view. Access from 2-track on right before rocky descent to creek. ",
+    "lat": 44.48519255286374,
+    "lon": -80.52519697225962,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Steep, rocky downhill",
+    "description": "",
+    "lat": 44.48643836706435,
+    "lon": -80.52500247954777,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Subway",
+    "description": "",
+    "lat": 44.09056728224452,
+    "lon": -80.13832534239702,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Country Cabin Restaurant",
+    "description": "",
+    "lat": 44.08918791213421,
+    "lon": -80.14765942976885,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Shelburn Motel",
+    "description": "5199255552",
+    "lat": 44.09091404620644,
+    "lon": -80.14255344205611,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Primrose Park",
+    "description": "(519) 925-2848",
+    "lat": 44.08763026170049,
+    "lon": -80.13812243276345,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Emily's Place Bed & Breakfast",
+    "description": "1 705-795-5733",
+    "lat": 44.32470713164881,
+    "lon": -80.10242265756557,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Creemore Springs Brewery",
+    "description": "Rumors of free samples in their retail store. ",
+    "lat": 44.32503355222385,
+    "lon": -80.10549967327108,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Creemore Public Library",
+    "description": "Wifi Access",
+    "lat": 44.326555155831386,
+    "lon": -80.10333513059607,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Creemore ",
+    "description": "Various food services",
+    "lat": 44.32646305484368,
+    "lon": -80.10599531811181,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Some rocky/rough sections on downhill",
+    "description": "",
+    "lat": 44.346424288557785,
+    "lon": -80.19023675962404,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "New Lowell Conservation Area",
+    "description": "",
+    "lat": 44.35559407925914,
+    "lon": -79.97324546485413,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Mylar & Loreta's Restaurant",
+    "description": "",
+    "lat": 44.35025232447326,
+    "lon": -80.25117684983849,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Esso Gas Station",
+    "description": "Convenience style store attached. They sell tasty samosas. \nTuesday\n7AM\u20138PM\n\nWednesday\n7AM\u20138PM\n\nThursday\n7AM\u20138PM\n\nFriday\n7AM\u20138PM\n\nSaturday\n7AM\u20138PM\n\nSunday\n8AM\u20137PM\n\nMonday\n7AM\u20138PM",
+    "lat": 44.35024509871319,
+    "lon": -80.25086967094336,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Avalon Clearview B&B",
+    "description": "705-444-8541",
+    "lat": 44.36141494393172,
+    "lon": -80.21348519366529,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Ravenna Country Market",
+    "description": "Famed butter tarts as well as many different food options. \n\nWednesday\n9AM\u20136PM\n\nThursday\n9AM\u20136PM\n\nFriday\n9AM\u20136PM\n\nSaturday\n9AM\u20136PM\n\nSunday\n9AM\u20136PM\n\nMonday\n9AM\u20136PM\n\nTuesday\n9AM\u20136PM",
+    "lat": 44.46954738996634,
+    "lon": -80.41739624518812,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Bowering Guesthouse/Eagle Adventures",
+    "description": "BT 700 friendly accommodation. Bunk beds also available. Guest have use of a kitchen.  705-888-2551\nboweringr@gmail.com\nIdentify yourself as being \"on the tour\" for a special rate. They will waive the 2 night minimum stay. ",
+    "lat": 44.44796325631724,
+    "lon": -80.43872893472951,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Ladybank Farm",
+    "description": "info@ladybankfarm.com",
+    "lat": 44.366716512158675,
+    "lon": -80.40027312115961,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Hawthorn Cottages & Camping",
+    "description": "Bunkie cabins available. Owner has allowed for 1 night stays for riders if not booked.  ",
+    "lat": 44.310245633082204,
+    "lon": -80.48315763473511,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Village Pizza",
+    "description": "Open 7 days a week",
+    "lat": 44.26186697162095,
+    "lon": -80.55003221400693,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Artemisia Cheese and Fine Food",
+    "description": "Also makes sandwiches, various meats",
+    "lat": 44.262005275094985,
+    "lon": -80.55068667300657,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Bakery",
+    "description": "Friday\n\t\n\n    8a.m.\u20135p.m.\n\n\t\nSaturday\n\t\n\n    8a.m.\u20134p.m.\n\n\t\nSunday\n\t\n\n    9a.m.\u20132p.m.\n\n\t\nMonday\n\t\n\n    Closed\n\n\t\nTuesday\n\t\n\n    Closed\n\n\t\nWednesday\n\t\n\n    8a.m.\u20135p.m.\n\n\t\nThursday\n\t\n\n    8a.m.\u20135p.m.",
+    "lat": 44.26194476736512,
+    "lon": -80.55062229999021,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Leelas Villa Inn ",
+    "description": "A popular spot for BT 700 riders. Offering 10% discount on rooms - say BT 700 when booking. On site restaurant. Free breakfast if you book directly through them. Ring door bell if closed.  519-924-3300",
+    "lat": 44.25629590573286,
+    "lon": -80.54094821715734,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Hickling House B&B",
+    "description": "",
+    "lat": 44.26285214598115,
+    "lon": -80.55119305867959,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Hogg's Falls",
+    "description": "Very nice waterfall area. ",
+    "lat": 44.28630256865916,
+    "lon": -80.54335714721475,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "The Treehouse B&B",
+    "description": "https://www.ontariobybike.ca/accommodations/the-treehouse-bed-a-breakfast",
+    "lat": 44.33845619018834,
+    "lon": -80.50614482624167,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Public Library",
+    "description": "Free wifi outside of building. And a hose available.",
+    "lat": 44.38433264195249,
+    "lon": -80.53616472016404,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Justin's Oven",
+    "description": "Dinner starts at 5pm (Thurs-Sat), Sunday brunch 10:30am to 2pm",
+    "lat": 44.38379911983729,
+    "lon": -80.53623495110104,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Blackbird Pie Company",
+    "description": "9am to 5pm (Closed Sunday). Riders report amazing butter tarts. Plus sandwiches",
+    "lat": 44.49998005266633,
+    "lon": -80.4935608483015,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Craigleiht Provincial Park",
+    "description": "",
+    "lat": 44.53673525855665,
+    "lon": -80.34935382092137,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Georgian Manor B&B",
+    "description": "519.599.3999",
+    "lat": 44.5617602253672,
+    "lon": -80.4568654320982,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Penny's Motel",
+    "description": "519-599-3909",
+    "lat": 44.55810616543094,
+    "lon": -80.44392849879313,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Foodland Grocery Store",
+    "description": "7am to 10pm",
+    "lat": 44.565237256601755,
+    "lon": -80.4598084802692,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Thornbury Cidery",
+    "description": "Craft beer and cider. 11am-6pm (Sun-Thrus), 11am - 8pm (Fri, Sat)",
+    "lat": 44.55988468744051,
+    "lon": -80.44617743524094,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Smitty's Bicycle Shop",
+    "description": "Espresso, baked goods and Smoothies also available. 9am - 4pm. Closed Monday",
+    "lat": 44.56088988457999,
+    "lon": -80.45396159453871,
+    "trailforks_type": "Bike Shop"
+  },
+  {
+    "name": "Beaver Motel",
+    "description": "",
+    "lat": 44.55762909481709,
+    "lon": -80.44306353812516,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Thornbury Bakery",
+    "description": "8am to 4pm 7 Days a Week",
+    "lat": 44.56162485007826,
+    "lon": -80.45332159809914,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Goldsmith's Market",
+    "description": "9am to 6pm 7 days a week",
+    "lat": 44.570866087079885,
+    "lon": -80.4763126373291,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Frying Pan Diner",
+    "description": "",
+    "lat": 44.26865113579328,
+    "lon": -80.54235935211182,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Beaver Valley Basecamp",
+    "description": "Bunkie also available",
+    "lat": 44.400553489125045,
+    "lon": -80.53352408075864,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Forest Cabin",
+    "description": "",
+    "lat": 43.7778385092038,
+    "lon": -80.15298473146434,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Community Coffee Cafe",
+    "description": "",
+    "lat": 43.68167445895184,
+    "lon": -80.42996942996979,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "",
+    "lat": 43.584043870991565,
+    "lon": -80.56189660573692,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "A&W",
+    "description": "",
+    "lat": 43.57652340664265,
+    "lon": -80.5629077279415,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tenting Spot",
+    "description": "Flat area down by the river can be used for descret camping.",
+    "lat": 43.53973489245734,
+    "lon": -80.5505095630162,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 43.687313520083556,
+    "lon": -80.43429481081895,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 43.687343101962,
+    "lon": -80.434491624761,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Hidden Oasis",
+    "description": "",
+    "lat": 43.597416588175115,
+    "lon": -80.41153787431001,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Reis Kamp",
+    "description": "",
+    "lat": 43.58301546607597,
+    "lon": -80.55033173177372,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "St. Jacob's Village Suites",
+    "description": "+15194989395",
+    "lat": 43.54032794712652,
+    "lon": -80.55435352865895,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Route Host",
+    "description": "Resident is able to host BT riders when available. Can also provide water. 639142 St. Vincent- Sydenham Townline. Contact Gale to determine availability. 519-379-1536\ngspencer59@hotmail.com",
+    "lat": 44.6372501176984,
+    "lon": -80.73832349400301,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.56340118445086,
+    "lon": -80.45394799732597,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.61332733484541,
+    "lon": -80.60681164997153,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Back Forty Glamping",
+    "description": "",
+    "lat": 44.58069086903088,
+    "lon": -80.70057087122504,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.58780598010703,
+    "lon": -80.87992625653303,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Cottonwood Manor",
+    "description": "",
+    "lat": 43.573682162271254,
+    "lon": -80.84118194716312,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Noah's Pizza",
+    "description": "",
+    "lat": 43.58056823309056,
+    "lon": -80.72629575508921,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "BT Host",
+    "description": "Landowner is offering camping space on his property. Contact Chris to determine availability and exact location. christopher.a.scott@gmail.com \n5194892312 (no texts)",
+    "lat": 44.32229651554021,
+    "lon": -81.31434691709741,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Grocery Store",
+    "description": "",
+    "lat": 44.594954172947624,
+    "lon": -80.57964263790394,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Roebuck campground access",
+    "description": "If going to Roebuck campground you can take the Tom Thompson trail here to access the site.",
+    "lat": 44.61049052323682,
+    "lon": -80.72758449228473,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "BT Host",
+    "description": "Local who lives near Big Bay can offer tenting space for riders. Contact for availability and exact locaation. general.leung@gmail.com",
+    "lat": 44.785706582731976,
+    "lon": -80.95046367814503,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Fordwich Diner",
+    "description": "Wednesday\n8\u202fAM\u20137\u202fPM\n\nThursday\n8\u202fAM\u20137\u202fPM\n\nFriday\n8\u202fAM\u20137\u202fPM\n\nSaturday\n8\u202fAM\u20137\u202fPM\n\nSunday\n9\u202fAM\u20132\u202fPM\n\nMonday\nClosed\n\nTuesday\n8\u202fAM\u20137\u202fPM",
+    "lat": 43.872225684770356,
+    "lon": -81.03108616475762,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "River Viewpoint",
+    "description": "",
+    "lat": 44.302655415700414,
+    "lon": -81.27641707850087,
+    "trailforks_type": "Viewpoint"
+  },
+  {
+    "name": "Public Beach",
+    "description": "",
+    "lat": 44.6105610989575,
+    "lon": -80.5905024642068,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "AirBNB",
+    "description": "Landowner has an Airbnb that BT riders can book directly. \n5558 line 84\n519.496.8967 \n jasmin.hofer@gmail.com ",
+    "lat": 43.706196463601394,
+    "lon": -80.94000355872052,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "BT Host",
+    "description": "Landowner can provide tenting space. Might be a fee. \n5558 line 84\n519.496.8967 \n jasmin.hofer@gmail.com ",
+    "lat": 43.70551394981733,
+    "lon": -80.93760029944318,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "tenting space available",
+    "lat": 44.796570875564505,
+    "lon": -80.92599140942725,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "Bunkie available",
+    "lat": 44.79617498153793,
+    "lon": -80.92689263165626,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Fairly steep downhill switchbacks",
+    "description": "",
+    "lat": 44.76964424138825,
+    "lon": -80.93373101148494,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Route Option",
+    "description": "For a side-trip to two epic lookouts continue straight on this dirt road. When you get to a T-junction where the Bruce trail runs in about 1.5km make a right on the dirt road and you'll come to the lookouts. At the second lookout you need to backtrack as the road does not continue through. The first lookout is about 2km and the second is about 2.5km from this intersection. ",
+    "lat": 44.784307246625296,
+    "lon": -81.01396358195316,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Tenting spot",
+    "description": "Large flat area by lookout would make for a picturesque camping spot",
+    "lat": 44.795716837649984,
+    "lon": -81.00938524183631,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Georgian Bay Lookout",
+    "description": "",
+    "lat": 44.796699670870105,
+    "lon": -81.00312400726779,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Georgian Bay Lookout",
+    "description": "",
+    "lat": 44.79572135307018,
+    "lon": -81.00953985123141,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "East Linton Side Trail",
+    "description": "Don't take the Sarawak switchbacks beside this trail. They are much steeper than the trail you want to be on.",
+    "lat": 44.64930124963192,
+    "lon": -80.96425061625298,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Ainsly Conservation Area",
+    "description": "Some areas down by the beach that are excellent for discreet camping. Picnic shelter and outhouse. Great sunsets. ",
+    "lat": 44.6296438770299,
+    "lon": -80.870811700845,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Nice stone beach where you can swim",
+    "description": "",
+    "lat": 44.62962097108909,
+    "lon": -80.87292528154873,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Hills Bike Shop",
+    "description": "Owner is offering showers to passing by cyclists. Deluxe Pitstop which features laundry, hot shower, coffee break, energy bar re-load and bike repair services including a DIY work stand. ",
+    "lat": 44.606383854696034,
+    "lon": -80.59195381977946,
+    "trailforks_type": "Bike Shop"
+  },
+  {
+    "name": "Pom Pom",
+    "description": "Ice Cream Shop",
+    "lat": 44.607035521556064,
+    "lon": -80.59166511462992,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Hills Bike Shop",
+    "description": "Bike shop with apartment rentals. Bt 700 riders can take advantage of a 10% discount.\neric@hillsmeaford.com",
+    "lat": 44.60640402990701,
+    "lon": -80.59209183312484,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Hills Bicycle Shop",
+    "description": "Monday & Tuesday  \n10:00 a.m. to 4:00 p.m.\nWednesday to Friday  \n10:00 a.m. to 6:00 p.m.\nSaturday & Sunday  \n10:00 a.m. to 5:00 p.m.\n\nDeluxe Pitstop which features laundry, hot shower, coffee break, energy bar re-load and bike repair services including a DIY work stand. ",
+    "lat": 44.60643661977065,
+    "lon": -80.59188569369803,
+    "trailforks_type": "Bike Shop"
+  },
+  {
+    "name": "Swimming Beach",
+    "description": "",
+    "lat": 44.60223489855062,
+    "lon": -80.56579847462194,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "Riders can choose to stay on rail trail",
+    "lat": 44.60040421743979,
+    "lon": -80.58593343048393,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Busy Hwy",
+    "description": "Ride on gravel shoulder",
+    "lat": 44.59505782871229,
+    "lon": -80.72333164056474,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Unmaintained Road",
+    "description": "Be aware of a few ruts",
+    "lat": 44.56478218093571,
+    "lon": -80.70035702771847,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "LCBO",
+    "description": "",
+    "lat": 44.564484906785395,
+    "lon": -80.45812396954912,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "New Orleans Pizza",
+    "description": "",
+    "lat": 44.56213798549063,
+    "lon": -80.4530395572024,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Mill Cafe",
+    "description": "",
+    "lat": 44.56158397696475,
+    "lon": -80.45213302274738,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Corner Cafe and Grill",
+    "description": "",
+    "lat": 44.561639397823086,
+    "lon": -80.45281162162814,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tenting spot",
+    "description": "There is a small flat area tucked into the cedars that can fit a small tent. Look for fire pit.",
+    "lat": 44.56667686899584,
+    "lon": -80.46123056337217,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Subway",
+    "description": "",
+    "lat": 44.59784907066859,
+    "lon": -80.58519282600048,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Swimming beach",
+    "description": "",
+    "lat": 44.61192794872197,
+    "lon": -80.59365787765148,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Some streaming spring water along this road",
+    "description": "",
+    "lat": 44.53498971931398,
+    "lon": -80.93774281462944,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Can be a few rough spots on this road",
+    "description": "",
+    "lat": 44.6581117315469,
+    "lon": -80.73799749051338,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "The Blended Brew & Co",
+    "description": "Coffee, baked goods, sandwiches",
+    "lat": 44.61557248944609,
+    "lon": -81.08772003600602,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Hortons",
+    "description": "Friday\n5AM\u201310PM\n\nSaturday\n5AM\u201310PM\n\nSunday\n5AM\u201310PM\n\nMonday\n5AM\u201310PM\n\nTuesday\n5AM\u201310PM\n\nWednesday\n5AM\u201310PM\n\nThursday\n5AM\u201310PM",
+    "lat": 44.49063150683923,
+    "lon": -81.37594699859619,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Bare Necessities Convenience Store",
+    "description": "Friday\n8AM\u20139PM\n\nSaturday\n8AM\u20139PM\n\nSunday\n10AM\u20136PM\n\nMonday\n8AM\u20139PM\n\nTuesday\n8AM\u20139PM\n\nWednesday\n8AM\u20139PM\n\nThursday\n8AM\u20139PM",
+    "lat": 43.86798763344833,
+    "lon": -81.03146794678491,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Just Like Mom's",
+    "description": "Breakfast Diner\nTuesday\nClosed\n\nWednesday\n8AM\u20133PM\n\nThursday\n8AM\u20133PM\n\nFriday\n8AM\u20133PM\n\nSaturday\n8AM\u20133PM\n\nSunday\nClosed\n\nMonday\nClosed",
+    "lat": 44.50260033484499,
+    "lon": -81.3655685255026,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Dizzy Bird Coffee",
+    "description": "Tuesday\n7AM\u20136PM\n\nWednesday\n7AM\u20136PM\n\nThursday\n7AM\u20136PM\n\nFriday\n7AM\u20136PM\n\nSaturday\n7AM\u20136PM\n\nSunday\n7AM\u20136PM\n\nMonday\n7AM\u20136PM",
+    "lat": 44.495896776878965,
+    "lon": -81.37173258012312,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tomboi Artisan Ice Cream",
+    "description": "",
+    "lat": 44.3053996238291,
+    "lon": -81.27277889833113,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Harley's Pub and Perk",
+    "description": "Tuesday\n5:30AM\u20138PM\n\nWednesday\n5:30AM\u20139PM\n\nThursday\n5:30AM\u201310PM\n\nFriday\n5:30AM\u201310PM\n\nSaturday\n12\u201310PM\n\nSunday\n9:30AM\u20137PM\n\nMonday\n5:30AM\u20132PM",
+    "lat": 44.042375010613696,
+    "lon": -81.11913952418749,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Ted's Range Road Diner",
+    "description": "Monday\nClosed\n\nTuesday\nClosed\n\nWednesday\nClosed\n\nThursday\n3\u20139PM\n\nFriday\n3\u20139PM\n\nSaturday\n3\u20139PM\n\nSunday\n3\u20139PM",
+    "lat": 44.63432610126749,
+    "lon": -80.66208837673193,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Irish Mountain",
+    "description": "",
+    "lat": 44.6412366921945,
+    "lon": -80.66486745287382,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Hipcamp Listing",
+    "description": "",
+    "lat": 44.626916408404554,
+    "lon": -80.66113381792509,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Hipcamp Listing",
+    "description": "Maybe cheaper price for less people.",
+    "lat": 44.3176867989591,
+    "lon": -81.2799775721564,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Casero Kitchen",
+    "description": "Mexican Food\nThursday\n12\u20138PM\n\nFriday\n12\u20139PM\n\nSaturday\n12\u20139PM\n\nSunday\nClosed\n\nMonday\nClosed\n\nTuesday\n12\u20138PM\n\nWednesday\n12\u20138PM",
+    "lat": 44.56665490021967,
+    "lon": -80.9414757977591,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Village Pizzaria",
+    "description": "Thursday\n11:30AM\u20138PM\n\nFriday\n11:30AM\u20139PM\n\nSaturday\n11:30AM\u20138PM\n\nSunday\nClosed\n\nMonday\n11:30AM\u20138PM\n\nTuesday\n11:30AM\u20138PM\n\nWednesday\n11:30AM\u20138PM",
+    "lat": 44.56679821742423,
+    "lon": -80.94343649254898,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Micha's Bed and Breakfast",
+    "description": "+16472953322",
+    "lat": 44.567363563084804,
+    "lon": -80.94487415658097,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "The Pub",
+    "description": "Thursday\n12PM\u20132AM\n\nFriday\n12PM\u20132AM\n\nSaturday\n12PM\u20132AM\n\nSunday\n12PM\u201312AM\n\nMonday\n12PM\u201312AM\n\nTuesday\n12PM\u201312AM\n\nWednesday\n12PM\u201312AM",
+    "lat": 44.567989775474594,
+    "lon": -80.94303936419276,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Curry House",
+    "description": "Indian\nThursday\n11:30AM\u20132:30PM\n4\u20138:30PM\n\nFriday\n11:30AM\u20132:30PM\n4\u20138:30PM\n\nSaturday\n11:30AM\u20132:30PM\n4\u20138:30PM\n\nSunday\n11:30AM\u20132:30PM\n4\u20138:30PM\n\nMonday\n11:30AM\u20132:30PM\n4\u20138:30PM\n\nTuesday\n11:30AM\u20132:30PM\n4\u20138:30PM\n\nWednesday\n11:30AM\u20132:30PM\n4\u20138:30PM",
+    "lat": 44.567550277264864,
+    "lon": -80.94340414461878,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Oregano Bistro",
+    "description": "Thursday\n3\u20139:30PM\n\nFriday\n3\u20139:30PM\n\nSaturday\n3\u20139:30PM\n\nSunday\n3\u20139:30PM\n\nMonday\n3\u20139:30PM\n\nTuesday\nClosed\n\nWednesday\n3\u20139:30PM",
+    "lat": 44.56760187070499,
+    "lon": -80.94380647597102,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Sunday's Ice Cream Parlour",
+    "description": "",
+    "lat": 44.56472785527896,
+    "lon": -80.94323516545084,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Pizza Pizza",
+    "description": "",
+    "lat": 44.565918372247204,
+    "lon": -80.94302058872965,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Mr. Khan's Gyro and Fish Corner",
+    "description": "",
+    "lat": 44.56586560954965,
+    "lon": -80.94346270608582,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Sprout",
+    "description": "Specializing in gluten-free food \nTuesday - Thursday 10am - 4pm\n\nFriday - Saturday 10am - 2pm\n\nSunday & Monday closed",
+    "lat": 44.565893485121734,
+    "lon": -80.9432009560558,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Paisley Common Cafe",
+    "description": "Monday:\n6:00 AM - 11:00 AM\nTuesday:\n6:00 AM - 11:00 AM\nWednesday:\n6:00 AM - 8:00 PM\nThursday:\n6:00 AM - 8:00 PM\nFriday:\n6:00 AM - 9:00 PM\nSaturday:\n9:00 AM - 9:00 PM\nSunday:\n9:00 AM - 8:00 PM",
+    "lat": 44.30564667603636,
+    "lon": -81.27279405351355,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Shelter",
+    "description": "There is a small shelter at the trail head that a tent can fit under. But best not to set up until after trail users have departed. ",
+    "lat": 44.23794953491681,
+    "lon": -81.22124899037757,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Sunnycrest Bakery",
+    "description": "Mennonite Bakery\n\nWednesday\n7AM\u20137PM\n\nThursday\n7AM\u20137PM\n\nFriday\n7AM\u20137PM\n\nSaturday\n8AM\u20135PM\n\nSunday\nClosed\n\nMonday\nClosed\n\nTuesday\n7AM\u20137PM",
+    "lat": 43.56362979007687,
+    "lon": -80.63686902556444,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "For a big reroute shortcut if needed you can take this rail trail south all the way to Flesherton. Conditions might be variable because of ATV use",
+    "lat": 44.52349385776382,
+    "lon": -80.91330739750467,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "LCBO",
+    "description": "Friday\n10AM\u20136PM\n\nSaturday\n10AM\u20136PM\n\nSunday\nClosed\n\nMonday\nClosed\n\nTuesday\n10AM\u20136PM\n\nWednesday\n10AM\u20136PM\n\nThursday\n10AM\u20136PM",
+    "lat": 44.30725720303021,
+    "lon": -81.27311646938324,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Bonnfire on Queen Pizza",
+    "description": "Also craft beer and cider on menu\n\nTuesday\nClosed\n\nWednesday\n11:30AM\u20138PM\n\nThursday\n11:30AM\u20138PM\n\nFriday\n11:30AM\u20138:30PM\n\nSaturday\n11:30AM\u20138:30PM\n\nSunday\n11:30AM\u20138PM\n\nMonday\nClosed",
+    "lat": 44.307701358892814,
+    "lon": -81.27366447783004,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Three Sheets Brewing/Wismer House",
+    "description": "Monday:\n12:00 PM - 9:00 PM\nTuesday:\n12:00 PM - 9:00 PM\nWednesday:\n12:00 PM - 8:00 PM\nThursday:\n12:00 PM - 9:00 PM\nFriday:\n12:00 PM - 9:00 PM\nSaturday:\n12:00 PM - 9:00 PM\nSunday:\n12:00 PM - 8:00 PM",
+    "lat": 44.43815161568221,
+    "lon": -81.38710701770286,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Trail Option",
+    "description": "It is possible to continue on trail here into park but it has become flooded due to a beaver dam. ",
+    "lat": 44.410692846394376,
+    "lon": -81.42721811362149,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Pom Pom Treats",
+    "description": "Ice cream shop. Vegan options available and ice cream sandwiches\n1pm to 6pm",
+    "lat": 44.56218576164083,
+    "lon": -80.45277326570884,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Skinners Bluff Trail Entrance",
+    "description": "A shortish bike/walk takes you to a stunning viewpoint of Georgian Bay",
+    "lat": 44.78891619501403,
+    "lon": -80.99651854129958,
+    "trailforks_type": "Viewpoint"
+  },
+  {
+    "name": "Skinner's Bluff Lookout",
+    "description": "",
+    "lat": 44.79112646355548,
+    "lon": -80.9947184361225,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Tenting Spot",
+    "description": "Riders report camping in this sports field for a night with no problems. ",
+    "lat": 44.61302045505866,
+    "lon": -81.09317620412051,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Tenting Spot",
+    "description": "Might be able to pitch a tent here after dark for a rest.",
+    "lat": 44.58360630333172,
+    "lon": -80.48712484273796,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Lora Bay Beach",
+    "description": "",
+    "lat": 44.5897875921963,
+    "lon": -80.49773248754411,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Tenting spot",
+    "description": "Riders report good results camping here",
+    "lat": 44.59399001138084,
+    "lon": -80.51528332865091,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Tenting",
+    "description": "Some spots along here could be good for camping.",
+    "lat": 44.61121383384445,
+    "lon": -80.88784164081073,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Big Puddles",
+    "description": "Road is typically flooded in a couple spots. Can take shoes off and walk across in sandles.",
+    "lat": 44.79218979885362,
+    "lon": -80.98536237776061,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Washroom with drinking water taps",
+    "description": "",
+    "lat": 44.41571683739371,
+    "lon": -81.4669027667767,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Freshmart",
+    "description": "Clean port-a-potty at freshmart grocery store",
+    "lat": 44.309176306454624,
+    "lon": -81.2740480578909,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Tenting",
+    "description": "A flat area by trail with picnic table could be a good resting spot. But maybe some noise overnight from road.",
+    "lat": 44.16093304965004,
+    "lon": -81.2256413138593,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Bread & Butter Co (Cafe/Bakery)",
+    "description": "8am to 5pm (Closed Tues/Wed)",
+    "lat": 44.56081073126814,
+    "lon": -80.45374538712349,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Hasty Market Convenience Store",
+    "description": "",
+    "lat": 44.561361122697086,
+    "lon": -80.45363273434486,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Christie Beach",
+    "description": "",
+    "lat": 44.59385586606516,
+    "lon": -80.51491790474209,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "Open 24 hrs",
+    "lat": 44.59883455697517,
+    "lon": -80.58652848374169,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Convenience Store",
+    "description": "6:30am to 10pm",
+    "lat": 44.60485834953863,
+    "lon": -80.59084952246468,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Suzie's Place",
+    "description": "A greasy spoon",
+    "lat": 44.60530520427676,
+    "lon": -80.59082538258355,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tilly's By the Bay Bakery and Cafe",
+    "description": "8am to 2pm (7pm on Friday)\nRumors of good butter tarts",
+    "lat": 44.610720952920616,
+    "lon": -80.59336319746787,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "A few restaurants in this area",
+    "description": "",
+    "lat": 44.60862956533102,
+    "lon": -80.59240564884955,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Convenience Store",
+    "description": "Open 24 Hours",
+    "lat": 44.60980310781997,
+    "lon": -80.59311106982047,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Serenity Cottage",
+    "description": "Suitable for larger groups.\n226-256-8057",
+    "lat": 44.69434183208779,
+    "lon": -80.80375608266326,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Rockford Restaurant",
+    "description": "Wednesday\n7AM\u20138PM\n\nThursday\n7AM\u20138PM\n\nFriday\n7AM\u20138PM\n\nSaturday\n7AM\u20138PM\n\nSunday\n7AM\u20138PM\n\nMonday\n7AM\u20132:30PM\n\nTuesday\n7AM\u20132:30PM",
+    "lat": 44.52408805926774,
+    "lon": -80.91725830639092,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Harrison Park",
+    "description": "Washrooms should always be open",
+    "lat": 44.54534632848357,
+    "lon": -80.93769027672582,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "Open 24 Hours",
+    "lat": 44.56697055494837,
+    "lon": -80.95681833788656,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "5am to 9:30pm",
+    "lat": 44.56559346936995,
+    "lon": -80.94347564955766,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Twin County Brew",
+    "description": "",
+    "lat": 44.569144677375476,
+    "lon": -80.94420606422251,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "European Bakery Cafe",
+    "description": "7:30am to 4pm. Closed Sat/Sun",
+    "lat": 44.572935791826495,
+    "lon": -80.94457377648209,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Queen's Manor Guesthouse",
+    "description": "416) 568-8050",
+    "lat": 44.73849550410453,
+    "lon": -81.14088133066659,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Tim Horton's ",
+    "description": "Open 24 Hours",
+    "lat": 44.739538444201116,
+    "lon": -81.14006593912606,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Foodland Grocery Store",
+    "description": "",
+    "lat": 44.73885256439991,
+    "lon": -81.14005521029,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Turn here if you need to go into Wiarton",
+    "description": "",
+    "lat": 44.73760335076254,
+    "lon": -81.09003827317684,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Cindy's Variety",
+    "description": "7am to 9pm 7 days a week",
+    "lat": 44.63519403164525,
+    "lon": -81.13331717976979,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tuggy's Restaurant",
+    "description": "",
+    "lat": 44.512548448731685,
+    "lon": -81.33677710336102,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Subway",
+    "description": "",
+    "lat": 44.48975325354651,
+    "lon": -81.37640942376507,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "7am to 11pm",
+    "lat": 44.43565829550248,
+    "lon": -81.38879687632615,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Fast Food Restaurants along this stretch of road",
+    "description": "",
+    "lat": 44.42552335232649,
+    "lon": -81.39762670840318,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "",
+    "lat": 44.4234212111984,
+    "lon": -81.3985526561737,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Saugie's Stop 'N Shop Conveniences Store",
+    "description": "",
+    "lat": 44.30544245230542,
+    "lon": -81.27273433949048,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Village Cafe",
+    "description": "10am to 5:30pm. Closed Sunday",
+    "lat": 44.307090194059874,
+    "lon": -81.27341697420502,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Cargill Library",
+    "description": "Wifi Access",
+    "lat": 44.194974081647146,
+    "lon": -81.24669431204414,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Hunting Ground Hideaway",
+    "description": "Single and Group Occupancy\n226-558-2266",
+    "lat": 44.197435557425806,
+    "lon": -81.23646436686134,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Walkerton Library",
+    "description": "Wifi Access",
+    "lat": 44.132996770767704,
+    "lon": -81.14874870335716,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "A few restaurants around here",
+    "description": "",
+    "lat": 44.13314692756099,
+    "lon": -81.14809960877555,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Circle K Convenience Store",
+    "description": "Open 24 hours",
+    "lat": 44.12296352984514,
+    "lon": -81.15030698280667,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Silver Creek Bed & Breakfast",
+    "description": "1 (519) 881-0252",
+    "lat": 44.13335756922501,
+    "lon": -81.15348922863224,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Mildmay Rotery Park",
+    "description": "24 hr drinking water from well located under covered gazebo",
+    "lat": 44.04601920736796,
+    "lon": -81.12313038801616,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Megan & Rob's Burger Box",
+    "description": "11-9pm seven days a week",
+    "lat": 44.045641808364664,
+    "lon": -81.12198149521423,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "24 hour Tim Hortons",
+    "description": "",
+    "lat": 43.735605576522765,
+    "lon": -80.96622522456241,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Community Centre",
+    "description": "Washrooms on left side of building are always open. ",
+    "lat": 43.58401422943102,
+    "lon": -80.72937967280916,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Tigris Valley",
+    "description": "Need to call them to inquire about tenting space. +647-893 8333",
+    "lat": 44.00793422067374,
+    "lon": -81.11257829326212,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "The Moon Bakery & Cafe",
+    "description": "Closed Monday. 8am - 2pm",
+    "lat": 44.60713888631263,
+    "lon": -80.59257202115703,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Lookout",
+    "description": "",
+    "lat": 44.705921288295905,
+    "lon": -80.92722156256491,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Downhill - Rough and rocky in spots",
+    "description": "",
+    "lat": 44.79177473296878,
+    "lon": -80.9929286309262,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Route Alternative",
+    "description": "If you would like to take the paved shoreline road option continue on main road here. This is the gps routing for that option: https://ridewithgps.com/routes/31287617",
+    "lat": 44.75752817881934,
+    "lon": -81.08781304182918,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Evergreen Forest",
+    "description": "(519) 534-9398",
+    "lat": 44.69987781981035,
+    "lon": -81.12032314427773,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Shenstone Motor Inn",
+    "description": "(519) 534-1831\nOn site restaurant",
+    "lat": 44.69835258629752,
+    "lon": -81.13751073964517,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Bass Lake Park",
+    "description": " 519-534-0919",
+    "lat": 44.702271854888814,
+    "lon": -81.00864881500644,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Mountain Lake Camp",
+    "description": "519-534-0776",
+    "lat": 44.71154049098861,
+    "lon": -81.0453005083964,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Big Bay General Store",
+    "description": "12pm to 6pm.",
+    "lat": 44.791524602201704,
+    "lon": -80.94813733671998,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Island View B&B",
+    "description": "(519) 534 4396",
+    "lat": 44.77112859278083,
+    "lon": -81.0853863052775,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Wiarton Willy Inn",
+    "description": "(519) 534-3907",
+    "lat": 44.727570957789794,
+    "lon": -81.13974301123926,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Top Notch Motel",
+    "description": "(519) 534-1310",
+    "lat": 44.730899788105866,
+    "lon": -81.13957450814178,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Pacific Hotel Wiarton",
+    "description": "(519) 534-1370",
+    "lat": 44.74393190534717,
+    "lon": -81.14101217217376,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Lots of food options in Wiarton",
+    "description": "",
+    "lat": 44.74114850858039,
+    "lon": -81.14033523596162,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Waterview Motel",
+    "description": "519-534-0921 ",
+    "lat": 44.74586926861689,
+    "lon": -81.11840349509083,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Bluewater Park ",
+    "description": "519-534-1400 ext. 316",
+    "lat": 44.7438604392078,
+    "lon": -81.136400481272,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Hepworth Hostel",
+    "description": "",
+    "lat": 44.636072438111846,
+    "lon": -81.13335007490605,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "Open 24 Hours",
+    "lat": 44.63388893964903,
+    "lon": -81.13408500017613,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Mudtown Station Brewery",
+    "description": "Food and Beer. Closed Tuesday",
+    "lat": 44.571994218342915,
+    "lon": -80.94220582258833,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Good Grief Coffee Roasters",
+    "description": "Closed Monday. Open till 4pm.\nGreat place that roasts their own coffee. Also delicious treats. ",
+    "lat": 44.56145344347998,
+    "lon": -80.45354841029598,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "BT 700 Host",
+    "description": "Local cyclists are interested in hosting riders for an evening. Tenting in backyard and washroom access. Contact johnaholmes1967@gmail.com or charlotteschwartzentruber@gmail.com to determine availability.",
+    "lat": 44.57235685106122,
+    "lon": -80.47151319947886,
+    "trailforks_type": "Toilet"
+  },
+  {
+    "name": "The Chepstow Inn",
+    "description": "519-366-2626",
+    "lat": 44.15429606190882,
+    "lon": -81.27614541134062,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Water Stop",
+    "description": "Coffin Ridge can fill water bottles during operating hours",
+    "lat": 44.66449823093106,
+    "lon": -80.77543034292842,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "The Kitchen Cupboard",
+    "description": "Sandwich shop. Closed Sunday",
+    "lat": 43.733609266654604,
+    "lon": -80.95184817695633,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Gas Convenience Store",
+    "description": "Wednesday\n6AM\u20139PM\n\nThursday\n6AM\u20139PM\n\nFriday\n6AM\u20139PM\n\nSaturday\n7AM\u20139PM\n\nSunday\n7AM\u20139PM\n\nMonday\n6AM\u20139PM\n\nTuesday\nClosed",
+    "lat": 44.52387973677216,
+    "lon": -80.91800137836651,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Trail",
+    "description": "A few rocky and rooty sections but almost all rideable. Trail detour would be to continue on Inglis Falls Road to Grey Rd 18 and take this east to meet up with the route. You may also encounter a park attendant who will tell you that you need to detour onto the main road. ",
+    "lat": 44.52627726890965,
+    "lon": -80.9338152076075,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Route Detour",
+    "description": "If you need to skip the riding in MacGregor park you can take Concession Rd 4 north to the lake to meet up with the route.",
+    "lat": 44.41357110165474,
+    "lon": -81.43432889145151,
+    "trailforks_type": "Information"
+  },
+  {
+    "name": "Saugeen Riverbank",
+    "description": "A couple bunkie cabins available for indoor sleeping\n(519) 881-0491\nshannonquest1@gmail.com",
+    "lat": 44.14170500579449,
+    "lon": -81.10187784706335,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "A few food services in this part of town",
+    "description": "",
+    "lat": 43.73190587823919,
+    "lon": -80.95381875581859,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Hortons",
+    "description": "",
+    "lat": 43.73944467796196,
+    "lon": -80.94712396211742,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Food Basics Grocery Store",
+    "description": "",
+    "lat": 43.74221964749691,
+    "lon": -80.94626565523265,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Hortons",
+    "description": "",
+    "lat": 43.73561531886864,
+    "lon": -80.9663929516804,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Glamping Accommodation ",
+    "description": "",
+    "lat": 44.62449909709789,
+    "lon": -80.66008013352194,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "The European Bakery Cafe",
+    "description": "",
+    "lat": 44.574568299834475,
+    "lon": -80.9278616174289,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Harrison Park Inn Restaurant",
+    "description": "",
+    "lat": 44.5446705457419,
+    "lon": -80.93730856543255,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Forks Bicycle Shop",
+    "description": "Closed Monday.  519-371-7800",
+    "lat": 44.563056364752015,
+    "lon": -80.98947353792909,
+    "trailforks_type": "Bike Shop"
+  },
+  {
+    "name": "Hidden Valley Campground Turnoff",
+    "description": "If camping at Hidden Valley Camp turn off trail here. Stay on Main Road (Bruce-Saugeen Townline) until you see a sign for Hidden Valley. ",
+    "lat": 44.30580288358335,
+    "lon": -81.30430334112822,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Sandy's Family Restaurant",
+    "description": "Tuesday\n10:30AM\u20137:30PM\n\nWednesday\n10:30AM\u20137:30PM\n\nThursday\n10:30AM\u20137:30PM\n\nFriday\n10:30AM\u20137:30PM\n\nSaturday\n10:30AM\u20137:30PM\n\nSunday\n10:30AM\u20137:30PM\n\nMonday\n10:30AM\u20137:30PM",
+    "lat": 44.04514638144777,
+    "lon": -81.12310368077186,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "BT 700 Parking",
+    "description": "Contact me if you need a free multi-day parking in St. Jacobs",
+    "lat": 43.53935143906053,
+    "lon": -80.55097148403054,
+    "trailforks_type": "Parking"
+  },
+  {
+    "name": "Heritage Reflections Guest House",
+    "description": "",
+    "lat": 44.590301288740754,
+    "lon": -81.03120709124113,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "McGinty's Cafe",
+    "description": "6am to 4pm (3pm Saturday). Closed Sunday",
+    "lat": 44.60764075259262,
+    "lon": -80.59184737599088,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Saugeen Riverbank Campground",
+    "description": "Excellent tent sites for riders\n(519) 881-0491\nshannonquest1@gmail.com",
+    "lat": 44.14195138040394,
+    "lon": -81.09886792646068,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Vow Motel",
+    "description": "+15194175550",
+    "lat": 43.80558816166254,
+    "lon": -80.89456957348233,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Driftwood Beach Park",
+    "description": "Have a limited number of tent sites. Call to make sure: \n519-327-8536",
+    "lat": 43.959000472372544,
+    "lon": -81.05643656361303,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Walnut Hill Cabin B&B",
+    "description": "(519) 664-1124 ",
+    "lat": 43.57683569636219,
+    "lon": -80.62577041074763,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Schnurrs Grocery Store",
+    "description": "",
+    "lat": 43.580737906161225,
+    "lon": -80.72700770780574,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Couple spots for tents by river.",
+    "description": "No direct access from west. Need to go west on Concession road 8, south on Sideroad10 S and then west on Concession Rd 6 E",
+    "lat": 44.184064104828224,
+    "lon": -81.19337548609076,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.56721882092719,
+    "lon": -80.94357045377643,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.54492853361461,
+    "lon": -81.23271619947491,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Ashanti Coffee",
+    "description": "",
+    "lat": 44.56121705132948,
+    "lon": -80.45350371147123,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Perogie Palace",
+    "description": "12:30 to 8:30 (Closed Mon-Wed)",
+    "lat": 44.60520126880494,
+    "lon": -80.59097808982483,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Several Food options in this part of town",
+    "description": "",
+    "lat": 44.4961174830862,
+    "lon": -81.37249990913585,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Chantry Breezes B&B",
+    "description": "",
+    "lat": 44.49656887798311,
+    "lon": -81.37495301345581,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "A Knight Inn B&B",
+    "description": "",
+    "lat": 44.494544677924836,
+    "lon": -81.37236468175644,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Port Elgin Municipal Tourist Camp",
+    "description": "A few tent sites. Contact them beforehand to check availability.  519-832-2512\ncamping@saugeenshores.ca",
+    "lat": 44.438582157464275,
+    "lon": -81.39603523721996,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.44612948798838,
+    "lon": -81.40031628253143,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.438347004869236,
+    "lon": -81.3841908419339,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Lots of food options in this area of town",
+    "description": "",
+    "lat": 44.4367347997208,
+    "lon": -81.38880747068968,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Warmshower Host",
+    "description": "Excellent host and cycling enthusiast. Might be able to offer indoor accommodation.",
+    "lat": 44.307499866884406,
+    "lon": -81.27631333467161,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Hidden Valley Camp",
+    "description": "Lodging available",
+    "lat": 44.32484350268736,
+    "lon": -81.30500354962714,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Cargill Variety",
+    "description": "",
+    "lat": 44.19570868908877,
+    "lon": -81.2482355798743,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Subway",
+    "description": "",
+    "lat": 44.12239900994692,
+    "lon": -81.15030276432253,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tim Hortons",
+    "description": "Open 24 hours",
+    "lat": 44.13289554875069,
+    "lon": -81.14473449840763,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Best Western ",
+    "description": "",
+    "lat": 44.1407109084836,
+    "lon": -81.13005745067812,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Lighthouse Motel",
+    "description": "519-881-0202",
+    "lat": 44.10611528836589,
+    "lon": -81.14623653545596,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "A warmshowers member with tent space. Must arrange in advance.",
+    "lat": 44.05446470479293,
+    "lon": -81.04250223483143,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Rail Trail to Listowel",
+    "description": "",
+    "lat": 43.68690651463806,
+    "lon": -80.99805580592732,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Zehr's Country Market",
+    "description": "Closed Sunday ",
+    "lat": 43.56951961226705,
+    "lon": -80.8346739515215,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Foodland Grocery Store",
+    "description": "",
+    "lat": 43.583139128701,
+    "lon": -80.56120333061915,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Holiday Inn Express",
+    "description": "BT riders can obtain a special room rate by using this link. You can also call the hotel directly and mention BT700 to reserve at the discounted rate.\n519-514-7863\n",
+    "lat": 43.5091769822566,
+    "lon": -80.55633472801578,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Laurel Creek Conservation Area",
+    "description": "Camping not available in 2020 because of COVID",
+    "lat": 43.49183833695606,
+    "lon": -80.57192214939647,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Foodland Grocery Store",
+    "description": "7am to 10pm",
+    "lat": 44.56498501131689,
+    "lon": -80.45926130963018,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Smitty's Bicycle Shop",
+    "description": "Espresso, baked goods and Smoothies also available. 9am - 4pm. Closed Monday",
+    "lat": 44.560880329140254,
+    "lon": -80.45395086570265,
+    "trailforks_type": "Bike Shop"
+  },
+  {
+    "name": "Lighthouse",
+    "description": "",
+    "lat": 44.50151170766835,
+    "lon": -81.37520850453052,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Grey County Rail Trail",
+    "description": "",
+    "lat": 44.524185894219016,
+    "lon": -80.91374103637827,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Allan's Merchantile",
+    "description": "General Store with a variety of food",
+    "lat": 44.61540030545485,
+    "lon": -81.08732010696474,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Inn on the 6th",
+    "description": "Rider recommended with nice owner who can accommodate cyclists. ",
+    "lat": 44.56214767539846,
+    "lon": -80.92689300912565,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Owen Sound Inn",
+    "description": "",
+    "lat": 44.559930686190356,
+    "lon": -80.92573991282177,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Quality Inn",
+    "description": "",
+    "lat": 44.56259090343393,
+    "lon": -80.92480650408459,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Travellers Motel",
+    "description": "",
+    "lat": 44.56451582762236,
+    "lon": -80.92726870114433,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Travelodge",
+    "description": "Good rooms at reasonable rates",
+    "lat": 44.56975783568134,
+    "lon": -80.92917680740356,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Comfort Inn",
+    "description": "",
+    "lat": 44.56861840510777,
+    "lon": -80.92752619320976,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Best Western",
+    "description": "",
+    "lat": 44.578905590675184,
+    "lon": -80.93610818065258,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Foodland Grocery Store",
+    "description": "",
+    "lat": 44.5636559519758,
+    "lon": -80.96222760623209,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Knights Inn",
+    "description": "",
+    "lat": 44.56701641624337,
+    "lon": -80.95563727079615,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Zehr's Grocery Store",
+    "description": "",
+    "lat": 44.57520610088656,
+    "lon": -80.92413278263922,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Metro Grocery Store",
+    "description": "8am to 8pm",
+    "lat": 44.570031918579346,
+    "lon": -80.94251127880926,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Frog Pond Cafe",
+    "description": "",
+    "lat": 44.56392657355383,
+    "lon": -80.94220575832134,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Sunny Valley Park",
+    "description": "",
+    "lat": 44.4904090175277,
+    "lon": -80.92094399560062,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Harrison Park",
+    "description": "519-371-9734",
+    "lat": 44.54433699583892,
+    "lon": -80.93768436486351,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Dreamaker Family Campground",
+    "description": "",
+    "lat": 44.515506514907294,
+    "lon": -81.28302525812586,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Denny's Dam Conservation Area",
+    "description": "No longer an operational campground but some riders report still a good place to pitch a tent. Though there are some no camping signs and it's a popular place for those fishing. ",
+    "lat": 44.50366253621153,
+    "lon": -81.33166926114387,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Whispering Pines",
+    "description": "519-935-2571",
+    "lat": 44.63155682615324,
+    "lon": -81.12055892916146,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Carson's Camp",
+    "description": "A few tent sites available among trailers",
+    "lat": 44.61871150509283,
+    "lon": -81.2669393290862,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Hilltop Motel",
+    "description": " 519-538-1700 ",
+    "lat": 44.59850606339677,
+    "lon": -80.58717580755155,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Bay-Vue Motel",
+    "description": "519-538-3490",
+    "lat": 44.61837239078058,
+    "lon": -80.60867506835194,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Owen Sound KOA",
+    "description": "800-562-8675",
+    "lat": 44.56443034467115,
+    "lon": -80.89206200964225,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Meaford Memorial Park",
+    "description": "519-538-1060 ext. 1402",
+    "lat": 44.60193283579907,
+    "lon": -80.56430273712431,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Roebuck Campground",
+    "description": "519-375-1205",
+    "lat": 44.6199535145226,
+    "lon": -80.68557207291451,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Meaford Inn",
+    "description": "519-538-5799 ",
+    "lat": 44.60969846036583,
+    "lon": -80.59300879207723,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Trail down to excellent viewpoint of Georgian Bay ",
+    "description": "",
+    "lat": 44.58895694405949,
+    "lon": -80.54796596638113,
+    "trailforks_type": "Viewpoint"
+  },
+  {
+    "name": "Coffin Ridge Resting Place",
+    "description": "",
+    "lat": 44.663783846717465,
+    "lon": -80.77420184887916,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Coffin Ridge Cider & Wine",
+    "description": "Great view!\n\nThursday\n11AM\u20136PM\n\nFriday\n11AM\u20136PM\n\nSaturday\n11AM\u20136PM\n\nSunday\n11AM\u20135PM\n\nMonday\nClosed\n\nTuesday\nClosed",
+    "lat": 44.66416538644419,
+    "lon": -80.77437351025611,
+    "trailforks_type": "Viewpoint"
+  },
+  {
+    "name": "Inglis Falls",
+    "description": "",
+    "lat": 44.526254260500785,
+    "lon": -80.9340146671089,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Weaver Creek Falls",
+    "description": "",
+    "lat": 44.54318202791566,
+    "lon": -80.93858400377087,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Birgit's Pastry Cafe",
+    "description": "",
+    "lat": 44.56667886934843,
+    "lon": -80.94309212657265,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Bikeface Cycling",
+    "description": "Closed Sunday and Monday",
+    "lat": 44.56779893414209,
+    "lon": -80.94206018477911,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Eden Springs Campground",
+    "description": "Private campground on saugeen river. $40/night for tent. Cabin that sleeps two also available. Phone or Text Tod at before arriving to determine availability: (519) 771-0222",
+    "lat": 44.24084346395769,
+    "lon": -81.1980801868093,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Deer Run Trail ",
+    "description": "Start of fun, non-technical trails in the park with beach access. ",
+    "lat": 44.410096106429535,
+    "lon": -81.44112413914678,
+    "trailforks_type": "Trailhead"
+  },
+  {
+    "name": "Thorncrest Outfitters",
+    "description": "",
+    "lat": 44.49570732157884,
+    "lon": -81.37182845172879,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Beach Path",
+    "description": "Best to walk bikes on beach boardwalk",
+    "lat": 44.49287661107918,
+    "lon": -81.38051986841202,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Swimming Beach ",
+    "description": "",
+    "lat": 44.44184563186673,
+    "lon": -81.40386459922792,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Shipley Trail",
+    "description": "",
+    "lat": 44.43216439127063,
+    "lon": -81.40782671706432,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Some more swimming spots along shore road",
+    "description": "",
+    "lat": 44.42477772744941,
+    "lon": -81.42874842284067,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Swimming Beach",
+    "description": "",
+    "lat": 44.41610514486106,
+    "lon": -81.46822379430972,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Tenting",
+    "description": "Great stealth camping spot overlooking the river. Plenty of spaces hidden by trees. ",
+    "lat": 44.42597606012401,
+    "lon": -81.3852268492227,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Maplewood Motel",
+    "description": "",
+    "lat": 44.42920081401939,
+    "lon": -81.39393912597183,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "The Southampton Inn",
+    "description": "",
+    "lat": 44.49712604873986,
+    "lon": -81.37413388187156,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Stop 21 Motel",
+    "description": "",
+    "lat": 44.48568785715468,
+    "lon": -81.37574274551054,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Manor Motel",
+    "description": "",
+    "lat": 44.494177958489146,
+    "lon": -81.37318207233756,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Harringan 100 Mile Food Market",
+    "description": "Groceries, bakery, sandwiches",
+    "lat": 44.49572262739786,
+    "lon": -81.37190802305548,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Southampton Public Library",
+    "description": "Free Wifi - can access from outside building.",
+    "lat": 44.49521753324854,
+    "lon": -81.37095047443717,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Offshore Bakery",
+    "description": "Tuesday\n9AM\u20134PM\n\nWednesday\n9AM\u20134PM\n\nThursday\n9AM\u20134PM\n\nFriday\n9AM\u20134PM\n\nSaturday\n9AM\u20134PM\n\nSunday\nClosed\n\nMonday\nClosed",
+    "lat": 44.49524814513967,
+    "lon": -81.37070907562583,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "All Seasons Motel",
+    "description": "",
+    "lat": 44.43958778944307,
+    "lon": -81.38661536137215,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Sand Castle Motel",
+    "description": "",
+    "lat": 44.42670243596575,
+    "lon": -81.39614143016075,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Walmart",
+    "description": "",
+    "lat": 44.42246138670502,
+    "lon": -81.39482714774346,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Food Basics Grocery",
+    "description": "",
+    "lat": 44.44873585619552,
+    "lon": -81.38110879624162,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Quality Inn",
+    "description": "",
+    "lat": 44.50243981026196,
+    "lon": -81.3661656778284,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Foodland Supermarket",
+    "description": "8am to 9pm (7pm on Sunday)",
+    "lat": 44.5021207216768,
+    "lon": -81.36361221484623,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Beach Motel",
+    "description": "",
+    "lat": 44.49673046593635,
+    "lon": -81.37544050536724,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "South Beach Boutique Hotel",
+    "description": "",
+    "lat": 44.48934560056944,
+    "lon": -81.38113239298758,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Paradise Inn on the Beach",
+    "description": "",
+    "lat": 44.44300143230546,
+    "lon": -81.40146455342807,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Outlaw Brew Company",
+    "description": "",
+    "lat": 44.49592530669071,
+    "lon": -81.37138856704217,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Brucedale Conservation Area",
+    "description": "http://www.svca.on.ca/ca.php?page=brucedale",
+    "lat": 44.37563723516562,
+    "lon": -81.51255524556024,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Revive Resort",
+    "description": "",
+    "lat": 44.458001415589585,
+    "lon": -81.37017338729788,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "MacGregor Point",
+    "description": "Good sunsets!\n",
+    "lat": 44.41093810046797,
+    "lon": -81.44674137455877,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Swimming Beach",
+    "description": "",
+    "lat": 44.49335414764645,
+    "lon": -81.38082678978316,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Martin's Bicycle Shop",
+    "description": "",
+    "lat": 44.49514981101586,
+    "lon": -81.37060754431639,
+    "trailforks_type": "Bike Shop"
+  },
+  {
+    "name": "Sunset Point ",
+    "description": "How romantic! ",
+    "lat": 44.42178505695788,
+    "lon": -81.46136939757372,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Swimming Beach",
+    "description": "",
+    "lat": 44.417530510577514,
+    "lon": -81.46533906691576,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Travelodge ",
+    "description": "",
+    "lat": 44.426901209528445,
+    "lon": -81.39562026524783,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Super 8 ",
+    "description": "",
+    "lat": 44.42469490734037,
+    "lon": -81.39859333993292,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Saugeen Bluffs Conservation",
+    "description": "",
+    "lat": 44.346765283314525,
+    "lon": -81.30633032619369,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Hidden Valley Camp",
+    "description": "Good sites down by the river. ",
+    "lat": 44.325654646257526,
+    "lon": -81.30726820383347,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Paisley Riverside Campground",
+    "description": "(519) 353-5575\nOwner only charges $20 for cyclists with a hot shower",
+    "lat": 44.30629043127718,
+    "lon": -81.26836691275264,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Lobies Campground",
+    "description": "",
+    "lat": 44.13637373521334,
+    "lon": -81.1554748608289,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Freshmart Grocery Store",
+    "description": "",
+    "lat": 44.30897357646765,
+    "lon": -81.27452767246399,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Wild Camping - Junction of Rabbit Run and West Road",
+    "description": "Could be a goop place to pitch a tent. Indoor shelter and a picnic table.  No water available. ",
+    "lat": 44.25010502931207,
+    "lon": -81.22210655523975,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Brant Tract Trails",
+    "description": "Fun set of flowy trails and not technical. Sometimes trails are marked as closed because of rain but this route is the least muddy way through.  You can spend more time in here riding on additional trails. Very well market. Most are doable on a cross bike. The loop I recommend is Brainbuster, Rabbit Run, Red Pine Loop, Razor\u2019s Run, The Shocker, The Maples, Devil\u2019s Elbow, The Express and then back up Rabbit Run.  Above is the gps route for this. ",
+    "lat": 44.237201521321055,
+    "lon": -81.22090381487459,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Green Bean Pantry",
+    "description": "",
+    "lat": 44.116531945392474,
+    "lon": -81.14950879941796,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Foodland Grocery Store",
+    "description": "",
+    "lat": 44.133295642830944,
+    "lon": -81.15042240344172,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": " Grocery Store",
+    "description": "",
+    "lat": 44.11916167858092,
+    "lon": -81.14903301917201,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Walkerton Inn",
+    "description": "519-881-0629",
+    "lat": 44.118394385995565,
+    "lon": -81.14984919320426,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Mildmay Public Library",
+    "description": "Wifi Access",
+    "lat": 44.04109994935044,
+    "lon": -81.11709099851527,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "True North Market",
+    "description": "",
+    "lat": 44.03883515656577,
+    "lon": -81.11044983445169,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Mildmay Cheese Haus",
+    "description": "",
+    "lat": 44.04197288915169,
+    "lon": -81.11834029229965,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Formosa Springs Brewery",
+    "description": "",
+    "lat": 44.05754135224284,
+    "lon": -81.21150604716627,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Formosa Lions Park",
+    "description": "",
+    "lat": 44.05914505006156,
+    "lon": -81.2107550286421,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Pine Echo Camp",
+    "description": "Large grassy area for campers",
+    "lat": 43.953629166296004,
+    "lon": -81.18458656288817,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Bruce County Rail Trail",
+    "description": "Trail can be chunky  in a couple of places due to inconsistent aggregate and rutted in  in spots because of ATV use.  ",
+    "lat": 44.01835644305129,
+    "lon": -81.0803954716971,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Carrick Tract",
+    "description": "Likely OK to pitch a tent in parking area for trails. It's a nice little area away from the road. Picnic table and port-a-potty. Likely best to wait until sundown to put up any shelter. ",
+    "lat": 43.973924757019454,
+    "lon": -81.08011747023363,
+    "trailforks_type": "Parking"
+  },
+  {
+    "name": "Lindwood Convenience Store",
+    "description": "Also sandwiches and baked goods",
+    "lat": 43.58134074476738,
+    "lon": -80.7281271008888,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Country Inn Motel",
+    "description": "",
+    "lat": 43.75984273909576,
+    "lon": -80.93119345728064,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Zehrs",
+    "description": "Grocery Store",
+    "lat": 43.73103040610486,
+    "lon": -80.96756379382106,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Millbank Cheese Chop",
+    "description": "Cheese, jams etc. Closed Sunday",
+    "lat": 43.57005840723093,
+    "lon": -80.83583317986205,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Anna Mae's ",
+    "description": "Amish Restaurant and Bakery - Closed Sunday",
+    "lat": 43.57180910307912,
+    "lon": -80.83473253048908,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tenting spot",
+    "description": "Large flat area by lookout would make for a picturesque camping spot",
+    "lat": 44.79643141395741,
+    "lon": -81.00318017489249,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Steep rocky uphill",
+    "description": "",
+    "lat": 44.64936358068373,
+    "lon": -80.9646124097835,
+    "trailforks_type": "Hazard"
+  },
+  {
+    "name": "Mac's Convenience Store",
+    "description": "",
+    "lat": 44.04150130761751,
+    "lon": -81.11759709161589,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Pickled & Baked Foods",
+    "description": "Family run bakery",
+    "lat": 44.03530594017221,
+    "lon": -81.1261371022347,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Hideaway",
+    "description": "",
+    "lat": 44.03951437411778,
+    "lon": -81.14563533827399,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Mel's 4&9 Diner",
+    "description": "",
+    "lat": 44.11595631279055,
+    "lon": -81.14982853459182,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Rowley's Saugeen River ",
+    "description": "",
+    "lat": 44.265764866074704,
+    "lon": -81.22142317774778,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.43467492194761,
+    "lon": -81.38999738386515,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Holiday Inn Express",
+    "description": "",
+    "lat": 44.45014426357264,
+    "lon": -81.37799385290744,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.44983790726149,
+    "lon": -81.39305713873507,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Warmshowers Host",
+    "description": "",
+    "lat": 44.49988981147784,
+    "lon": -81.28770969045729,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Dottie's Donuts and Coffee",
+    "description": "",
+    "lat": 44.59013090837108,
+    "lon": -81.28965585028388,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Pond Bunkie",
+    "description": "",
+    "lat": 44.49884264444333,
+    "lon": -81.28123270251172,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Dreamer's Writing Farm",
+    "description": "Bunkie's available",
+    "lat": 44.63742301223782,
+    "lon": -81.13252212969262,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Tim Horton's",
+    "description": "",
+    "lat": 44.34570648982164,
+    "lon": -80.24986769883338,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Bottle Refill Station at Washroom",
+    "description": "",
+    "lat": 44.57878223223336,
+    "lon": -80.94628580411691,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Olivia's Ristorante",
+    "description": "",
+    "lat": 44.61766699211603,
+    "lon": -81.09216851673698,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Shallow Lake Community Centre",
+    "description": "Grounds of community centre could be a place for discreet camping during off-hours. ",
+    "lat": 44.61945261117894,
+    "lon": -81.09445251983854,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Petun Conservation Area",
+    "description": "Probably OK to tent in the parking area for the conservation area. ",
+    "lat": 44.449582133335575,
+    "lon": -80.30872478909775,
+    "trailforks_type": "Parking"
+  },
+  {
+    "name": "Cardinals Roost",
+    "description": "705-888-7344",
+    "lat": 44.40833939568333,
+    "lon": -80.29902883634341,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Pretty River Valley Country Inn",
+    "description": "+1 855-445-7598",
+    "lat": 44.41011343553198,
+    "lon": -80.29068801224922,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Sweet Woods Hill B&B",
+    "description": "",
+    "lat": 44.44567355880587,
+    "lon": -80.36667383925105,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Castle Glen Ruins",
+    "description": "",
+    "lat": 44.46517069847704,
+    "lon": -80.31966639548583,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Lake for taking a dip",
+    "description": "",
+    "lat": 44.46330177091417,
+    "lon": -80.32346973181987,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Stream water can be filtered ",
+    "description": "",
+    "lat": 44.42397588271663,
+    "lon": -80.2902173453643,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Tenting area",
+    "description": "Grassy area by the lake is probably ok for discreet camping. ",
+    "lat": 44.46351882862169,
+    "lon": -80.32297260999462,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Farm Stay",
+    "description": "Cycling friendly accommodation ",
+    "lat": 44.736780515085925,
+    "lon": -81.08960004698737,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Mono Motel",
+    "description": "+15199408434",
+    "lat": 44.01060662074587,
+    "lon": -79.9903735440501,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "The Pub by Stone Crock",
+    "description": "",
+    "lat": 43.53882471609718,
+    "lon": -80.5535752361712,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Stockyards Brewing",
+    "description": "On Site Restaurant",
+    "lat": 43.50966335957393,
+    "lon": -80.55410845347548,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Morning Dale Centennnial Park",
+    "description": "Probably OK for discreet camping. Lots of good tenting spots. Tables and washroom. ",
+    "lat": 43.58553322397991,
+    "lon": -80.835775984257,
+    "trailforks_type": "Campground"
+  },
+  {
+    "name": "Clifford",
+    "description": "A couple of food services",
+    "lat": 43.96900074020113,
+    "lon": -80.97860066680462,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Fat Bastard Burrito",
+    "description": "",
+    "lat": 44.11962074498043,
+    "lon": -81.14898407398546,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Happy Hive Bakery and Cafe",
+    "description": "",
+    "lat": 44.305845563788175,
+    "lon": -81.2726315398051,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Grocery Store",
+    "description": "",
+    "lat": 44.45352722109246,
+    "lon": -81.37588741808278,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Park Store",
+    "description": "Basic Supplies",
+    "lat": 44.4109727173614,
+    "lon": -81.46346255060776,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Beachside Cafe",
+    "description": "",
+    "lat": 44.44112708608457,
+    "lon": -81.40281900245157,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Duffy's Port Elgin & PORT PIZZA",
+    "description": "",
+    "lat": 44.441823762837025,
+    "lon": -81.39861144882151,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Staybridge Suites",
+    "description": "",
+    "lat": 44.45063820374838,
+    "lon": -81.37999346457428,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Gas Station Convenience Store",
+    "description": "",
+    "lat": 44.51866672463244,
+    "lon": -81.2723241777406,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tito's Pizza",
+    "description": "",
+    "lat": 43.77039650388939,
+    "lon": -80.06434233833131,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Convenience Store",
+    "description": "",
+    "lat": 43.77940619083719,
+    "lon": -80.07658480200088,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Tipsy Fox Pub and Grill",
+    "description": "",
+    "lat": 43.78152789083472,
+    "lon": -80.08217178653094,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Quesada Burritos & Tacos",
+    "description": "",
+    "lat": 43.78114282547771,
+    "lon": -80.07734492401677,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Tito's Pizza",
+    "description": "",
+    "lat": 43.791661519626636,
+    "lon": -80.14376813689178,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Farm on the Lake",
+    "description": "Bunkies also available",
+    "lat": 44.75599324890204,
+    "lon": -81.01239146104636,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Applewood House B&B",
+    "description": "",
+    "lat": 44.61017546982429,
+    "lon": -80.59393829377544,
+    "trailforks_type": "Shelter"
+  },
+  {
+    "name": "Sammies Fish and Chips",
+    "description": "",
+    "lat": 44.25784541865776,
+    "lon": -80.54391085626656,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Kimberley Cafe",
+    "description": "",
+    "lat": 44.38325685180919,
+    "lon": -80.53623395750753,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "The Utopia Market",
+    "description": "",
+    "lat": 44.368154087483894,
+    "lon": -80.3844593894723,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Beach",
+    "description": "",
+    "lat": 44.53868577370429,
+    "lon": -80.36997241549327,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Mad River Park",
+    "description": "Could be ok for discreet camping. River water can be filtered.",
+    "lat": 44.32246085778221,
+    "lon": -80.10494764142842,
+    "trailforks_type": "Water Source"
+  },
+  {
+    "name": "Carruthers Memorial Park",
+    "description": "Good swimming hole",
+    "lat": 44.31030297346519,
+    "lon": -80.07571430056429,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Gas Station Convenience Store",
+    "description": "",
+    "lat": 44.29813636861637,
+    "lon": -80.01764770668167,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "General Store",
+    "description": "",
+    "lat": 43.87167310241541,
+    "lon": -79.86965875042925,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Punjabi Swaad",
+    "description": "",
+    "lat": 43.838770812526015,
+    "lon": -79.89489162930752,
+    "trailforks_type": "Food"
+  },
+  {
+    "name": "Quarry Swimming Hole",
+    "description": "",
+    "lat": 43.73115365752928,
+    "lon": -80.33966171731385,
+    "trailforks_type": "Other"
+  },
+  {
+    "name": "Bristow's Inn",
+    "description": "",
+    "lat": 43.59513105221559,
+    "lon": -80.56090017686067,
+    "trailforks_type": "Shelter"
+  }
+]
