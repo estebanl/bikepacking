@@ -18,6 +18,9 @@
   .stats { display:flex; gap:14px; margin-bottom:10px; }
   .stat b { display:block; font-size:19px; color:#d92b00; }
   .stat span { font-size:11px; color:#666; text-transform:uppercase; letter-spacing:.04em; }
+  .slider-row { display:flex; align-items:center; gap:8px; font-size:12px; color:#444; border-top:1px solid #e5e5e5; padding-top:8px; margin-bottom:2px; }
+  .slider-row input[type=range] { flex:1; accent-color:#d92b00; }
+  .slider-row span { font-variant-numeric:tabular-nums; min-width:32px; text-align:right; }
   .rides { font-size:12.5px; border-top:1px solid #e5e5e5; padding-top:8px; max-height:180px; overflow:auto; }
   .rides div { display:flex; justify-content:space-between; gap:10px; padding:2px 0; }
   .rides .d { color:#888; white-space:nowrap; }
@@ -36,6 +39,11 @@
     <div class="stat"><b id="s-rides">–</b><span>rides</span></div>
     <div class="stat"><b id="s-total">–</b><span>km ridden</span></div>
     <div class="stat"><b id="s-unique">–</b><span>unique km</span></div>
+  </div>
+  <div class="slider-row">
+    <label for="weight">Line</label>
+    <input type="range" id="weight" min="1" max="6" step="0.5" value="2">
+    <span id="weight-val">2 px</span>
   </div>
   <div class="rides" id="rides"></div>
   <button id="toggle">Hide panel</button>
@@ -63,18 +71,30 @@ L.control.layers({
 map.setView([43.71, -79.39], 11);
 
 document.getElementById('toggle').addEventListener('click', (e) => {
-  const body = document.querySelectorAll('.card .stats, .card .rides, .card .sub');
+  const body = document.querySelectorAll('.card .stats, .card .rides, .card .sub, .card .slider-row');
   const hidden = document.getElementById('rides').style.display === 'none';
   body.forEach(el => el.style.display = hidden ? '' : 'none');
   e.target.textContent = hidden ? 'Hide panel' : 'Show panel';
+});
+
+let routeLine = null;
+const weightInput = document.getElementById('weight');
+const weightVal = document.getElementById('weight-val');
+const savedWeight = parseFloat(localStorage.getItem('ero-line-weight'));
+if (!isNaN(savedWeight)) { weightInput.value = savedWeight; weightVal.textContent = savedWeight + ' px'; }
+weightInput.addEventListener('input', () => {
+  const w = parseFloat(weightInput.value);
+  weightVal.textContent = w + ' px';
+  localStorage.setItem('ero-line-weight', w);
+  if (routeLine) routeLine.setStyle({ weight: w });
 });
 
 fetch('segments.json', { cache: 'no-cache' })
   .then(r => r.json())
   .then(data => {
     const latlngs = data.segments.map(s => [[s[1], s[0]], [s[3], s[2]]]);
-    const lines = L.polyline(latlngs, { color: '#d92b00', weight: 2, opacity: 0.9 }).addTo(map);
-    map.fitBounds(lines.getBounds().pad(0.03));
+    routeLine = L.polyline(latlngs, { color: '#d92b00', weight: parseFloat(weightInput.value), opacity: 0.9 }).addTo(map);
+    map.fitBounds(routeLine.getBounds().pad(0.03));
     const st = data.stats;
     document.getElementById('s-rides').textContent = st.rides;
     document.getElementById('s-total').textContent = Math.round(st.total_km).toLocaleString();
