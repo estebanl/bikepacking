@@ -51,20 +51,24 @@ year_trips = [t for t in trips_raw if t["departed_at"].startswith(YEAR)
               and os.path.exists(f"{BASE}/tracks/{t['id']}.json")]
 total_km = sum((t.get("distance") or 0) for t in year_trips) / 1000
 
-CELL = 0.0005
-def cell_of(x, y): return (math.floor(x / CELL), math.floor(y / CELL))
-def center(c): return ((c[0] + 0.5) * CELL, (c[1] + 0.5) * CELL)
-unique = {}
-for t in year_trips:
-    pts = json.load(open(f"{BASE}/tracks/{t['id']}.json"))
-    cells = [cell_of(x, y) for x, y in pts]
-    for a, b in zip(cells, cells[1:]):
-        if a == b: continue
-        key = (a, b) if a <= b else (b, a)
-        if key not in unique: unique[key] = (center(a), center(b))
 COS = math.cos(math.radians(44.0))
 def seg_km(p1, p2):
     return math.hypot((p2[0] - p1[0]) * 111.32 * COS, (p2[1] - p1[1]) * 110.57)
+
+# Micro-segments between consecutive real GPS points, so drawn lines follow
+# the true ridden path (street curves, trails) instead of a coarse grid.
+# Dedupe key: endpoints rounded to 4 dp (~10 m); first occurrence wins.
+# Pairs longer than 250 m are GPS gaps and are skipped.
+unique = {}
+for t in year_trips:
+    pts = json.load(open(f"{BASE}/tracks/{t['id']}.json"))
+    for a, b in zip(pts, pts[1:]):
+        if seg_km(a, b) > 0.25: continue
+        ka = (round(a[0], 4), round(a[1], 4))
+        kb = (round(b[0], 4), round(b[1], 4))
+        if ka == kb: continue
+        key = (ka, kb) if ka <= kb else (kb, ka)
+        if key not in unique: unique[key] = (a, b)
 unique_km = sum(seg_km(a, b) for a, b in unique.values())
 
 web = {

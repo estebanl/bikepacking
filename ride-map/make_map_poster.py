@@ -9,20 +9,23 @@ BASE = "/home/hatch/workspace/ridewithgps-2026"
 TILE_CACHE = f"{BASE}/tiles"
 os.makedirs(TILE_CACHE, exist_ok=True)
 
-# --- rebuild deduped segments (same method as the black poster) ---
-CELL = 0.0005
-def cell_of(x, y): return (math.floor(x / CELL), math.floor(y / CELL))
-def center(c): return ((c[0] + 0.5) * CELL, (c[1] + 0.5) * CELL)
+# --- rebuild deduped segments (micro-segments, same builder as update_map.py) ---
+COSL = math.cos(math.radians(44.0))
+def seg_len(p1, p2):
+    return math.hypot((p2[0] - p1[0]) * 111.32 * COSL, (p2[1] - p1[1]) * 110.57)
 unique = {}
 for path in glob.glob(f"{BASE}/tracks/*.json"):
     pts = json.load(open(path))
-    cells = [cell_of(x, y) for x, y in pts]
-    for a, b in zip(cells, cells[1:]):
-        if a == b: continue
-        key = (a, b) if a <= b else (b, a)
-        if key not in unique: unique[key] = (center(a), center(b))
+    for a, b in zip(pts, pts[1:]):
+        if seg_len(a, b) > 0.25: continue
+        ka = (round(a[0], 4), round(a[1], 4))
+        kb = (round(b[0], 4), round(b[1], 4))
+        if ka == kb: continue
+        key = (ka, kb) if ka <= kb else (kb, ka)
+        if key not in unique: unique[key] = (a, b)
 segs = list(unique.values())
-print("unique segments:", len(segs))
+unique_km = sum(seg_len(a, b) for a, b in segs)
+print("unique segments:", len(segs), "unique km:", round(unique_km))
 
 # --- OSM tiles ---
 def tile_range(lng, lat, z):
@@ -87,7 +90,7 @@ def render(fname, extent, z, figsize, title, subtitle, lw):
 
 render("map_ontario_2026.png", (-81.45, 42.82, -77.95, 45.72), 9, (12.5, 13.5),
        "EVERY ROAD, ONCE — 2026",
-       "113 rides · 3,143 km ridden · 1,970 km of unique road · Southern Ontario", 1.1)
+       f"113 rides · 3,143 km ridden · {unique_km:,.0f} km of unique road · Southern Ontario", 1.1)
 render("map_toronto_2026.png", (-79.70, 43.52, -79.05, 43.98), 12, (12.5, 10.5),
        "TORONTO — 2026",
        "Each unique stretch of road drawn once · overlaps removed", 1.5)

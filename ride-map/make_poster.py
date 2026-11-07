@@ -5,27 +5,30 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 
 BASE = "/home/hatch/workspace/ridewithgps-2026"
-CELL = 0.0005  # ~55 m N-S, ~40 m E-W at lat 44
 COS = math.cos(math.radians(44.0))
 
-def cell_of(x, y):
-    return (math.floor(x / CELL), math.floor(y / CELL))
+def seg_len_raw(p1, p2):
+    dx = (p2[0] - p1[0]) * 111.32 * COS
+    dy = (p2[1] - p1[1]) * 110.57
+    return math.hypot(dx, dy)
 
-def center(c):
-    return ((c[0] + 0.5) * CELL, (c[1] + 0.5) * CELL)
-
-unique = {}   # undirected key -> (p1, p2) snapped coords
+# Micro-segments between consecutive real GPS points (same builder as
+# update_map.py): dedupe key = endpoints rounded to 4 dp, gaps > 250 m skipped.
+unique = {}   # undirected key -> (p1, p2) real coords
 total_segs = 0
 for path in glob.glob(f"{BASE}/tracks/*.json"):
     pts = json.load(open(path))
-    cells = [cell_of(x, y) for x, y in pts]
-    for a, b in zip(cells, cells[1:]):
-        if a == b:
+    for a, b in zip(pts, pts[1:]):
+        if seg_len_raw(a, b) > 0.25:
+            continue
+        ka = (round(a[0], 4), round(a[1], 4))
+        kb = (round(b[0], 4), round(b[1], 4))
+        if ka == kb:
             continue
         total_segs += 1
-        key = (a, b) if a <= b else (b, a)
+        key = (ka, kb) if ka <= kb else (kb, ka)
         if key not in unique:
-            unique[key] = (center(a), center(b))
+            unique[key] = (a, b)
 
 segs = list(unique.values())
 def seg_km(p1, p2):

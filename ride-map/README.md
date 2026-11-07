@@ -12,8 +12,8 @@ login) and https://every-road-once.pages.dev
 ```
 Garmin Edge ──sync──> RideWithGPS ──API──> update_map.py
                                               │ downloads new tracks only,
-                                              │ snaps points to a ~50 m grid,
-                                              │ keeps each segment once
+                                              │ builds micro-segments between
+                                              │ GPS points, keeps each once
                                               ▼
                                      web/segments.json
                                               │ deploy_pages.py
@@ -26,7 +26,11 @@ Garmin Edge ──sync──> RideWithGPS ──API──> update_map.py
 - `update_map.py` — incremental refresh: pulls recent trips through the
   RideWithGPS API, downloads tracks for uncached trips only, rebuilds the
   de-overlapped segment set, writes `web/segments.json` (stats, recent
-  rides, segments as `[lng1, lat1, lng2, lat2]`).
+  rides, segments as `[lng1, lat1, lng2, lat2]`). Segments are the real
+  micro-segments between consecutive GPS points (dedupe key: endpoints
+  rounded to ~10 m, gaps over 250 m skipped), so drawn lines follow the
+  true ridden path — street curves and trails alike — with no map
+  matching and nothing sent to a third party.
 - `make_poster.py` / `make_map_poster.py` — render the black-background and
   OpenStreetMap poster images from the same segment data.
 - `deploy_pages.py` — copies the fresh data into `site/` and deploys to
