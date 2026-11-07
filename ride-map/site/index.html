@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Every Road Once — 2026 Rides</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  html, body { margin:0; height:100%; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #map { position:absolute; inset:0; }
+  .card {
+    position:absolute; top:12px; left:12px; z-index:1000; max-width:320px;
+    background:rgba(255,255,255,.94); border-radius:12px; padding:14px 16px;
+    box-shadow:0 2px 14px rgba(0,0,0,.25); color:#1a1a1a;
+  }
+  .card h1 { font-size:17px; margin:0 0 2px; }
+  .card .sub { font-size:12px; color:#666; margin-bottom:10px; }
+  .stats { display:flex; gap:14px; margin-bottom:10px; }
+  .stat b { display:block; font-size:19px; color:#d92b00; }
+  .stat span { font-size:11px; color:#666; text-transform:uppercase; letter-spacing:.04em; }
+  .rides { font-size:12.5px; border-top:1px solid #e5e5e5; padding-top:8px; max-height:180px; overflow:auto; }
+  .rides div { display:flex; justify-content:space-between; gap:10px; padding:2px 0; }
+  .rides .d { color:#888; white-space:nowrap; }
+  .rides .k { white-space:nowrap; font-variant-numeric:tabular-nums; }
+  #toggle { margin-top:8px; font-size:12px; background:none; border:none; color:#2563eb; cursor:pointer; padding:0; }
+  .leaflet-control-layers { font-size:12.5px; }
+  @media (max-width: 480px) { .card { max-width: calc(100vw - 60px); } }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="card" id="card">
+  <h1>Every Road Once — 2026</h1>
+  <div class="sub" id="updated">Loading ride data…</div>
+  <div class="stats">
+    <div class="stat"><b id="s-rides">–</b><span>rides</span></div>
+    <div class="stat"><b id="s-total">–</b><span>km ridden</span></div>
+    <div class="stat"><b id="s-unique">–</b><span>unique km</span></div>
+  </div>
+  <div class="rides" id="rides"></div>
+  <button id="toggle">Hide panel</button>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map('map', { renderer: L.canvas(), zoomControl: true });
+const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+const dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors &copy; CARTO' });
+L.control.layers({ 'Street': osm, 'Dark': dark }).addTo(map);
+map.setView([43.71, -79.39], 11);
+
+document.getElementById('toggle').addEventListener('click', (e) => {
+  const body = document.querySelectorAll('.card .stats, .card .rides, .card .sub');
+  const hidden = document.getElementById('rides').style.display === 'none';
+  body.forEach(el => el.style.display = hidden ? '' : 'none');
+  e.target.textContent = hidden ? 'Hide panel' : 'Show panel';
+});
+
+fetch('segments.json', { cache: 'no-cache' })
+  .then(r => r.json())
+  .then(data => {
+    const latlngs = data.segments.map(s => [[s[1], s[0]], [s[3], s[2]]]);
+    const lines = L.polyline(latlngs, { color: '#d92b00', weight: 2, opacity: 0.9 }).addTo(map);
+    map.fitBounds(lines.getBounds().pad(0.03));
+    const st = data.stats;
+    document.getElementById('s-rides').textContent = st.rides;
+    document.getElementById('s-total').textContent = Math.round(st.total_km).toLocaleString();
+    document.getElementById('s-unique').textContent = Math.round(st.unique_km).toLocaleString();
+    document.getElementById('updated').textContent =
+      'Every unique road, drawn once · updated ' + new Date(data.updated_at).toLocaleDateString();
+    document.getElementById('rides').innerHTML = data.recent_rides.map(r =>
+      `<div><span>${r.name}</span><span class="d">${r.date}</span><span class="k">${r.km} km</span></div>`).join('');
+  })
+  .catch(() => { document.getElementById('updated').textContent = 'Could not load ride data.'; });
+</script>
+</body>
+</html>
