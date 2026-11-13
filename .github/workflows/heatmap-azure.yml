@@ -1,0 +1,65 @@
+name: heatmap-azure
+
+# Deploys the Ride Heatmap worker (Function App) and site + API (Static Web App).
+# No secrets are stored in GitHub: Azure login is OIDC (federated credential on
+# a user-assigned identity, Contributor on the heatmap resource group only), and
+# the Static Web Apps deployment token is read at run time and masked.
+# Infrastructure (infra/main.bicep) is deployed from a laptop with
+# heatmap-azure/deploy.sh because it creates role assignments.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'heatmap-azure/web/**'
+      - 'heatmap-azure/api/**'
+      - 'heatmap-azure/worker/**'
+      - '.github/workflows/heatmap-azure.yml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: heatmap-azure
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: vars.AZURE_CLIENT_ID != ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy worker (Flex Consumption, remote build)
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ vars.HEATMAP_FUNCTION_APP }}
+          package: heatmap-azure/worker
+          sku: flexconsumption
+          remote-build: true
+
+      - name: Read Static Web Apps deployment token
+        id: swa
+        run: |
+          token=$(az staticwebapp secrets list -n "${{ vars.HEATMAP_SWA_NAME }}" \
+            -g "${{ vars.AZURE_RESOURCE_GROUP }}" --query properties.apiKey -o tsv)
+          echo "::add-mask::$token"
+          echo "token=$token" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy site + API
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ steps.swa.outputs.token }}
+          action: upload
+          app_location: heatmap-azure/web
+          api_location: heatmap-azure/api
+          output_location: ''
+          skip_app_build: true
