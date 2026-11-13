@@ -192,8 +192,15 @@ fetch('heatmap.json', { cache: 'no-cache' })
     document.getElementById('s-unique').textContent = Math.round(st.unique_km).toLocaleString();
     document.getElementById('updated').textContent =
       'Garmin Connect · each road drawn once, colored by rides · updated ' + new Date(data.updated_at).toLocaleDateString();
-    document.getElementById('rides').innerHTML = data.recent_rides.map(r =>
-      `<div><span>${r.name}</span><span class="d">${r.date}</span><span class="k">${r.km} km</span></div>`).join('');
+    const ridesEl = document.getElementById('rides');
+    ridesEl.replaceChildren(...data.recent_rides.map(r => {
+      const row = document.createElement('div');
+      const n = document.createElement('span'); n.textContent = r.name;
+      const d = document.createElement('span'); d.className = 'd'; d.textContent = r.date;
+      const k = document.createElement('span'); k.className = 'k'; k.textContent = `${r.km} km`;
+      row.append(n, d, k);
+      return row;
+    }));
   })
   .catch(() => { document.getElementById('updated').textContent = 'Could not load ride data.'; });
 </script>

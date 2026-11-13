@@ -54,23 +54,26 @@ def fetch(api_key):
             if os.path.exists(path):
                 continue
             z = zipfile.ZipFile(io.BytesIO(client.download_activity(a["activityId"])))
-            fit = next(n for n in z.namelist() if n.lower().endswith(".fit"))
+            fit = next((n for n in z.namelist() if n.lower().endswith(".fit")), None)
             pts = []
-            with fitdecode.FitReader(io.BytesIO(z.read(fit))) as fr:
-                for f in fr:
-                    if isinstance(f, fitdecode.FitDataMessage) and f.name == "record":
-                        la = f.get_value("position_lat", fallback=None)
-                        lo = f.get_value("position_long", fallback=None)
-                        if la is not None and lo is not None:
-                            pts.append((round(lo * SEMI, 6), round(la * SEMI, 6)))
-            json.dump(pts, open(path, "w"))
+            if fit:
+                with fitdecode.FitReader(io.BytesIO(z.read(fit))) as fr:
+                    for f in fr:
+                        if isinstance(f, fitdecode.FitDataMessage) and f.name == "record":
+                            la = f.get_value("position_lat", fallback=None)
+                            lo = f.get_value("position_long", fallback=None)
+                            if la is not None and lo is not None:
+                                pts.append((round(lo * SEMI, 6), round(la * SEMI, 6)))
+            with open(path, "w") as fp:
+                json.dump(pts, fp)
             new.append(a["activityId"])
             time.sleep(0.3)
     rides = [{"id": a["activityId"], "name": a.get("activityName") or "Ride",
               "date": a["startTimeLocal"][:10], "km": round((a.get("distance") or 0) / 1000, 1)}
              for a in rides]
     rides.sort(key=lambda r: r["date"], reverse=True)
-    json.dump(rides, open(f"{CACHE}/rides.json", "w"), indent=1)
+    with open(f"{CACHE}/rides.json", "w") as fp:
+        json.dump(rides, fp, indent=1)
     return rides, new
 
 
@@ -198,10 +201,11 @@ def main():
     stats = {"rides": len(rides), "total_km": round(sum(r["km"] for r in rides), 1),
              "unique_km": round(unique_km), "repeat_km": round(repeat_km),
              "max_count": max((l[0] for l in lines), default=0), "lines": len(lines)}
-    json.dump({"updated_at": datetime.now().isoformat(timespec="seconds"), "year": int(YEAR),
-               "source": "garmin", "stats": stats,
-               "recent_rides": [{k: r[k] for k in ("name", "date", "km")} for r in rides[:15]],
-               "lines": lines}, open(OUT, "w"))
+    with open(OUT, "w") as fp:
+        json.dump({"updated_at": datetime.now().isoformat(timespec="seconds"), "year": int(YEAR),
+                   "source": "garmin", "stats": stats,
+                   "recent_rides": [{k: r[k] for k in ("name", "date", "km")} for r in rides[:15]],
+                   "lines": lines}, fp)
     print(json.dumps({"ok": True, "new_rides": len(new), **stats}))
 
 

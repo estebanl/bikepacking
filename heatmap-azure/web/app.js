@@ -229,10 +229,24 @@ function renderProfile(p, me) {
   const wipe = el('button', { className: 'danger', textContent: 'Delete my data' });
   wipe.onclick = async () => {
     if (!confirm('Delete your Garmin key, downloaded rides and heatmap? This cannot be undone.')) return;
-    await api('profile', { method: 'DELETE' });
+    const r = await api('profile', { method: 'DELETE' });
+    if (r.status !== 202) {
+      alert((r.body && r.body.error) || 'Could not delete your data.');
+      return;
+    }
+    clearTimeout(pollTimer);
+    shownRun = null;
     if (routeGroup) map.removeLayer(routeGroup);
     $('mapui').classList.add('hidden');
-    loadProfile();
+    $('updated').textContent = 'Your data is being deleted.';
+    $('account').replaceChildren(
+      el('p', { className: 'who', textContent: `Signed in as ${me.userDetails}` }),
+      el('p', { className: 'status', textContent: 'Your Garmin key, rides and heatmap are being deleted.' }),
+      el('div', { className: 'links' },
+        el('button', { textContent: 'Start over', onclick: () => loadProfile() }),
+        el('a', { href: '/.auth/logout?post_logout_redirect_uri=/', textContent: 'Sign out' }),
+      ),
+    );
   };
   links.append(wipe, el('a', { href: '/.auth/logout?post_logout_redirect_uri=/', textContent: 'Sign out' }));
   const parts = [el('p', { className: 'who', textContent: `Signed in as ${me.userDetails}` }), status];

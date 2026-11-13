@@ -83,9 +83,10 @@ def _decrypt(enc_b64):
 
 # ---------------------------------------------------------------- garmin
 def _token(api_key):
-    cache = os.path.join(tempfile.mkdtemp(), "token.json")
-    with PersonalApiAuthenticator(bearer_token_cache_file=cache) as auth:
-        return auth.obtain_token(api_key).access_token
+    with tempfile.TemporaryDirectory() as tmp:
+        cache = os.path.join(tmp, "token.json")
+        with PersonalApiAuthenticator(bearer_token_cache_file=cache) as auth:
+            return auth.obtain_token(api_key).access_token
 
 
 def _sync_tracks(uid, access_token):
@@ -226,16 +227,21 @@ def handle(msg):
     if not (len(uid) == 32 and all(c in "0123456789abcdef" for c in uid)):
         log.error("rejecting job with bad uid")
         return
-    if op == "set-key":
-        set_key(uid, msg["enc"])
-    elif op == "delete-key":
-        delete_key(uid)
-    elif op == "refresh":
-        refresh(uid)
-    elif op == "purge-user":
-        purge_user(uid)
-    else:
-        log.error("unknown op %r", op)
+    try:
+        if op == "set-key":
+            set_key(uid, msg["enc"])
+        elif op == "delete-key":
+            delete_key(uid)
+        elif op == "refresh":
+            refresh(uid)
+        elif op == "purge-user":
+            purge_user(uid)
+        else:
+            log.error("unknown op %r", op)
+    except Exception:
+        log.exception("job %s failed for %s", op, uid)
+        _set_profile(uid, status="error", message="Something went wrong. Please try again.")
+        raise
 
 
 def refresh_all():
