@@ -11,7 +11,7 @@ this (public) repository.
 ```
 Browser ──Microsoft sign-in (built-in, Entra)──> Static Web App (Free)
   web/  page                                     /api/* needs role "rider"
-  api/  managed functions (Node 20)              (invite-only, max 25 on Free)
+  api/  managed functions (Node 22)              (invite-only, max 25 on Free)
      │ PUT /api/key: key encrypted with a Key Vault RSA public key, then queued
      │ GET /api/heatmap: the rider's own blob
      ▼

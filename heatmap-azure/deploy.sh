@@ -41,7 +41,7 @@ echo "==> site + API -> $SWA"
 (cd api && npm ci --omit=dev --no-audit --no-fund --loglevel=error)
 TOKEN=$(az staticwebapp secrets list -n "$SWA" -g "$RG" --query properties.apiKey -o tsv)
 npx -y @azure/static-web-apps-cli@2 deploy ./web --api-location ./api \
-  --api-language node --api-version 20 --env production --deployment-token "$TOKEN" >/dev/null
+  --api-language node --api-version 22 --env production --deployment-token "$TOKEN" >/dev/null
 unset TOKEN
 
 if [[ -n "${OWNER_EMAIL:-}" ]]; then

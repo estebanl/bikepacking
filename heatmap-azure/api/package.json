@@ -4,7 +4,7 @@
   "private": true,
   "description": "Static Web Apps managed API for the ride heatmap",
   "main": "src/functions/*.js",
-  "engines": { "node": ">=20" },
+  "engines": { "node": ">=22" },
   "dependencies": {
     "@azure/data-tables": "^13.3.0",
     "@azure/functions": "^4.6.0",
