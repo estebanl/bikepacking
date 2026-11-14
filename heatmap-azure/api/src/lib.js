@@ -66,12 +66,21 @@ async function wrapPublicKey() {
   return wrapKey;
 }
 
+// Hybrid encryption: RSA-OAEP with a 2048-bit key can only hold 190 bytes, and
+// a Garmin key may be longer. The key is sealed with a one-time AES-256-GCM key,
+// and only that AES key is wrapped with the Key Vault public key.
+// Format: v2.<wrapped AES key>.<iv>.<ciphertext>.<tag>, each part base64.
 async function encryptForVault(text) {
   const pem = await wrapPublicKey();
-  return crypto.publicEncrypt(
+  const aesKey = crypto.randomBytes(32);
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv('aes-256-gcm', aesKey, iv);
+  const sealed = Buffer.concat([cipher.update(text, 'utf8'), cipher.final()]);
+  const wrapped = crypto.publicEncrypt(
     { key: pem, padding: crypto.constants.RSA_PKCS1_OAEP_PADDING, oaepHash: 'sha256' },
-    Buffer.from(text, 'utf8'),
-  ).toString('base64');
+    aesKey,
+  );
+  return ['v2', ...[wrapped, iv, sealed, cipher.getAuthTag()].map((b) => b.toString('base64'))].join('.');
 }
 
 module.exports = { principal, json, enqueue, getProfile, mergeProfile, blobs, encryptForVault };

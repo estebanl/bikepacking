@@ -27,7 +27,9 @@ from azure.keyvault.keys import KeyClient
 from azure.keyvault.keys.crypto import CryptographyClient, EncryptionAlgorithm
 from azure.keyvault.secrets import SecretClient
 from azure.storage.blob import BlobServiceClient, ContentSettings
+from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
 from garmin_personal_api import GarminPersonalApiClient, PersonalApiAuthenticator
 from garmin_personal_api.errors import GarminPersonalApiError, HttpError
@@ -146,9 +148,24 @@ def publish_public_key():
     log.info("published wrap public key")
 
 
-def _decrypt(enc_b64):
+class BadEnvelope(Exception):
+    """The submitted key could not be decrypted (malformed or tampered with)."""
+
+
+def _decrypt(enc):
+    """Open a key sealed by the API: v2.<RSA-wrapped AES key>.<iv>.<ciphertext>.<tag>."""
     crypto = CryptographyClient(_keys.get_key(WRAP_KEY), _cred)
-    return crypto.decrypt(EncryptionAlgorithm.rsa_oaep_256, base64.b64decode(enc_b64)).plaintext.decode()
+    unwrap = lambda b: crypto.decrypt(EncryptionAlgorithm.rsa_oaep_256, b).plaintext
+    if not enc.startswith("v2."):                     # queued before v2: the key itself, RSA-encrypted
+        return unwrap(base64.b64decode(enc)).decode()
+    try:
+        wrapped, iv, sealed, tag = (base64.b64decode(p, validate=True) for p in enc.split(".")[1:])
+    except ValueError as e:                           # wrong number of parts or bad base64
+        raise BadEnvelope() from e
+    try:
+        return AESGCM(unwrap(wrapped)).decrypt(iv, sealed + tag, None).decode()
+    except (InvalidTag, ValueError) as e:
+        raise BadEnvelope() from e
 
 
 # ---------------------------------------------------------------- garmin
@@ -286,7 +303,7 @@ def _refresh(uid, api_key):
 def set_key(uid, enc):
     try:
         api_key = _decrypt(enc)
-    except HttpResponseError:
+    except (HttpResponseError, BadEnvelope):
         _set_profile(uid, status="error", message="Could not read the submitted key. Please submit it again.")
         return
     try:

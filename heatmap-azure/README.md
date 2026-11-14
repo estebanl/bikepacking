@@ -32,8 +32,8 @@ Key Vault (RBAC): secret garmin-<uid> per rider + RSA key garmin-wrap
   The raw provider id is never stored; the display name sits in the profile
   row only.
 - **Garmin keys:** the API never stores them. It encrypts each submitted key
-  with the public half of the Key Vault RSA key (RSA-OAEP-256) and queues
-  it. The worker decrypts it inside Key Vault, validates it with Garmin, and
+  with a one-time AES-256-GCM key, wraps that with the public half of the
+  Key Vault RSA key (RSA-OAEP-256), and queues it. The worker decrypts it inside Key Vault, validates it with Garmin, and
   saves it as a Key Vault secret. Keys are never returned to the browser.
   "Remove Garmin key" deletes the secret; "Delete my data" also removes the
   rider's tracks, heatmap and profile.
