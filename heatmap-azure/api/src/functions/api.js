@@ -25,10 +25,13 @@ const deleting = () => json(409, { error: 'Your data is being deleted. Try again
 // Mark the profile busy, then queue the job that will clear it. If the queue
 // send fails, no job will ever run, so put the profile back before failing:
 // otherwise the page would hide its forms and poll forever.
+// Every job carries the profile's gen, so a job that is delayed or retried
+// until after "Delete my data" and a fresh start is refused by the worker.
 async function submit(uid, before, busy, job) {
-  await mergeProfile(uid, busy);
+  const gen = (before && before.gen) || crypto.randomUUID();
+  await mergeProfile(uid, { ...busy, gen });
   try {
-    await enqueue(job);
+    await enqueue({ ...job, uid, gen });
   } catch (e) {
     const undo = {};
     for (const k of Object.keys(busy)) undo[k] = before && before[k] !== undefined ? before[k] : BLANK[k];
@@ -58,7 +61,7 @@ app.http('profile', {
     if (request.method === 'DELETE') {
       // The purge mark stops worker jobs already running for this rider from
       // writing anything more; the purge job then removes the profile itself.
-      await submit(user.uid, p, { status: 'deleting', message: '', purge: true }, { op: 'purge-user', uid: user.uid });
+      await submit(user.uid, p, { status: 'deleting', message: '', purge: true }, { op: 'purge-user' });
       return json(202, { status: 'deleting' });
     }
     if (!p) {
@@ -81,7 +84,7 @@ app.http('key', {
     const p = await getProfile(user.uid);
     if (p && p.purge) return deleting();
     if (request.method === 'DELETE') {
-      await submit(user.uid, p, { status: 'deleting', message: '' }, { op: 'delete-key', uid: user.uid });
+      await submit(user.uid, p, { status: 'deleting', message: '' }, { op: 'delete-key' });
       return json(202, { status: 'deleting' });
     }
     let body;
@@ -96,7 +99,7 @@ app.http('key', {
     } catch {
       return json(503, { error: 'The app is still starting up. Try again in a minute.' });
     }
-    await submit(user.uid, p, { status: 'pending', message: '' }, { op: 'set-key', uid: user.uid, enc });
+    await submit(user.uid, p, { status: 'pending', message: '' }, { op: 'set-key', enc });
     return json(202, { status: 'pending' });
   }),
 });
@@ -116,7 +119,7 @@ app.http('refresh', {
       return json(429, { error: 'Refreshed recently. Try again in a few minutes.' });
     }
     await submit(user.uid, p, { status: 'pending', message: '', lastRequested: new Date().toISOString() },
-      { op: 'refresh', uid: user.uid });
+      { op: 'refresh' });
     return json(202, { status: 'pending' });
   }),
 });

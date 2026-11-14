@@ -89,10 +89,21 @@ def _live(uid):
     return entity
 
 
-def _begin(uid):
-    """Start a job for this rider: remember which generation of the profile it belongs to."""
+_ANY = object()
+
+
+def _begin(uid, gen=_ANY):
+    """Start a job for this rider, tied to one generation of the profile.
+
+    Queued jobs carry the generation they were submitted for, so one that is
+    delayed or retried until after the rider deleted their data and started
+    over is refused. The morning run has none and takes the current one.
+    """
     _job_gen.set(None)
-    _job_gen.set((uid, _live(uid).get("gen")))
+    current = _live(uid).get("gen")
+    if gen is not _ANY and gen != current:
+        raise Gone(uid)
+    _job_gen.set((uid, current))
 
 
 def _merge(uid, etag=None, **fields):
@@ -400,7 +411,7 @@ def handle(msg):
         if op == "purge-user":
             purge_user(uid)
             return
-        _begin(uid)
+        _begin(uid, msg["gen"]) if "gen" in msg else _begin(uid)   # no gen: queued by an older API
         if op == "set-key":
             set_key(uid, msg["enc"])
         elif op == "delete-key":
