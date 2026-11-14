@@ -6,6 +6,7 @@ Riders are identified by an opaque id (uid) the API derives from the
 signed-in principal; no names or emails are stored outside the profile.
 """
 import base64
+import hashlib
 import io
 import json
 import logging
@@ -37,6 +38,10 @@ VAULT = os.environ["KEY_VAULT_URI"]
 WRAP_KEY = os.environ.get("WRAP_KEY_NAME", "garmin-wrap")
 RIDE_TYPES = ("cycling", "biking")   # cycling, road_biking, mountain_biking, gravel_cycling...
 SEMI = 180 / 2**31                   # FIT semicircles -> degrees
+TRANSIENT = {429, 500, 502, 503, 504}
+BACKOFF = (5, 15, 45)                # seconds between attempts; 4 tries per Garmin call
+with open(heatmap_core.__file__, "rb") as _f:   # algorithm changes force a rebuild
+    CORE_HASH = hashlib.sha256(_f.read()).hexdigest()[:16]
 
 _cred = DefaultAzureCredential()
 _blobs = BlobServiceClient(f"https://{ACCOUNT}.blob.core.windows.net", credential=_cred)
@@ -82,11 +87,29 @@ def _decrypt(enc_b64):
 
 
 # ---------------------------------------------------------------- garmin
+def _garmin(what, fn, *args, **kwargs):
+    """Call Garmin, retrying gateway errors, rate limits and dropped connections."""
+    for attempt in range(len(BACKOFF) + 1):
+        try:
+            return fn(*args, **kwargs)
+        except HttpError as e:
+            if e.status_code not in TRANSIENT or attempt == len(BACKOFF):
+                log.warning("garmin %s failed: HTTP %s (attempt %d)", what, e.status_code, attempt + 1)
+                raise
+            log.info("garmin %s: HTTP %s, retrying in %ds", what, e.status_code, BACKOFF[attempt])
+        except OSError as e:                          # connection reset, timeout, DNS
+            if attempt == len(BACKOFF):
+                log.warning("garmin %s failed: %s (attempt %d)", what, type(e).__name__, attempt + 1)
+                raise
+            log.info("garmin %s: %s, retrying in %ds", what, type(e).__name__, BACKOFF[attempt])
+        time.sleep(BACKOFF[attempt])
+
+
 def _token(api_key):
     with tempfile.TemporaryDirectory() as tmp:
         cache = os.path.join(tmp, "token.json")
         with PersonalApiAuthenticator(bearer_token_cache_file=cache) as auth:
-            return auth.obtain_token(api_key).access_token
+            return _garmin("token", auth.obtain_token, api_key).access_token
 
 
 def _sync_tracks(uid, access_token):
@@ -99,8 +122,8 @@ def _sync_tracks(uid, access_token):
     with GarminPersonalApiClient(access_token) as client:
         start = 0
         while True:
-            page = client.search_activities(start=start, limit=100,
-                                            start_date=f"{year}-01-01", end_date=f"{year}-12-31") or []
+            page = _garmin("search", client.search_activities, start=start, limit=100,
+                           start_date=f"{year}-01-01", end_date=f"{year}-12-31") or []
             acts += page
             start += len(page)
             if len(page) < 100:
@@ -112,7 +135,7 @@ def _sync_tracks(uid, access_token):
             aid = str(a["activityId"])
             if aid in cached:
                 continue
-            z = zipfile.ZipFile(io.BytesIO(client.download_activity(a["activityId"])))
+            z = zipfile.ZipFile(io.BytesIO(_garmin("download", client.download_activity, a["activityId"])))
             fit = next((n for n in z.namelist() if n.lower().endswith(".fit")), None)
             pts = []
             if fit:
@@ -143,7 +166,7 @@ def refresh(uid):
         return
     _set_profile(uid, status="syncing", message="")
     try:
-        rides, new = _sync_tracks(uid, _token(api_key))
+        _refresh(uid, api_key)
     except HttpError as e:
         if e.status_code in (401, 403):
             _set_profile(uid, status="invalid-key",
@@ -151,7 +174,32 @@ def refresh(uid):
         else:
             _set_profile(uid, status="error", message=f"Garmin returned HTTP {e.status_code}. Will retry tomorrow.")
         log.warning("garmin http %s for %s", e.status_code, uid)
-        return
+    except Exception:                                 # never leave the rider stuck on "syncing"
+        log.exception("refresh failed for %s", uid)
+        _set_profile(uid, status="error", message="Refresh failed. Will retry tomorrow.")
+
+
+def _refresh(uid, api_key):
+    rides, new = _sync_tracks(uid, _token(api_key))
+    # Same rides as last time and same algorithm: the map can't have changed.
+    fingerprint = hashlib.sha256(json.dumps([CORE_HASH, rides]).encode()).hexdigest()
+    try:
+        previous = _profiles.get_entity("user", uid).get("ridesHash")
+    except ResourceNotFoundError:
+        previous = None
+    if new == 0 and fingerprint == previous:
+        blob = _blobs.get_blob_client("heatmaps", f"{uid}.json")
+        try:
+            doc = json.loads(blob.download_blob().readall())
+        except ResourceNotFoundError:
+            doc = None                                # map missing: fall through and rebuild
+        if doc is not None:
+            doc["updated_at"] = _now()                # "updated" on the page = last checked
+            blob.upload_blob(json.dumps(doc), overwrite=True,
+                             content_settings=ContentSettings(content_type="application/json"))
+            _set_profile(uid, status="ok", message="", lastRun=_now())
+            log.info("refreshed %s: %d rides, unchanged", uid, len(rides))
+            return
     tracks = _blobs.get_container_client("tracks")
     pts = [json.loads(tracks.download_blob(f"{uid}/{r['id']}.json").readall()) for r in rides]
     lines = heatmap_core.build_lines(pts)
@@ -163,7 +211,7 @@ def refresh(uid):
            "recent_rides": [{k: r[k] for k in ("name", "date", "km")} for r in rides[:15]], "lines": lines}
     _blobs.get_blob_client("heatmaps", f"{uid}.json").upload_blob(
         json.dumps(doc), overwrite=True, content_settings=ContentSettings(content_type="application/json"))
-    _set_profile(uid, status="ok", message="", lastRun=_now(), stats=json.dumps(stats))
+    _set_profile(uid, status="ok", message="", lastRun=_now(), stats=json.dumps(stats), ridesHash=fingerprint)
     log.info("refreshed %s: %d rides, %d new", uid, len(rides), new)
 
 
