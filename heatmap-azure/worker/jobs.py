@@ -176,12 +176,17 @@ def set_key(uid, enc):
         return
     try:
         _token(api_key)                               # validate before storing
-    except (HttpError, GarminPersonalApiError):
-        _set_profile(uid, hasKey=False, status="invalid-key",
-                     message="Garmin rejected that API key. Check it and try again.")
-        return
-    except Exception:                                 # timeout, DNS...: not the key's fault
+    except Exception as e:
+        rejected = (e.status_code in (400, 401, 403) if isinstance(e, HttpError)
+                    else isinstance(e, GarminPersonalApiError))
+        if rejected:
+            _set_profile(uid, hasKey=False, status="invalid-key",
+                         message="Garmin rejected that API key. Check it and try again.")
+            return
+        # 429, 5xx, timeout, DNS...: not the key's fault.
         # Leave a state the rider can resubmit from, even if the queue retries run out.
+        log.warning("could not validate key for %s: %s", uid,
+                    f"HTTP {e.status_code}" if isinstance(e, HttpError) else type(e).__name__)
         _set_profile(uid, status="error",
                      message="Could not reach Garmin to check the key. Please submit it again.")
         raise
