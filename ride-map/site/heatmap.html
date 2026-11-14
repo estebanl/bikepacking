@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ride Heatmap 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  html, body { margin:0; height:100%; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #map { position:absolute; inset:0; }
+  .card {
+    position:absolute; top:12px; left:12px; z-index:1000; max-width:320px;
+    background:rgba(255,255,255,.94); border-radius:12px; padding:14px 16px;
+    box-shadow:0 2px 14px rgba(0,0,0,.25); color:#1a1a1a;
+  }
+  .card h1 { font-size:17px; margin:0 0 2px; }
+  .card .sub { font-size:12px; color:#666; margin-bottom:10px; }
+  .stats { display:flex; gap:14px; margin-bottom:10px; }
+  .stat b { display:block; font-size:19px; color:#d92b00; }
+  .stat span { font-size:11px; color:#666; text-transform:uppercase; letter-spacing:.04em; }
+  .slider-row { display:flex; align-items:center; gap:8px; font-size:12px; color:#444; border-top:1px solid #e5e5e5; padding-top:8px; margin-bottom:2px; }
+  .slider-row input[type=range] { flex:1; accent-color:#d92b00; }
+  .slider-row span { font-variant-numeric:tabular-nums; min-width:32px; text-align:right; }
+  .mode-row { display:flex; align-items:center; gap:8px; font-size:12px; color:#444; margin:6px 0 4px; }
+  .seg { display:inline-flex; border:1px solid #d0d0d0; border-radius:6px; overflow:hidden; }
+  .seg button { font:inherit; font-size:11.5px; background:#fff; border:none; padding:2px 9px; cursor:pointer; color:#444; }
+  .seg button.on { background:#d92b00; color:#fff; }
+  .card.nocounts .mode-row, .card.nocounts .legend { display:none !important; }
+  .legend { font-size:11px; color:#555; margin-bottom:8px; }
+  .legend .bar { display:flex; height:8px; border-radius:4px; overflow:hidden; margin:3px 0 2px; }
+  .legend .bar i { flex:1; }
+  .legend .lbl { display:flex; }
+  .legend .lbl span { flex:1; text-align:center; font-variant-numeric:tabular-nums; }
+  .rides { font-size:12.5px; border-top:1px solid #e5e5e5; padding-top:8px; max-height:180px; overflow:auto; }
+  .rides div { display:flex; justify-content:space-between; gap:10px; padding:2px 0; }
+  .rides .d { color:#888; white-space:nowrap; }
+  .rides .k { white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .foot { display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:12px; }
+  .foot a { color:#2563eb; text-decoration:none; }
+  #toggle {  font-size:12px; background:none; border:none; color:#2563eb; cursor:pointer; padding:0; }
+  .leaflet-control-layers { font-size:12.5px; }
+  /* Muted basemaps: same OSM tiles, desaturated so the heat lines lead. */
+  .tiles-muted { filter: grayscale(1) contrast(.72) brightness(1.12); }
+  .tiles-muted-dark { filter: invert(1) grayscale(1) contrast(.78) brightness(.82); }
+  @media (max-width: 480px) { .card { max-width: calc(100vw - 60px); } }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="card" id="card">
+  <h1>Ride Heatmap — 2026</h1>
+  <div class="sub" id="updated">Loading Garmin ride data…</div>
+  <div class="stats">
+    <div class="stat"><b id="s-rides">–</b><span>rides</span></div>
+    <div class="stat"><b id="s-total">–</b><span>km ridden</span></div>
+    <div class="stat"><b id="s-unique">–</b><span>unique km</span></div>
+  </div>
+  <div class="slider-row">
+    <label for="weight">Line</label>
+    <input type="range" id="weight" min="1" max="6" step="0.5" value="2">
+    <span id="weight-val">2 px</span>
+  </div>
+  <div class="mode-row">
+    <span>Color</span>
+    <div class="seg"><button id="mode-heat" class="on">Heat</button><button id="mode-flat">Flat</button></div>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div class="rides" id="rides"></div>
+  <div class="foot"><button id="toggle">Hide panel</button><a href="./">Every Road Once map →</a></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map('map', { renderer: L.canvas(), zoomControl: true });
+const osmAttr = '&copy; OpenStreetMap contributors';
+const osmUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const muted = L.tileLayer(osmUrl, { maxZoom: 19, attribution: osmAttr, className: 'tiles-muted' }).addTo(map);
+const mutedDark = L.tileLayer(osmUrl, { maxZoom: 19, attribution: osmAttr, className: 'tiles-muted-dark' });
+const street = L.tileLayer(osmUrl, { maxZoom: 19, attribution: osmAttr });
+const cycling = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
+  { maxZoom: 19, attribution: osmAttr + ' &copy; CyclOSM' });
+const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+  { maxZoom: 15, attribution: osmAttr + ' &copy; OpenTopoMap (CC-BY-SA)' });
+const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  { maxZoom: 18, attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics' });
+const light = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  { maxZoom: 19, attribution: osmAttr + ' &copy; CARTO' });
+const dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  { maxZoom: 19, attribution: osmAttr + ' &copy; CARTO' });
+L.control.layers({
+  'Muted': muted, 'Muted dark': mutedDark,
+  'Street': street, 'Cycling': cycling, 'Topo': topo,
+  'Satellite': satellite, 'Light': light, 'Dark': dark
+}).addTo(map);
+map.setView([43.71, -79.39], 11);
+
+document.getElementById('toggle').addEventListener('click', (e) => {
+  const body = document.querySelectorAll('.card .stats, .card .rides, .card .sub, .card .slider-row, .card .mode-row, .card .legend');
+  const hidden = document.getElementById('rides').style.display === 'none';
+  body.forEach(el => el.style.display = hidden ? '' : 'none');
+  e.target.textContent = hidden ? 'Hide panel' : 'Show panel';
+});
+
+// --- Heat coloring: each line carries the number of rides that covered it.
+const BINS = [[1, 1, '1'], [2, 2, '2'], [3, 5, '3–5'], [6, 10, '6–10'], [11, 20, '11–20'], [21, Infinity, '21+']];
+// Hot = dark on light basemaps, hot = bright on dark ones.
+// Light ramp starts saturated: pale orange vanished into OSM's road fills.
+const PALETTE_LIGHT = ['#f26b1d', '#e03a12', '#c0122c', '#93004f', '#640066', '#33005c'];
+const PALETTE_DARK  = ['#8c2200', '#c23400', '#ee5500', '#ff8a1f', '#ffc04d', '#fff1a8'];
+const FLAT = '#d92b00';
+const DARK_BASES = new Set([dark, satellite, mutedDark]);
+let darkBase = false;
+let mode = 'heat';
+let hasCounts = true;   // false for data files built before ride counts existed
+try { if (localStorage.getItem('heat-color-mode') === 'flat') mode = 'flat'; } catch (e) {}
+let bucketLayers = [];   // [{layer, i}] for non-empty bins, low → high
+let usedBins = [];
+
+const weightInput = document.getElementById('weight');
+const weightVal = document.getElementById('weight-val');
+let savedWeight = NaN;
+try { savedWeight = parseFloat(localStorage.getItem('heat-line-weight')); } catch (e) {}
+if (!isNaN(savedWeight)) { weightInput.value = savedWeight; weightVal.textContent = savedWeight + ' px'; }
+
+function palette() { return darkBase ? PALETTE_DARK : PALETTE_LIGHT; }
+function styleFor(i) {
+  const w = parseFloat(weightInput.value);
+  if (mode === 'flat' || !hasCounts) return { color: FLAT, weight: w, opacity: 0.9 };
+  return { color: palette()[i], weight: Math.min(w + 0.4 * i, w * 2), opacity: 0.9 };
+}
+function restyle() {
+  bucketLayers.forEach(({ layer, i }) => layer.setStyle(styleFor(i)));
+  renderLegend();
+}
+function renderLegend() {
+  const el = document.getElementById('legend');
+  if (mode === 'flat' || !hasCounts || !usedBins.length) { el.innerHTML = ''; el.style.visibility = 'hidden'; return; }
+  el.style.visibility = '';
+  const pal = palette();
+  el.innerHTML = 'Rides per road' +
+    '<div class="bar">' + usedBins.map(i => `<i style="background:${pal[i]}"></i>`).join('') + '</div>' +
+    '<div class="lbl">' + usedBins.map(i => `<span>${BINS[i][2]}</span>`).join('') + '</div>';
+}
+function setMode(m) {
+  mode = m;
+  try { localStorage.setItem('heat-color-mode', m); } catch (e) {}
+  document.getElementById('mode-heat').classList.toggle('on', m === 'heat');
+  document.getElementById('mode-flat').classList.toggle('on', m === 'flat');
+  restyle();
+}
+document.getElementById('mode-heat').addEventListener('click', () => setMode('heat'));
+document.getElementById('mode-flat').addEventListener('click', () => setMode('flat'));
+map.on('baselayerchange', (e) => { darkBase = DARK_BASES.has(e.layer); restyle(); });
+
+weightInput.addEventListener('input', () => {
+  const w = parseFloat(weightInput.value);
+  weightVal.textContent = w + ' px';
+  try { localStorage.setItem('heat-line-weight', w); } catch (e) {}
+  restyle();
+});
+
+function binIndex(c) {
+  for (let i = 0; i < BINS.length; i++) if (c <= BINS[i][1]) return i;
+  return BINS.length - 1;
+}
+
+fetch('heatmap.json', { cache: 'no-cache' })
+  .then(r => r.json())
+  .then(data => {
+    const groups = BINS.map(() => []);
+    // Polylines [count, lng1, lat1, lng2, lat2, ...], least-ridden first.
+    for (const l of data.lines) {
+      const pts = [];
+      for (let j = 1; j + 1 < l.length; j += 2) pts.push([l[j + 1], l[j]]);
+      groups[binIndex(l[0] > 0 ? l[0] : 1)].push(pts);
+    }
+    // A one-band "heatmap" (no road ridden twice) reads better as flat red.
+    hasCounts = data.lines.some(l => l[0] > 1);
+    if (!hasCounts) document.getElementById('card').classList.add('nocounts');
+    const all = L.featureGroup().addTo(map);
+    groups.forEach((g, i) => {
+      if (!g.length) return;
+      usedBins.push(i);
+      const layer = L.polyline(g, styleFor(i));
+      bucketLayers.push({ layer, i });
+      all.addLayer(layer);   // added low → high, so hot roads draw on top
+    });
+    setMode(mode);
+    if (bucketLayers.length) map.fitBounds(all.getBounds().pad(0.03));
+    const st = data.stats;
+    document.getElementById('s-rides').textContent = st.rides;
+    document.getElementById('s-total').textContent = Math.round(st.total_km).toLocaleString();
+    document.getElementById('s-unique').textContent = Math.round(st.unique_km).toLocaleString();
+    document.getElementById('updated').textContent =
+      'Garmin Connect · each road drawn once, colored by rides · updated ' + new Date(data.updated_at).toLocaleDateString();
+    const ridesEl = document.getElementById('rides');
+    ridesEl.replaceChildren(...data.recent_rides.map(r => {
+      const row = document.createElement('div');
+      const n = document.createElement('span'); n.textContent = r.name;
+      const d = document.createElement('span'); d.className = 'd'; d.textContent = r.date;
+      const k = document.createElement('span'); k.className = 'k'; k.textContent = `${r.km} km`;
+      row.append(n, d, k);
+      return row;
+    }));
+  })
+  .catch(() => { document.getElementById('updated').textContent = 'Could not load ride data.'; });
+</script>
+</body>
+</html>

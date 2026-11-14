@@ -1,0 +1,5 @@
+api/node_modules/
+worker/.python_packages/
+**/local.settings.json
+.venv/
+__pycache__/
