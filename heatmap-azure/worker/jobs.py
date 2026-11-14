@@ -180,6 +180,11 @@ def set_key(uid, enc):
         _set_profile(uid, hasKey=False, status="invalid-key",
                      message="Garmin rejected that API key. Check it and try again.")
         return
+    except Exception:                                 # timeout, DNS...: not the key's fault
+        # Leave a state the rider can resubmit from, even if the queue retries run out.
+        _set_profile(uid, status="error",
+                     message="Could not reach Garmin to check the key. Please submit it again.")
+        raise
     name = _secret_name(uid)
     try:
         _secrets.set_secret(name, api_key, content_type="garmin-personal-api-key")
@@ -240,7 +245,12 @@ def handle(msg):
             log.error("unknown op %r", op)
     except Exception:
         log.exception("job %s failed for %s", op, uid)
-        _set_profile(uid, status="error", message="Something went wrong. Please try again.")
+        try:                                          # keep a more specific message if the job set one
+            current = _profiles.get_entity("user", uid)
+        except ResourceNotFoundError:
+            current = {}
+        if current.get("status") != "error":
+            _set_profile(uid, status="error", message="Something went wrong. Please try again.")
         raise
 
 

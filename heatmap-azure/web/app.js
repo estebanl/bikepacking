@@ -250,7 +250,9 @@ function renderProfile(p, me) {
   };
   links.append(wipe, el('a', { href: '/.auth/logout?post_logout_redirect_uri=/', textContent: 'Sign out' }));
   const parts = [el('p', { className: 'who', textContent: `Signed in as ${me.userDetails}` }), status];
-  if (!p.hasKey && !BUSY.has(p.status)) parts.push(keyForm());
+  // A saved key Garmin rejected (expired or revoked) can be replaced in place.
+  const needsKey = !p.hasKey || p.status === 'invalid-key';
+  if (needsKey && !BUSY.has(p.status)) parts.push(keyForm());
   parts.push(links);
   $('account').replaceChildren(...parts);
 }
