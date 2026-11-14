@@ -129,13 +129,15 @@ def _set_profile(uid, **fields):
 def _put_blob(uid, container, name, data, **kwargs):
     """Upload a rider's blob, then make sure the rider wasn't deleted while it was in flight."""
     blob = _blobs.get_blob_client(container, name)
-    blob.upload_blob(data, overwrite=True, **kwargs)
+    written = blob.upload_blob(data, overwrite=True, **kwargs)
     try:
         _live(uid)
     except Gone:
+        # Remove only what this job wrote: blob names are per rider, so after a
+        # fresh start the same name may already hold the new profile's data.
         try:
-            blob.delete_blob()
-        except ResourceNotFoundError:
+            blob.delete_blob(etag=written["etag"], match_condition=MatchConditions.IfNotModified)
+        except (ResourceNotFoundError, ResourceModifiedError):
             pass
         raise
 
