@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ride Heatmap</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<style>
+  html, body { margin:0; height:100%; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #map { position:absolute; inset:0; }
+  .card {
+    position:absolute; top:12px; left:12px; z-index:1000; max-width:320px;
+    background:rgba(255,255,255,.94); border-radius:12px; padding:14px 16px;
+    box-shadow:0 2px 14px rgba(0,0,0,.25); color:#1a1a1a;
+  }
+  .card h1 { font-size:17px; margin:0 0 2px; }
+  .card .sub { font-size:12px; color:#666; margin-bottom:10px; }
+  .stats { display:flex; gap:14px; margin-bottom:10px; }
+  .stat b { display:block; font-size:19px; color:#d92b00; }
+  .stat span { font-size:11px; color:#666; text-transform:uppercase; letter-spacing:.04em; }
+  .slider-row { display:flex; align-items:center; gap:8px; font-size:12px; color:#444; border-top:1px solid #e5e5e5; padding-top:8px; margin-bottom:2px; }
+  .slider-row input[type=range] { flex:1; accent-color:#d92b00; }
+  .slider-row span { font-variant-numeric:tabular-nums; min-width:32px; text-align:right; }
+  .mode-row { display:flex; align-items:center; gap:8px; font-size:12px; color:#444; margin:6px 0 4px; }
+  .seg { display:inline-flex; border:1px solid #d0d0d0; border-radius:6px; overflow:hidden; }
+  .seg button { font:inherit; font-size:11.5px; background:#fff; border:none; padding:2px 9px; cursor:pointer; color:#444; }
+  .seg button.on { background:#d92b00; color:#fff; }
+  .card.nocounts .mode-row, .card.nocounts .legend { display:none !important; }
+  .legend { font-size:11px; color:#555; margin-bottom:8px; }
+  .legend .bar { display:flex; height:8px; border-radius:4px; overflow:hidden; margin:3px 0 2px; }
+  .legend .bar i { flex:1; }
+  .legend .lbl { display:flex; }
+  .legend .lbl span { flex:1; text-align:center; font-variant-numeric:tabular-nums; }
+  .rides { font-size:12.5px; border-top:1px solid #e5e5e5; padding-top:8px; max-height:180px; overflow:auto; }
+  .rides div { display:flex; justify-content:space-between; gap:10px; padding:2px 0; }
+  .rides .d { color:#888; white-space:nowrap; }
+  .rides .k { white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .foot { display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:12px; }
+  .foot a { color:#2563eb; text-decoration:none; }
+  #toggle {  font-size:12px; background:none; border:none; color:#2563eb; cursor:pointer; padding:0; }
+  .leaflet-control-layers { font-size:12.5px; }
+  /* Muted basemaps: same OSM tiles, desaturated so the heat lines lead. */
+  .tiles-muted { filter: grayscale(1) contrast(.72) brightness(1.12); }
+  .tiles-muted-dark { filter: invert(1) grayscale(1) contrast(.78) brightness(.82); }
+  @media (max-width: 480px) { .card { max-width: calc(100vw - 60px); } }
+  .account { font-size:12.5px; border-top:1px solid #e5e5e5; padding-top:8px; margin-top:8px; color:#333; }
+  .account p { margin:0 0 6px; }
+  .account .who { color:#666; font-size:12px; }
+  .account .status { font-size:12px; color:#555; }
+  .account .status.bad { color:#b42318; }
+  .account form { display:flex; gap:6px; margin:6px 0; }
+  .account input[type=password] { flex:1; min-width:0; font:inherit; font-size:12px; padding:4px 6px; border:1px solid #ccc; border-radius:6px; }
+  .account button, .account .btn { font:inherit; font-size:12px; padding:4px 10px; border-radius:6px; border:1px solid #d92b00; background:#d92b00; color:#fff; cursor:pointer; text-decoration:none; display:inline-block; }
+  .account .ghost { background:#fff; color:#d92b00; }
+  .account .links { display:flex; flex-wrap:wrap; gap:10px; margin-top:6px; }
+  .account .links a, .account .links button { font-size:12px; color:#2563eb; background:none; border:none; padding:0; cursor:pointer; text-decoration:none; }
+  .account .links .danger { color:#b42318; }
+  .account small { display:block; color:#777; font-size:11px; line-height:1.35; }
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="card" id="card">
+  <h1>Ride Heatmap</h1>
+  <div class="sub" id="updated">Loading…</div>
+  <div id="mapui" class="hidden">
+    <div class="stats">
+      <div class="stat"><b id="s-rides">–</b><span>rides</span></div>
+      <div class="stat"><b id="s-total">–</b><span>km ridden</span></div>
+      <div class="stat"><b id="s-unique">–</b><span>unique km</span></div>
+    </div>
+    <div class="slider-row">
+      <label for="weight">Line</label>
+      <input type="range" id="weight" min="1" max="6" step="0.5" value="2">
+      <span id="weight-val">2 px</span>
+    </div>
+    <div class="mode-row">
+      <span>Color</span>
+      <div class="seg"><button id="mode-heat" class="on">Heat</button><button id="mode-flat">Flat</button></div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="rides" id="rides"></div>
+  </div>
+  <div class="account" id="account"></div>
+  <div class="foot"><button id="toggle">Hide panel</button></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="app.js"></script>
+</body>
+</html>

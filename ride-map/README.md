@@ -40,6 +40,29 @@ Garmin Edge ──sync──> RideWithGPS ──API──> update_map.py
 - `site/index.html` — the whole front end: one Leaflet page, street/dark
   basemap toggle, stats card and recent rides, reads `segments.json`.
 
+## Ride heatmap (Garmin)
+
+A second page, `site/heatmap.html`, served next to the original map. It
+uses its own data and leaves the Every Road Once pipeline untouched.
+
+- `garmin_heatmap.py` — pulls this year's rides from Garmin Connect through
+  the official Personal API (`garmin-connect-personal-api-python`), caches
+  each ride's GPS track from its FIT file in `garmin/` (only new rides are
+  downloaded), and writes `site/heatmap.json`.
+- Each road is drawn once as a continuous line, colored by how many rides
+  covered it (1, 2, 3–5, 6–10, 11–20, 21+). Matching uses ~10 m cells with
+  a one-cell tolerance for GPS jitter; out-and-backs count once.
+- The Personal API key lives in Doppler (`bikepacking`, `dev_personal`,
+  secret `GARMIN_CONNECT`) and is only passed in through the environment:
+
+  ```
+  pip install garmin-connect-personal-api-python fitdecode   # Python 3.12+
+  doppler run --project bikepacking --config dev_personal -- python3 garmin_heatmap.py
+  ```
+
+  The short-lived bearer token is cached in `garmin/token-cache.json`
+  (mode 600, gitignored). Personal API keys expire (30 days to 1 year).
+
 ## Notes
 
 - No credentials live in this code. The RideWithGPS and Cloudflare calls

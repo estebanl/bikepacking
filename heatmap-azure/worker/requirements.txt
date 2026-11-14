@@ -1,0 +1,9 @@
+azure-functions
+azure-identity
+azure-data-tables
+azure-storage-blob
+azure-keyvault-secrets
+azure-keyvault-keys
+cryptography
+fitdecode
+garmin-connect-personal-api-python

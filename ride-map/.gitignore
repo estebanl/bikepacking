@@ -3,6 +3,8 @@ tracks/
 tiles/
 web/
 site/segments.json
+site/heatmap.json
+garmin/
 trips_raw.json
 poster_stats.json
 stats_2026.json
