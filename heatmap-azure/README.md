@@ -37,6 +37,10 @@ Key Vault (RBAC): secret garmin-<uid> per rider + RSA key garmin-wrap
   saves it as a Key Vault secret. Keys are never returned to the browser.
   "Remove Garmin key" deletes the secret; "Delete my data" also removes the
   rider's tracks, heatmap and profile.
+- **Deleting data:** "Delete my data" marks the profile before the purge is
+  queued. A sync still running for that rider (possibly on another worker
+  instance) checks the mark around every write, stops, and removes what it
+  just wrote, so nothing reappears after the purge.
 - **The one stored secret:** the Static Web Apps Free managed API can't use
   a managed identity, so its app settings hold a storage connection string.
   It lives in Azure (not in git), and it cannot decrypt Garmin keys.

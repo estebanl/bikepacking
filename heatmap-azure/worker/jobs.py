@@ -6,6 +6,7 @@ Riders are identified by an opaque id (uid) the API derives from the
 signed-in principal; no names or emails are stored outside the profile.
 """
 import base64
+import contextvars
 import hashlib
 import io
 import json
@@ -17,7 +18,9 @@ import zipfile
 from datetime import datetime, timezone
 
 import fitdecode
-from azure.core.exceptions import HttpResponseError, ResourceExistsError, ResourceNotFoundError
+from azure.core import MatchConditions
+from azure.core.exceptions import (HttpResponseError, ResourceExistsError, ResourceModifiedError,
+                                   ResourceNotFoundError)
 from azure.data.tables import TableClient, UpdateMode
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.keys import KeyClient
@@ -58,8 +61,70 @@ def _secret_name(uid):
     return f"garmin-{uid}"
 
 
+# ---------------------------------------------------------------- deletion fence
+# "Delete my data" can run on another instance while a refresh or set-key job
+# for the same rider is still going. The API marks the profile (purge=True)
+# before it queues the purge, and every profile carries a generation id that
+# changes when the rider starts over. A job remembers the generation it started
+# with and stops as soon as the profile is marked, gone, or a newer generation;
+# anything it wrote in the meantime is removed again.
+class Gone(Exception):
+    """The rider's data was (or is being) deleted; the job must stop writing."""
+
+
+_job_gen = contextvars.ContextVar("job_gen", default=None)   # (uid, generation) of the running job
+
+
+def _live(uid):
+    """Return the rider's profile, or raise Gone if this job may no longer write for them."""
+    try:
+        entity = _profiles.get_entity("user", uid)
+    except ResourceNotFoundError:
+        raise Gone(uid) from None
+    job = _job_gen.get()
+    if entity.get("purge") or (job and job[0] == uid and entity.get("gen") != job[1]):
+        raise Gone(uid)
+    return entity
+
+
+def _begin(uid):
+    """Start a job for this rider: remember which generation of the profile it belongs to."""
+    _job_gen.set(None)
+    _job_gen.set((uid, _live(uid).get("gen")))
+
+
+def _merge(uid, etag=None, **fields):
+    _profiles.update_entity(
+        {"PartitionKey": "user", "RowKey": uid, **fields}, mode=UpdateMode.MERGE, etag=etag,
+        match_condition=MatchConditions.IfNotModified if etag else MatchConditions.Unconditionally)
+
+
 def _set_profile(uid, **fields):
-    _profiles.upsert_entity({"PartitionKey": "user", "RowKey": uid, **fields}, mode=UpdateMode.MERGE)
+    """Merge fields into the profile. Never recreates a deleted one or writes over a purge mark."""
+    for _ in range(5):
+        entity = _live(uid)
+        try:
+            _merge(uid, etag=entity.metadata["etag"], **fields)
+            return
+        except ResourceModifiedError:                 # changed since we read it: look again
+            continue
+        except ResourceNotFoundError:
+            raise Gone(uid) from None
+    raise RuntimeError("profile kept changing")
+
+
+def _put_blob(uid, container, name, data, **kwargs):
+    """Upload a rider's blob, then make sure the rider wasn't deleted while it was in flight."""
+    blob = _blobs.get_blob_client(container, name)
+    blob.upload_blob(data, overwrite=True, **kwargs)
+    try:
+        _live(uid)
+    except Gone:
+        try:
+            blob.delete_blob()
+        except ResourceNotFoundError:
+            pass
+        raise
 
 
 # ---------------------------------------------------------------- wrap key
@@ -146,7 +211,7 @@ def _sync_tracks(uid, access_token):
                             lo = f.get_value("position_long", fallback=None)
                             if la is not None and lo is not None:
                                 pts.append((round(lo * SEMI, 6), round(la * SEMI, 6)))
-            tracks.upload_blob(f"{uid}/{aid}.json", json.dumps(pts), overwrite=True)
+            _put_blob(uid, "tracks", f"{uid}/{aid}.json", json.dumps(pts))
             cached.add(aid)
             new += 1
             time.sleep(0.3)
@@ -169,11 +234,13 @@ def refresh(uid):
         _refresh(uid, api_key)
     except HttpError as e:
         if e.status_code in (401, 403):
-            _set_profile(uid, status="invalid-key",
+            _set_profile(uid, status="invalid-key", keyRejected=True,
                          message="Garmin rejected the API key. It may have expired; add a new one.")
         else:
             _set_profile(uid, status="error", message=f"Garmin returned HTTP {e.status_code}. Will retry tomorrow.")
         log.warning("garmin http %s for %s", e.status_code, uid)
+    except Gone:
+        raise
     except Exception:                                 # never leave the rider stuck on "syncing"
         log.exception("refresh failed for %s", uid)
         _set_profile(uid, status="error", message="Refresh failed. Will retry tomorrow.")
@@ -195,8 +262,8 @@ def _refresh(uid, api_key):
             doc = None                                # map missing: fall through and rebuild
         if doc is not None:
             doc["updated_at"] = _now()                # "updated" on the page = last checked
-            blob.upload_blob(json.dumps(doc), overwrite=True,
-                             content_settings=ContentSettings(content_type="application/json"))
+            _put_blob(uid, "heatmaps", f"{uid}.json", json.dumps(doc),
+                      content_settings=ContentSettings(content_type="application/json"))
             _set_profile(uid, status="ok", message="", lastRun=_now())
             log.info("refreshed %s: %d rides, unchanged", uid, len(rides))
             return
@@ -209,8 +276,8 @@ def _refresh(uid, api_key):
              "max_count": max((l[0] for l in lines), default=0), "lines": len(lines)}
     doc = {"updated_at": _now(), "year": int(datetime.now(timezone.utc).strftime("%Y")), "stats": stats,
            "recent_rides": [{k: r[k] for k in ("name", "date", "km")} for r in rides[:15]], "lines": lines}
-    _blobs.get_blob_client("heatmaps", f"{uid}.json").upload_blob(
-        json.dumps(doc), overwrite=True, content_settings=ContentSettings(content_type="application/json"))
+    _put_blob(uid, "heatmaps", f"{uid}.json", json.dumps(doc),
+              content_settings=ContentSettings(content_type="application/json"))
     _set_profile(uid, status="ok", message="", lastRun=_now(), stats=json.dumps(stats), ridesHash=fingerprint)
     log.info("refreshed %s: %d rides, %d new", uid, len(rides), new)
 
@@ -228,27 +295,34 @@ def set_key(uid, enc):
         rejected = (e.status_code in (400, 401, 403) if isinstance(e, HttpError)
                     else isinstance(e, GarminPersonalApiError))
         if rejected:
-            _set_profile(uid, hasKey=False, status="invalid-key",
+            _set_profile(uid, hasKey=False, status="invalid-key", keyRejected=True,
                          message="Garmin rejected that API key. Check it and try again.")
             return
         # 429, 5xx, timeout, DNS...: not the key's fault.
         # Leave a state the rider can resubmit from, even if the queue retries run out.
+        # keyRejected is left alone: if the saved key was already rejected, the page
+        # keeps offering the key form so the replacement can be submitted again.
         log.warning("could not validate key for %s: %s", uid,
                     f"HTTP {e.status_code}" if isinstance(e, HttpError) else type(e).__name__)
         _set_profile(uid, status="error",
                      message="Could not reach Garmin to check the key. Please submit it again.")
         raise
     name = _secret_name(uid)
+    _live(uid)                                        # don't store a key for a rider being deleted
     try:
         _secrets.set_secret(name, api_key, content_type="garmin-personal-api-key")
     except ResourceExistsError:                       # soft-deleted earlier: recover, then overwrite
         _secrets.begin_recover_deleted_secret(name).wait()
         _secrets.set_secret(name, api_key, content_type="garmin-personal-api-key")
-    _set_profile(uid, hasKey=True, status="syncing", message="", keySetAt=_now())
+    try:
+        _set_profile(uid, hasKey=True, keyRejected=False, status="syncing", message="", keySetAt=_now())
+    except Gone:                                      # deleted while the key was being stored
+        _delete_secret(uid)
+        raise
     refresh(uid)
 
 
-def delete_key(uid):
+def _delete_secret(uid):
     name = _secret_name(uid)
     try:
         _secrets.begin_delete_secret(name).wait()
@@ -258,11 +332,22 @@ def delete_key(uid):
             log.info("purge not permitted; secret stays soft-deleted for 7 days")
     except ResourceNotFoundError:
         pass
-    _set_profile(uid, hasKey=False, status="no-key", message="")
+
+
+def delete_key(uid):
+    _delete_secret(uid)
+    _set_profile(uid, hasKey=False, keyRejected=False, status="no-key", message="")
 
 
 def purge_user(uid):
-    delete_key(uid)
+    """Delete everything for a rider. Jobs still running for them are fenced off by the purge mark."""
+    try:
+        if not _profiles.get_entity("user", uid).get("purge"):
+            log.warning("ignoring purge for %s: profile is not marked for deletion", uid)
+            return
+    except ResourceNotFoundError:
+        pass                                          # profile already gone: finish the rest
+    _delete_secret(uid)
     tracks = _blobs.get_container_client("tracks")
     for b in tracks.list_blobs(name_starts_with=f"{uid}/"):
         tracks.delete_blob(b.name)
@@ -277,41 +362,64 @@ def purge_user(uid):
     log.info("purged %s", uid)
 
 
+def _publish_quietly():
+    """Publishing is housekeeping; a Key Vault or storage blip must not fail a rider's job."""
+    try:
+        publish_public_key()
+    except Exception:
+        log.exception("could not publish the wrap public key")
+
+
 def handle(msg):
-    publish_public_key()
     op, uid = msg.get("op"), msg.get("uid", "")
     if op == "publish-key":
+        publish_public_key()                          # the whole job: let the queue retry it
         return
+    _publish_quietly()
     if not (len(uid) == 32 and all(c in "0123456789abcdef" for c in uid)):
         log.error("rejecting job with bad uid")
         return
     try:
+        if op == "purge-user":
+            purge_user(uid)
+            return
+        _begin(uid)
         if op == "set-key":
             set_key(uid, msg["enc"])
         elif op == "delete-key":
             delete_key(uid)
         elif op == "refresh":
             refresh(uid)
-        elif op == "purge-user":
-            purge_user(uid)
         else:
             log.error("unknown op %r", op)
+    except Gone:
+        log.info("job %s stopped for %s: rider data deleted", op, uid)
     except Exception:
         log.exception("job %s failed for %s", op, uid)
-        try:                                          # keep a more specific message if the job set one
-            current = _profiles.get_entity("user", uid)
-        except ResourceNotFoundError:
-            current = {}
-        if current.get("status") != "error":
-            _set_profile(uid, status="error", message="Something went wrong. Please try again.")
+        try:
+            if op == "purge-user":
+                # Keep the purge mark (other jobs stay fenced off) but leave "deleting",
+                # so the page stops polling and the rider can ask again.
+                _merge(uid, status="error", message="Could not delete your data. Please try again.")
+            elif _live(uid).get("status") != "error":  # keep a more specific message if the job set one
+                _set_profile(uid, status="error", message="Something went wrong. Please try again.")
+        except (Gone, ResourceNotFoundError):
+            pass
         raise
 
 
 def refresh_all():
-    publish_public_key()
+    _publish_quietly()
     for p in _profiles.query_entities("PartitionKey eq 'user' and hasKey eq true"):
+        uid = p["RowKey"]
         try:
-            refresh(p["RowKey"])
+            _begin(uid)
+            refresh(uid)
+        except Gone:
+            log.info("skipping %s: rider data deleted", uid)
         except Exception:                             # one rider's failure must not stop the rest
-            log.exception("refresh failed for %s", p["RowKey"])
-            _set_profile(p["RowKey"], status="error", message="Refresh failed. Will retry tomorrow.")
+            log.exception("refresh failed for %s", uid)
+            try:
+                _set_profile(uid, status="error", message="Refresh failed. Will retry tomorrow.")
+            except Exception:
+                log.exception("could not record the failure for %s", uid)

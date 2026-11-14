@@ -1,3 +1,4 @@
+const crypto = require('node:crypto');
 const { app } = require('@azure/functions');
 const { principal, json, enqueue, getProfile, mergeProfile, blobs, encryptForVault } = require('../lib');
 
@@ -17,9 +18,29 @@ function guard(handler) {
   };
 }
 
+// What a profile field goes back to when there was nothing there before.
+const BLANK = { status: 'no-key', message: '', lastRequested: '', purge: false };
+const deleting = () => json(409, { error: 'Your data is being deleted. Try again in a minute.' });
+
+// Mark the profile busy, then queue the job that will clear it. If the queue
+// send fails, no job will ever run, so put the profile back before failing:
+// otherwise the page would hide its forms and poll forever.
+async function submit(uid, before, busy, job) {
+  await mergeProfile(uid, busy);
+  try {
+    await enqueue(job);
+  } catch (e) {
+    const undo = {};
+    for (const k of Object.keys(busy)) undo[k] = before && before[k] !== undefined ? before[k] : BLANK[k];
+    await mergeProfile(uid, undo);
+    throw e;
+  }
+}
+
 function view(p) {
   return {
     hasKey: !!p.hasKey,
+    keyRejected: !!p.keyRejected || p.status === 'invalid-key',
     status: p.status || 'no-key',
     message: p.message || '',
     lastRun: p.lastRun || null,
@@ -33,14 +54,17 @@ app.http('profile', {
   authLevel: 'anonymous',
   route: 'profile',
   handler: guard(async (request, user) => {
+    let p = await getProfile(user.uid);
     if (request.method === 'DELETE') {
-      await mergeProfile(user.uid, { status: 'deleting' });
-      await enqueue({ op: 'purge-user', uid: user.uid });
+      // The purge mark stops worker jobs already running for this rider from
+      // writing anything more; the purge job then removes the profile itself.
+      await submit(user.uid, p, { status: 'deleting', message: '', purge: true }, { op: 'purge-user', uid: user.uid });
       return json(202, { status: 'deleting' });
     }
-    let p = await getProfile(user.uid);
     if (!p) {
-      p = { hasKey: false, status: 'no-key', createdAt: new Date().toISOString() };
+      // gen tells the worker which "life" of the profile a job belongs to, so a
+      // job that outlives "Delete my data" can't write into a fresh profile.
+      p = { hasKey: false, status: 'no-key', createdAt: new Date().toISOString(), gen: crypto.randomUUID() };
       await mergeProfile(user.uid, { ...p, displayName: user.name });
     }
     return json(200, { name: user.name, ...view(p) });
@@ -54,9 +78,10 @@ app.http('key', {
   authLevel: 'anonymous',
   route: 'key',
   handler: guard(async (request, user) => {
+    const p = await getProfile(user.uid);
+    if (p && p.purge) return deleting();
     if (request.method === 'DELETE') {
-      await mergeProfile(user.uid, { status: 'deleting' });
-      await enqueue({ op: 'delete-key', uid: user.uid });
+      await submit(user.uid, p, { status: 'deleting', message: '' }, { op: 'delete-key', uid: user.uid });
       return json(202, { status: 'deleting' });
     }
     let body;
@@ -71,8 +96,7 @@ app.http('key', {
     } catch {
       return json(503, { error: 'The app is still starting up. Try again in a minute.' });
     }
-    await mergeProfile(user.uid, { status: 'pending', message: '' });
-    await enqueue({ op: 'set-key', uid: user.uid, enc });
+    await submit(user.uid, p, { status: 'pending', message: '' }, { op: 'set-key', uid: user.uid, enc });
     return json(202, { status: 'pending' });
   }),
 });
@@ -84,14 +108,15 @@ app.http('refresh', {
   route: 'refresh',
   handler: guard(async (request, user) => {
     const p = await getProfile(user.uid);
+    if (p && p.purge) return deleting();
     if (!p || !p.hasKey) return json(409, { error: 'Add your Garmin API key first.' });
     if (BUSY.has(p.status)) return json(202, { status: p.status });
     const last = p.lastRequested ? Date.parse(p.lastRequested) : 0;
     if (Date.now() - last < REFRESH_COOLDOWN_MS) {
       return json(429, { error: 'Refreshed recently. Try again in a few minutes.' });
     }
-    await mergeProfile(user.uid, { status: 'pending', lastRequested: new Date().toISOString() });
-    await enqueue({ op: 'refresh', uid: user.uid });
+    await submit(user.uid, p, { status: 'pending', message: '', lastRequested: new Date().toISOString() },
+      { op: 'refresh', uid: user.uid });
     return json(202, { status: 'pending' });
   }),
 });
