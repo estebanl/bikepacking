@@ -48,6 +48,8 @@ function view(p) {
     message: p.message || '',
     lastRun: p.lastRun || null,
     stats: p.stats ? JSON.parse(p.stats) : null,
+    years: p.years ? JSON.parse(p.years) : [],
+    backfilling: !!p.backfilling,
   };
 }
 
@@ -119,27 +121,49 @@ app.http('refresh', {
       return json(429, { error: 'Refreshed recently. Try again in a few minutes.' });
     }
     await submit(user.uid, p, { status: 'pending', message: '', lastRequested: new Date().toISOString() },
-      { op: 'refresh' });
+      { op: 'refresh', full: true });
     return json(202, { status: 'pending' });
   }),
 });
 
-// GET: the signed-in rider's heatmap data.
+// GET: the signed-in rider's heatmap data (optional ?year=YYYY|all).
 app.http('heatmap', {
   methods: ['GET'],
   authLevel: 'anonymous',
   route: 'heatmap',
   handler: guard(async (request, user) => {
+    const rawYear = request.query.get('year');
+    if (rawYear !== null && rawYear !== 'all' && !/^\d{4}$/.test(rawYear)) {
+      return json(400, { error: 'Invalid year.' });
+    }
+    const year = rawYear || String(new Date().getUTCFullYear());
+    const container = blobs().getContainerClient('heatmaps');
     try {
-      const buf = await blobs().getContainerClient('heatmaps').getBlobClient(`${user.uid}.json`).downloadToBuffer();
+      const buf = await container.getBlobClient(`${user.uid}/${year}.json`).downloadToBuffer();
       return {
         status: 200,
         body: buf,
         headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-cache' },
       };
     } catch (e) {
-      if (e.statusCode === 404) return json(404, { error: 'No heatmap yet.' });
-      throw e;
+      if (e.statusCode !== 404) throw e;
     }
+    // Fallback to legacy single-file heatmap before the rider's next refresh/backfill.
+    if (year !== 'all') {
+      try {
+        const buf = await container.getBlobClient(`${user.uid}.json`).downloadToBuffer();
+        const parsed = JSON.parse(buf.toString('utf8'));
+        if (!rawYear || String(parsed.year) === year) {
+          return {
+            status: 200,
+            body: buf,
+            headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-cache' },
+          };
+        }
+      } catch (e) {
+        if (e.statusCode !== 404) throw e;
+      }
+    }
+    return json(404, { error: 'No heatmap yet.' });
   }),
 });

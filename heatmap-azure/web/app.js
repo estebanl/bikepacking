@@ -122,12 +122,16 @@ function drawHeatmap(data) {
     routeGroup.addLayer(layer);   // low → high, so hot roads draw on top
   });
   setMode(mode);
-  if (bucketLayers.length) map.fitBounds(routeGroup.getBounds().pad(0.03));
+  if (bucketLayers.length && !hasFitBounds) {
+    map.fitBounds(routeGroup.getBounds().pad(0.03));
+    hasFitBounds = true;
+  }
   const st = data.stats;
   $('s-rides').textContent = st.rides;
   $('s-total').textContent = Math.round(st.total_km).toLocaleString();
   $('s-unique').textContent = Math.round(st.unique_km).toLocaleString();
-  $('updated').textContent = `${data.year} · each road drawn once, colored by rides · updated ${new Date(data.updated_at).toLocaleString()}`;
+  const yearLabel = data.year === 'all' ? 'All years' : data.year;
+  $('updated').textContent = `${yearLabel} · each road drawn once, colored by rides · updated ${new Date(data.updated_at).toLocaleString()}`;
   const rides = $('rides');
   rides.replaceChildren(...data.recent_rides.map((r) => {
     const row = document.createElement('div');
@@ -236,6 +240,8 @@ function renderProfile(p, me) {
     }
     clearTimeout(pollTimer);
     shownRun = null;
+    shownYear = null;
+    hasFitBounds = false;
     if (routeGroup) map.removeLayer(routeGroup);
     $('mapui').classList.add('hidden');
     $('updated').textContent = 'Your data is being deleted.';
@@ -261,7 +267,47 @@ function renderProfile(p, me) {
 
 let me = null;
 let shownRun = null;
+let shownYear = null;
+let hasFitBounds = false;
+let selectedYear = store.get('heat-year') || null;
 let failures = 0;
+
+function renderYearSelect(years, backfilling) {
+  const row = $('year-row');
+  const sel = $('year-select');
+  const note = $('backfill-note');
+  note.classList.toggle('hidden', !backfilling);
+  if (!years.length && !backfilling) {
+    row.classList.add('hidden');
+    return;
+  }
+  row.classList.remove('hidden');
+  const opts = years.map((y) => el('option', { value: String(y), textContent: String(y) }));
+  if (years.length > 1) opts.push(el('option', { value: 'all', textContent: 'All years' }));
+  sel.replaceChildren(...opts);
+  const valid = new Set(opts.map((o) => o.value));
+  if (!selectedYear || !valid.has(selectedYear)) {
+    selectedYear = opts.length ? opts[0].value : null;
+  }
+  if (selectedYear) sel.value = selectedYear;
+}
+
+async function loadHeatmap(year) {
+  const q = year ? `heatmap?year=${encodeURIComponent(year)}` : 'heatmap';
+  const h = await api(q);
+  if (h.status === 200) {
+    drawHeatmap(h.body);
+    return true;
+  }
+  return false;
+}
+
+$('year-select').addEventListener('change', async (e) => {
+  selectedYear = e.target.value;
+  store.set('heat-year', selectedYear);
+  if (await loadHeatmap(selectedYear)) shownYear = selectedYear;
+});
+
 async function loadProfile() {
   clearTimeout(pollTimer);
   const r = await api('profile');
@@ -283,13 +329,18 @@ async function loadProfile() {
   failures = 0;
   const p = r.body;
   renderProfile(p, me);
-  if (p.lastRun && p.lastRun !== shownRun) {
-    const h = await api('heatmap');
-    if (h.status === 200) { drawHeatmap(h.body); shownRun = p.lastRun; }
-  } else if (!p.lastRun) {
+  if (p.lastRun) {
+    renderYearSelect(p.years || [], p.backfilling);
+    if (p.lastRun !== shownRun || selectedYear !== shownYear) {
+      if (await loadHeatmap(selectedYear)) {
+        shownRun = p.lastRun;
+        shownYear = selectedYear;
+      }
+    }
+  } else {
     $('updated').textContent = p.hasKey ? 'Your first heatmap is on its way.' : 'Add your Garmin key to build your heatmap.';
   }
-  if (BUSY.has(p.status)) pollTimer = setTimeout(loadProfile, 5000);
+  if (BUSY.has(p.status) || p.backfilling) pollTimer = setTimeout(loadProfile, 5000);
 }
 
 (async function start() {

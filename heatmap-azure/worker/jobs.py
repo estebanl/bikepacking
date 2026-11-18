@@ -27,6 +27,7 @@ from azure.keyvault.keys import KeyClient
 from azure.keyvault.keys.crypto import CryptographyClient, EncryptionAlgorithm
 from azure.keyvault.secrets import SecretClient
 from azure.storage.blob import BlobServiceClient, ContentSettings
+from azure.storage.queue import QueueClient
 from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -50,9 +51,14 @@ with open(heatmap_core.__file__, "rb") as _f:   # algorithm changes force a rebu
 
 _cred = DefaultAzureCredential()
 _blobs = BlobServiceClient(f"https://{ACCOUNT}.blob.core.windows.net", credential=_cred)
+_queue = QueueClient(f"https://{ACCOUNT}.queue.core.windows.net", "jobs", credential=_cred)
 _profiles = TableClient(f"https://{ACCOUNT}.table.core.windows.net", "profiles", credential=_cred)
 _secrets = SecretClient(VAULT, _cred)
 _keys = KeyClient(VAULT, _cred)
+
+
+def _enqueue(msg):
+    _queue.send_message(base64.b64encode(json.dumps(msg).encode()).decode())
 
 
 def _now():
@@ -207,18 +213,17 @@ def _token(api_key):
             return _garmin("token", auth.obtain_token, api_key).access_token
 
 
-def _sync_tracks(uid, access_token):
-    """Download FIT tracks for this year's rides not cached yet. Returns ride list."""
-    year = datetime.now(timezone.utc).strftime("%Y")
+def _sync_tracks(uid, access_token, start_date=None, end_date=None):
+    """Download FIT tracks for rides not cached yet. Returns (rides, new_count)."""
     tracks = _blobs.get_container_client("tracks")
     cached = {b.name.rsplit("/", 1)[-1][:-5] for b in tracks.list_blobs(name_starts_with=f"{uid}/")
               if b.name.endswith(".json") and not b.name.endswith("/rides.json")}
     acts = []
+    search_kwargs = {"start_date": start_date, "end_date": end_date} if start_date and end_date else {}
     with GarminPersonalApiClient(access_token) as client:
         start = 0
         while True:
-            page = _garmin("search", client.search_activities, start=start, limit=100,
-                           start_date=f"{year}-01-01", end_date=f"{year}-12-31") or []
+            page = _garmin("search", client.search_activities, start=start, limit=100, **search_kwargs) or []
             acts += page
             start += len(page)
             if len(page) < 100:
@@ -252,7 +257,75 @@ def _sync_tracks(uid, access_token):
     return rides, new
 
 
-def refresh(uid):
+def _load_rides_cache(uid):
+    try:
+        return json.loads(_blobs.get_blob_client("tracks", f"{uid}/rides.json").download_blob().readall())
+    except ResourceNotFoundError:
+        return []
+
+
+def _merge_rides(existing, fetched, replace_year):
+    by_id = {r["id"]: r for r in existing if r["date"][:4] != replace_year}
+    for r in fetched:
+        by_id[r["id"]] = r
+    merged = list(by_id.values())
+    merged.sort(key=lambda r: r["date"], reverse=True)
+    return merged
+
+
+def _build_heatmap_doc(uid, year_key, year_rides, prev_hashes, touch_updated=False):
+    """Build or reuse a single heatmap blob (year_key is 'YYYY' or 'all')."""
+    fingerprint = hashlib.sha256(json.dumps([CORE_HASH, year_rides]).encode()).hexdigest()
+    blob_name = f"{uid}/{year_key}.json"
+    if fingerprint == prev_hashes.get(year_key):
+        blob = _blobs.get_blob_client("heatmaps", blob_name)
+        try:
+            doc = json.loads(blob.download_blob().readall())
+        except ResourceNotFoundError:
+            doc = None
+        if doc is not None:
+            if touch_updated:
+                doc["updated_at"] = _now()
+                _put_blob(uid, "heatmaps", blob_name, json.dumps(doc),
+                          content_settings=ContentSettings(content_type="application/json"))
+            return fingerprint, doc["stats"]
+    tracks = _blobs.get_container_client("tracks")
+    pts = [json.loads(tracks.download_blob(f"{uid}/{r['id']}.json").readall()) for r in year_rides]
+    lines = heatmap_core.build_lines(pts)
+    stats = {"rides": len(year_rides), "total_km": round(sum(r["km"] for r in year_rides), 1),
+             "unique_km": round(sum(heatmap_core.line_km(l) for l in lines)),
+             "repeat_km": round(sum(heatmap_core.line_km(l) for l in lines if l[0] > 1)),
+             "max_count": max((l[0] for l in lines), default=0), "lines": len(lines)}
+    doc = {"updated_at": _now(), "year": "all" if year_key == "all" else int(year_key), "stats": stats,
+           "recent_rides": [{k: r[k] for k in ("name", "date", "km")} for r in year_rides[:15]], "lines": lines}
+    _put_blob(uid, "heatmaps", blob_name, json.dumps(doc),
+              content_settings=ContentSettings(content_type="application/json"))
+    return fingerprint, stats
+
+
+def _rebuild_years(uid, all_rides, cur_year, full):
+    """Rebuild changed year heatmaps and 'all', returning (years, hashes, cur_stats)."""
+    entity = _live(uid)
+    prev_hashes = json.loads(entity["yearHashes"]) if entity.get("yearHashes") else {}
+    by_year = {}
+    for r in all_rides:
+        by_year.setdefault(r["date"][:4], []).append(r)
+    by_year.setdefault(cur_year, [])
+    years = sorted((int(y) for y in by_year), reverse=True)
+    new_hashes = {}
+    cur_stats = None
+    for y in years:
+        yk = str(y)
+        fp, st = _build_heatmap_doc(uid, yk, by_year[yk], prev_hashes, touch_updated=(yk == cur_year))
+        new_hashes[yk] = fp
+        if yk == cur_year:
+            cur_stats = st
+    all_fp, _ = _build_heatmap_doc(uid, "all", all_rides, prev_hashes, touch_updated=full)
+    new_hashes["all"] = all_fp
+    return years, new_hashes, cur_stats
+
+
+def refresh(uid, full=False):
     """Rebuild one rider's heatmap from Garmin."""
     try:
         api_key = _secrets.get_secret(_secret_name(uid)).value
@@ -261,7 +334,7 @@ def refresh(uid):
         return
     _set_profile(uid, status="syncing", message="")
     try:
-        _refresh(uid, api_key)
+        _refresh(uid, api_key, full=full)
     except HttpError as e:
         if e.status_code in (401, 403):
             _set_profile(uid, status="invalid-key", keyRejected=True,
@@ -276,40 +349,65 @@ def refresh(uid):
         _set_profile(uid, status="error", message="Refresh failed. Will retry tomorrow.")
 
 
-def _refresh(uid, api_key):
-    rides, new = _sync_tracks(uid, _token(api_key))
-    # Same rides as last time and same algorithm: the map can't have changed.
-    fingerprint = hashlib.sha256(json.dumps([CORE_HASH, rides]).encode()).hexdigest()
-    try:
-        previous = _profiles.get_entity("user", uid).get("ridesHash")
-    except ResourceNotFoundError:
-        previous = None
-    if new == 0 and fingerprint == previous:
-        blob = _blobs.get_blob_client("heatmaps", f"{uid}.json")
-        try:
-            doc = json.loads(blob.download_blob().readall())
-        except ResourceNotFoundError:
-            doc = None                                # map missing: fall through and rebuild
-        if doc is not None:
-            doc["updated_at"] = _now()                # "updated" on the page = last checked
-            _put_blob(uid, "heatmaps", f"{uid}.json", json.dumps(doc),
-                      content_settings=ContentSettings(content_type="application/json"))
-            _set_profile(uid, status="ok", message="", lastRun=_now())
-            log.info("refreshed %s: %d rides, unchanged", uid, len(rides))
-            return
-    tracks = _blobs.get_container_client("tracks")
-    pts = [json.loads(tracks.download_blob(f"{uid}/{r['id']}.json").readall()) for r in rides]
-    lines = heatmap_core.build_lines(pts)
-    stats = {"rides": len(rides), "total_km": round(sum(r["km"] for r in rides), 1),
-             "unique_km": round(sum(heatmap_core.line_km(l) for l in lines)),
-             "repeat_km": round(sum(heatmap_core.line_km(l) for l in lines if l[0] > 1)),
-             "max_count": max((l[0] for l in lines), default=0), "lines": len(lines)}
-    doc = {"updated_at": _now(), "year": int(datetime.now(timezone.utc).strftime("%Y")), "stats": stats,
-           "recent_rides": [{k: r[k] for k in ("name", "date", "km")} for r in rides[:15]], "lines": lines}
-    _put_blob(uid, "heatmaps", f"{uid}.json", json.dumps(doc),
+def _refresh(uid, api_key, full=False):
+    cur_year = datetime.now(timezone.utc).strftime("%Y")
+    token = _token(api_key)
+    if full:
+        all_rides, new = _sync_tracks(uid, token)
+    else:
+        yr_rides, new = _sync_tracks(uid, token, start_date=f"{cur_year}-01-01", end_date=f"{cur_year}-12-31")
+        all_rides = _merge_rides(_load_rides_cache(uid), yr_rides, replace_year=cur_year)
+    _put_blob(uid, "tracks", f"{uid}/rides.json", json.dumps(all_rides),
               content_settings=ContentSettings(content_type="application/json"))
-    _set_profile(uid, status="ok", message="", lastRun=_now(), stats=json.dumps(stats), ridesHash=fingerprint)
-    log.info("refreshed %s: %d rides, %d new", uid, len(rides), new)
+    years, new_hashes, cur_stats = _rebuild_years(uid, all_rides, cur_year, full=full)
+    entity = _live(uid)
+    fields = {"status": "ok", "message": "", "lastRun": _now(),
+              "stats": json.dumps(cur_stats), "years": json.dumps(years),
+              "yearHashes": json.dumps(new_hashes)}
+    if full:
+        fields["historySynced"] = True
+        fields["backfilling"] = False
+        _set_profile(uid, **fields)
+    else:
+        need_backfill = not entity.get("historySynced") and not entity.get("backfilling")
+        if need_backfill:
+            fields["backfilling"] = True
+        _set_profile(uid, **fields)
+        if need_backfill:
+            _enqueue({"op": "backfill", "uid": uid, "gen": entity.get("gen")})
+    log.info("refreshed %s (full=%s): %d rides, %d new, years=%s", uid, full, len(all_rides), new, years)
+
+
+def backfill(uid):
+    """Sync all historical years from Garmin in the background without blocking the UI."""
+    try:
+        api_key = _secrets.get_secret(_secret_name(uid)).value
+    except ResourceNotFoundError:
+        _set_profile(uid, backfilling=False)
+        return
+    _set_profile(uid, backfilling=True)
+    cur_year = datetime.now(timezone.utc).strftime("%Y")
+    try:
+        all_rides, new = _sync_tracks(uid, _token(api_key))
+        _put_blob(uid, "tracks", f"{uid}/rides.json", json.dumps(all_rides),
+                  content_settings=ContentSettings(content_type="application/json"))
+        years, new_hashes, cur_stats = _rebuild_years(uid, all_rides, cur_year, full=True)
+        _set_profile(uid, backfilling=False, historySynced=True, lastRun=_now(),
+                     stats=json.dumps(cur_stats), years=json.dumps(years),
+                     yearHashes=json.dumps(new_hashes))
+        log.info("backfilled %s: %d rides, %d new, years=%s", uid, len(all_rides), new, years)
+    except HttpError as e:
+        if e.status_code in (401, 403):
+            _set_profile(uid, status="invalid-key", keyRejected=True, backfilling=False,
+                         message="Garmin rejected the API key. It may have expired; add a new one.")
+        else:
+            _set_profile(uid, backfilling=False)
+        log.warning("backfill garmin http %s for %s", e.status_code, uid)
+    except Gone:
+        raise
+    except Exception:
+        log.exception("backfill failed for %s", uid)
+        _set_profile(uid, backfilling=False)
 
 
 # ---------------------------------------------------------------- key lifecycle
@@ -381,8 +479,11 @@ def purge_user(uid):
     tracks = _blobs.get_container_client("tracks")
     for b in tracks.list_blobs(name_starts_with=f"{uid}/"):
         tracks.delete_blob(b.name)
+    heatmaps = _blobs.get_container_client("heatmaps")
+    for b in heatmaps.list_blobs(name_starts_with=f"{uid}/"):
+        heatmaps.delete_blob(b.name)
     try:
-        _blobs.get_blob_client("heatmaps", f"{uid}.json").delete_blob()
+        heatmaps.delete_blob(f"{uid}.json")
     except ResourceNotFoundError:
         pass
     try:
@@ -419,7 +520,9 @@ def handle(msg):
         elif op == "delete-key":
             delete_key(uid)
         elif op == "refresh":
-            refresh(uid)
+            refresh(uid, full=bool(msg.get("full")))
+        elif op == "backfill":
+            backfill(uid)
         else:
             log.error("unknown op %r", op)
     except Gone:
@@ -431,6 +534,8 @@ def handle(msg):
                 # Keep the purge mark (other jobs stay fenced off) but leave "deleting",
                 # so the page stops polling and the rider can ask again.
                 _merge(uid, status="error", message="Could not delete your data. Please try again.")
+            elif op == "backfill":
+                _set_profile(uid, backfilling=False)
             elif _live(uid).get("status") != "error":  # keep a more specific message if the job set one
                 _set_profile(uid, status="error", message="Something went wrong. Please try again.")
         except (Gone, ResourceNotFoundError):

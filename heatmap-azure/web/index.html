@@ -57,6 +57,9 @@
   .account .links a, .account .links button { font-size:12px; color:#2563eb; background:none; border:none; padding:0; cursor:pointer; text-decoration:none; }
   .account .links .danger { color:#b42318; }
   .account small { display:block; color:#777; font-size:11px; line-height:1.35; }
+  .year-row { display:flex; align-items:center; gap:8px; font-size:12px; color:#444; margin-bottom:10px; }
+  .year-row select { font:inherit; font-size:12px; padding:2px 6px; border:1px solid #d0d0d0; border-radius:6px; background:#fff; color:#1a1a1a; cursor:pointer; }
+  .backfill-note { font-size:11px; color:#666; }
   .hidden { display:none !important; }
 </style>
 </head>
@@ -66,6 +69,11 @@
   <h1>Ride Heatmap</h1>
   <div class="sub" id="updated">Loading…</div>
   <div id="mapui" class="hidden">
+    <div class="year-row hidden" id="year-row">
+      <label for="year-select">Year</label>
+      <select id="year-select"></select>
+      <span class="backfill-note hidden" id="backfill-note">Syncing past years…</span>
+    </div>
     <div class="stats">
       <div class="stat"><b id="s-rides">–</b><span>rides</span></div>
       <div class="stat"><b id="s-total">–</b><span>km ridden</span></div>
