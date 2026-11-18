@@ -119,7 +119,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('Manitoba.gpx')
+        fetch('gpx/canada/manitoba/manitoba.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();

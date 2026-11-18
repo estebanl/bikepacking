@@ -119,7 +119,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('Newfoundland_Viking_Trail.gpx')
+        fetch('gpx/canada/newfoundland/newfoundland_viking_trail.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();

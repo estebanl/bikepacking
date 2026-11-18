@@ -119,7 +119,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('Ontario_Part_One.gpx')
+        fetch('gpx/canada/ontario/ontario_part_one.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();

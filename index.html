@@ -124,7 +124,7 @@
         L.control.layers(baseLayers, null, { position: 'topright', collapsed: true }).addTo(map);
         
         // Load and parse GPX file
-        fetch('BT_700_.gpx')
+        fetch('gpx/bt700/bt_700.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();

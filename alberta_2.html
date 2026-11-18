@@ -119,7 +119,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('Alberta_2.gpx')
+        fetch('gpx/canada/alberta/alberta_2.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();

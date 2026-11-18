@@ -119,7 +119,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('New_Brunswick_.gpx')
+        fetch('gpx/canada/new_brunswick/new_brunswick.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();

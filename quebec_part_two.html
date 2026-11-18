@@ -116,7 +116,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('Quebec_Part_Two-2.gpx')
+        fetch('gpx/canada/quebec/quebec_part_two.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();

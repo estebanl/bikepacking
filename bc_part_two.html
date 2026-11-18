@@ -119,7 +119,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('BC_Part_Two_.gpx')
+        fetch('gpx/canada/bc/bc_part_two.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();

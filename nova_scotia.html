@@ -119,7 +119,7 @@
         }).addTo(map);
 
         // Load and parse GPX file
-        fetch('Nova_Scotia.gpx')
+        fetch('gpx/canada/nova_scotia/nova_scotia.gpx')
             .then(response => response.text())
             .then(gpxText => {
                 const parser = new DOMParser();
