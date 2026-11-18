@@ -2,14 +2,712 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=routes/bt_700.html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bikepacking Routes</title>
-    <script>
-        window.location.replace('routes/bt_700.html');
-    </script>
+    <title>Bikepacking Routes — Mapbox Explorer</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #111827; color: #1f2937; }
+        #map { position: absolute; inset: 0; }
+
+        .sidebar {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 10;
+            width: 330px;
+            max-width: calc(100vw - 24px);
+            max-height: calc(100vh - 24px);
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22);
+            overflow: hidden;
+        }
+        .sidebar.collapsed .sidebar-body { display: none; }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .sidebar-header h1 { font-size: 16px; font-weight: 700; color: #111827; }
+        .sidebar-header p { font-size: 11.5px; color: #6b7280; margin-top: 1px; }
+        .collapse-btn {
+            border: none;
+            background: #f3f4f6;
+            color: #374151;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .collapse-btn:hover { background: #e5e7eb; }
+
+        .sidebar-body {
+            padding: 12px 14px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .pill-btn {
+            font: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .pill-btn:hover { border-color: #9ca3af; }
+        .pill-btn.active {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            color: #fff;
+        }
+        .pill-btn.terrain-on {
+            background: #047857;
+            border-color: #047857;
+            color: #fff;
+        }
+
+        .stats-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+        .stats-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .stat-item b { display: block; font-size: 15px; color: #1d4ed8; }
+        .stat-item span { font-size: 10.5px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.03em; }
+        .stats-links {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+        }
+        .stats-links a { color: #2563eb; text-decoration: none; }
+        .stats-links a:hover { text-decoration: underline; }
+
+        .route-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .route-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+            font: inherit;
+            width: 100%;
+            color: #1f2937;
+            transition: background 0.12s ease;
+        }
+        .route-item:hover { background: #f3f4f6; }
+        .route-item.active {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            font-weight: 600;
+        }
+        .route-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+        .route-swatch {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .route-name {
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .route-meta {
+            font-size: 11.5px;
+            color: #6b7280;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .poi-marker {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+        }
+
+        .token-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(17, 24, 39, 0.72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .token-modal.hidden { display: none; }
+        .token-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .token-card h2 { font-size: 17px; margin-bottom: 6px; }
+        .token-card p { font-size: 13px; color: #4b5563; line-height: 1.45; margin-bottom: 12px; }
+        .token-card form { display: flex; gap: 8px; }
+        .token-card input {
+            flex: 1;
+            font: inherit;
+            font-size: 13px;
+            padding: 8px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+        }
+        .token-card button {
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #1d4ed8;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .sidebar { width: calc(100vw - 24px); max-height: 55vh; }
+        }
+    </style>
 </head>
 <body>
-    <p>Redirecting to <a href="routes/bt_700.html">BT 700 Route Map</a>…</p>
+    <div id="map"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div>
+                <h1>Bikepacking Routes</h1>
+                <p id="statusText">Loading routes…</p>
+            </div>
+            <button class="collapse-btn" id="collapseBtn" title="Toggle panel" aria-label="Toggle panel">
+                <i class="fa-solid fa-chevron-up"></i>
+            </button>
+        </div>
+
+        <div class="sidebar-body">
+            <div class="controls-row" id="styleControls">
+                <button class="pill-btn active" data-style="mapbox://styles/mapbox/outdoors-v12">Outdoors</button>
+                <button class="pill-btn" data-style="mapbox://styles/mapbox/satellite-streets-v12">Satellite</button>
+                <button class="pill-btn" data-style="mapbox://styles/mapbox/dark-v11">Dark</button>
+                <button class="pill-btn" id="terrainBtn" title="Toggle 3D Terrain">3D Terrain</button>
+            </div>
+
+            <div class="stats-card" id="statsCard">
+                <div class="stats-title">
+                    <span id="statsTitle">All Routes</span>
+                    <button class="pill-btn" id="fitAllBtn" style="padding: 2px 8px; font-size: 11px;">Fit All</button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><b id="statDist">–</b><span>km</span></div>
+                    <div class="stat-item"><b id="statEle">–</b><span>m gain</span></div>
+                    <div class="stat-item"><b id="statWpt">–</b><span>waypoints</span></div>
+                </div>
+                <div class="stats-links" id="statsLinks" style="display: none;">
+                    <a id="legacyLink" href="#">Open Leaflet page →</a>
+                    <a id="gpxLink" href="#" download>Download GPX</a>
+                </div>
+            </div>
+
+            <div class="route-list" id="routeList"></div>
+        </div>
+    </aside>
+
+    <div class="token-modal hidden" id="tokenModal">
+        <div class="token-card">
+            <h2>Mapbox Token Required</h2>
+            <p>
+                Enter your Mapbox public access token (<code>pk.*</code>) to load the map.
+                It will be saved in your browser's <code>localStorage</code>.
+            </p>
+            <form id="tokenForm">
+                <input type="text" id="tokenInput" placeholder="pk.eyJ1..." required>
+                <button type="submit">Load Map</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
+    <script>
+        const ROUTES = [
+            { id: 'all', name: 'All Routes Overview', gpx: null, color: '#1d4ed8' },
+            { id: 'bt_700', name: 'BT 700 (Ontario)', gpx: 'gpx/bt700/bt_700.gpx', legacy: 'routes/bt_700.html', color: '#ef4444' },
+            { id: 'bc_part_one', name: 'BC Part One', gpx: 'gpx/canada/bc/bc_part_one.gpx', legacy: 'routes/bc_part_one.html', color: '#3b82f6' },
+            { id: 'bc_part_two', name: 'BC Part Two', gpx: 'gpx/canada/bc/bc_part_two.gpx', legacy: 'routes/bc_part_two.html', color: '#2563eb' },
+            { id: 'alberta', name: 'Alberta', gpx: 'gpx/canada/alberta/alberta.gpx', legacy: 'routes/alberta.html', color: '#10b981' },
+            { id: 'alberta_2', name: 'Alberta 2', gpx: 'gpx/canada/alberta/alberta_2.gpx', legacy: 'routes/alberta_2.html', color: '#059669' },
+            { id: 'saskatchewan', name: 'Saskatchewan', gpx: 'gpx/canada/saskatchewan/saskatchewan.gpx', legacy: 'routes/saskatchewan.html', color: '#f59e0b' },
+            { id: 'manitoba', name: 'Manitoba', gpx: 'gpx/canada/manitoba/manitoba.gpx', legacy: 'routes/manitoba.html', color: '#d97706' },
+            { id: 'ontario_part_one', name: 'Ontario Part One', gpx: 'gpx/canada/ontario/ontario_part_one.gpx', legacy: 'routes/ontario_part_one.html', color: '#8b5cf6' },
+            { id: 'ontario_part_two', name: 'Ontario Part Two', gpx: 'gpx/canada/ontario/ontario_part_two.gpx', legacy: 'routes/ontario_part_two.html', color: '#7c3aed' },
+            { id: 'quebec_part_two', name: 'Quebec Part Two', gpx: 'gpx/canada/quebec/quebec_part_two.gpx', legacy: 'routes/quebec_part_two.html', color: '#ec4899' },
+            { id: 'new_brunswick', name: 'New Brunswick', gpx: 'gpx/canada/new_brunswick/new_brunswick.gpx', legacy: 'routes/new_brunswick.html', color: '#14b8a6' },
+            { id: 'new_brunswick_2', name: 'New Brunswick 2', gpx: 'gpx/canada/new_brunswick/new_brunswick_2.gpx', legacy: 'routes/new_brunswick_2.html', color: '#0d9488' },
+            { id: 'prince_edward_island', name: 'Prince Edward Island', gpx: 'gpx/canada/prince_edward_island/prince_edward_island.gpx', legacy: 'routes/prince_edward_island.html', color: '#f97316' },
+            { id: 'nova_scotia', name: 'Nova Scotia', gpx: 'gpx/canada/nova_scotia/nova_scotia.gpx', legacy: 'routes/nova_scotia.html', color: '#06b6d4' },
+            { id: 'newfoundland', name: 'Newfoundland', gpx: 'gpx/canada/newfoundland/newfoundland.gpx', legacy: 'routes/newfoundland.html', color: '#6366f1' },
+            { id: 'newfoundland_viking_trail', name: 'Newfoundland Viking Trail', gpx: 'gpx/canada/newfoundland/newfoundland_viking_trail.gpx', legacy: 'routes/newfoundland_viking_trail.html', color: '#4f46e5' }
+        ];
+
+        const POI_ICONS = {
+            campsite: { icon: 'fa-campground', color: '#16a34a' },
+            camping: { icon: 'fa-campground', color: '#16a34a' },
+            shelter: { icon: 'fa-house', color: '#2563eb' },
+            water: { icon: 'fa-droplet', color: '#0891b2' },
+            food: { icon: 'fa-utensils', color: '#ea580c' },
+            store: { icon: 'fa-store', color: '#9333ea' },
+            gear: { icon: 'fa-toolbox', color: '#9333ea' },
+            toilet: { icon: 'fa-toilet', color: '#6b7280' },
+            shower: { icon: 'fa-shower', color: '#6b7280' },
+            checkpoint: { icon: 'fa-flag', color: '#dc2626' },
+            rest_area: { icon: 'fa-chair', color: '#2563eb' },
+            overlook: { icon: 'fa-binoculars', color: '#1e40af' },
+            info: { icon: 'fa-circle-info', color: '#2563eb' },
+            service: { icon: 'fa-wrench', color: '#6b7280' },
+            danger: { icon: 'fa-exclamation-triangle', color: '#dc2626' },
+            generic: { icon: 'fa-map-pin', color: '#2563eb' }
+        };
+
+        let map = null;
+        let styleReady = false;
+        let terrainEnabled = false;
+        let selectedRouteId = 'all';
+        let activeMarkers = [];
+        const routeData = new Map();
+
+        function resolveToken() {
+            const params = new URLSearchParams(window.location.search);
+            const urlToken = params.get('token');
+            if (urlToken && urlToken.startsWith('pk.')) {
+                localStorage.setItem('mapbox_token', urlToken);
+                return urlToken;
+            }
+            const stored = localStorage.getItem('mapbox_token');
+            return stored && stored.startsWith('pk.') ? stored : null;
+        }
+
+        function haversineKm(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) ** 2 +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function parseGpx(xmlText) {
+            const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+            const trkpts = doc.querySelectorAll('trkpt');
+            const coords = [];
+            let distanceKm = 0;
+            let elevationGain = 0;
+            let lastEle = null;
+            let minLon = Infinity, minLat = Infinity, maxLon = -Infinity, maxLat = -Infinity;
+
+            trkpts.forEach((pt, idx) => {
+                const lat = parseFloat(pt.getAttribute('lat'));
+                const lon = parseFloat(pt.getAttribute('lon'));
+                if (Number.isNaN(lat) || Number.isNaN(lon)) return;
+
+                coords.push([lon, lat]);
+                if (lon < minLon) minLon = lon;
+                if (lat < minLat) minLat = lat;
+                if (lon > maxLon) maxLon = lon;
+                if (lat > maxLat) maxLat = lat;
+
+                if (idx > 0) {
+                    const prev = coords[coords.length - 2];
+                    distanceKm += haversineKm(prev[1], prev[0], lat, lon);
+                }
+
+                const eleNode = pt.querySelector('ele');
+                if (eleNode) {
+                    const ele = parseFloat(eleNode.textContent);
+                    if (!Number.isNaN(ele)) {
+                        if (lastEle !== null && ele > lastEle) {
+                            elevationGain += ele - lastEle;
+                        }
+                        lastEle = ele;
+                    }
+                }
+            });
+
+            const waypoints = [];
+            doc.querySelectorAll('wpt').forEach((wpt, idx) => {
+                const lat = parseFloat(wpt.getAttribute('lat'));
+                const lon = parseFloat(wpt.getAttribute('lon'));
+                if (Number.isNaN(lat) || Number.isNaN(lon)) return;
+                waypoints.push({
+                    lat,
+                    lon,
+                    name: wpt.querySelector('name')?.textContent || `Waypoint ${idx + 1}`,
+                    desc: wpt.querySelector('desc')?.textContent || '',
+                    type: (wpt.querySelector('type')?.textContent || 'generic').toLowerCase()
+                });
+            });
+
+            return {
+                geojson: {
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: coords }
+                },
+                bounds: coords.length ? [[minLon, minLat], [maxLon, maxLat]] : null,
+                distanceKm,
+                elevationGain,
+                waypoints
+            };
+        }
+
+        async function loadAllRoutes() {
+            const gpxRoutes = ROUTES.filter(r => r.gpx);
+            const hashId = window.location.hash.replace('#', '');
+            if (hashId) {
+                gpxRoutes.sort((a, b) => (a.id === hashId ? -1 : b.id === hashId ? 1 : 0));
+            }
+            let loadedCount = 0;
+
+            await Promise.all(gpxRoutes.map(async (route) => {
+                try {
+                    const res = await fetch(route.gpx);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const text = await res.text();
+                    const parsed = parseGpx(text);
+                    routeData.set(route.id, { ...route, ...parsed });
+                    loadedCount++;
+                    document.getElementById('statusText').textContent = `${loadedCount} / ${gpxRoutes.length} routes loaded`;
+                    renderRouteList();
+                    syncMapLayers();
+                    if (hashId && route.id === hashId) {
+                        selectRoute(hashId, true);
+                    }
+                } catch (err) {
+                    console.error(`Failed to load ${route.gpx}:`, err);
+                }
+            }));
+
+            if (hashId && (hashId === 'all' || routeData.has(hashId))) {
+                selectRoute(hashId, true);
+            } else {
+                selectRoute('all', true);
+            }
+        }
+
+        function renderRouteList() {
+            const list = document.getElementById('routeList');
+            list.innerHTML = '';
+
+            ROUTES.forEach((route) => {
+                const data = routeData.get(route.id);
+                if (route.id !== 'all' && !data) return;
+
+                const btn = document.createElement('button');
+                btn.className = 'route-item' + (selectedRouteId === route.id ? ' active' : '');
+                btn.dataset.id = route.id;
+
+                const meta = route.id === 'all'
+                    ? `${routeData.size} routes`
+                    : `${data.distanceKm.toFixed(0)} km`;
+
+                btn.innerHTML = `
+                    <span class="route-left">
+                        <span class="route-swatch" style="background:${route.color}"></span>
+                        <span class="route-name">${route.name}</span>
+                    </span>
+                    <span class="route-meta">${meta}</span>
+                `;
+                btn.addEventListener('click', () => selectRoute(route.id, true));
+                list.appendChild(btn);
+            });
+        }
+
+        function syncMapLayers() {
+            if (!map || !styleReady) return;
+
+            if (terrainEnabled) {
+                if (!map.getSource('mapbox-dem')) {
+                    map.addSource('mapbox-dem', {
+                        type: 'raster-dem',
+                        url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                        tileSize: 512,
+                        maxzoom: 14
+                    });
+                }
+                map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+            } else {
+                map.setTerrain(null);
+            }
+
+            routeData.forEach((data, id) => {
+                const sourceId = `route-src-${id}`;
+                const layerId = `route-lyr-${id}`;
+
+                if (!map.getSource(sourceId)) {
+                    map.addSource(sourceId, { type: 'geojson', data: data.geojson });
+                }
+
+                const isSelected = selectedRouteId === id;
+                const isAll = selectedRouteId === 'all';
+
+                if (!map.getLayer(layerId)) {
+                    map.addLayer({
+                        id: layerId,
+                        type: 'line',
+                        source: sourceId,
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: {
+                            'line-color': data.color,
+                            'line-width': isSelected ? 4.5 : (isAll ? 3 : 2),
+                            'line-opacity': isAll || isSelected ? 0.9 : 0.22
+                        }
+                    });
+
+                    map.on('click', layerId, () => selectRoute(id, true));
+                    map.on('mouseenter', layerId, () => { map.getCanvas().style.cursor = 'pointer'; });
+                    map.on('mouseleave', layerId, () => { map.getCanvas().style.cursor = ''; });
+                } else {
+                    map.setPaintProperty(layerId, 'line-width', isSelected ? 4.5 : (isAll ? 3 : 2));
+                    map.setPaintProperty(layerId, 'line-opacity', isAll || isSelected ? 0.9 : 0.22);
+                }
+            });
+        }
+
+        function clearMarkers() {
+            activeMarkers.forEach(m => m.remove());
+            activeMarkers = [];
+        }
+
+        function renderWaypoints(route) {
+            clearMarkers();
+            if (!route || !route.waypoints) return;
+
+            route.waypoints.forEach((wpt) => {
+                const cfg = POI_ICONS[wpt.type] || POI_ICONS.generic;
+                const el = document.createElement('div');
+                el.className = 'poi-marker';
+                el.style.backgroundColor = cfg.color;
+                el.innerHTML = `<i class="fa-solid ${cfg.icon}"></i>`;
+
+                const popupHtml = `
+                    <div style="font-size:13px;max-width:220px;">
+                        <strong>${wpt.name}</strong><br>
+                        <em style="color:#6b7280;">${wpt.type}</em>
+                        ${wpt.desc ? `<p style="margin-top:4px;color:#374151;">${wpt.desc}</p>` : ''}
+                    </div>
+                `;
+
+                const marker = new mapboxgl.Marker({ element: el })
+                    .setLngLat([wpt.lon, wpt.lat])
+                    .setPopup(new mapboxgl.Popup({ offset: 14 }).setHTML(popupHtml))
+                    .addTo(map);
+                activeMarkers.push(marker);
+            });
+        }
+
+        function fitAllRoutes() {
+            let minLon = Infinity, minLat = Infinity, maxLon = -Infinity, maxLat = -Infinity;
+            routeData.forEach((data) => {
+                if (!data.bounds) return;
+                minLon = Math.min(minLon, data.bounds[0][0]);
+                minLat = Math.min(minLat, data.bounds[0][1]);
+                maxLon = Math.max(maxLon, data.bounds[1][0]);
+                maxLat = Math.max(maxLat, data.bounds[1][1]);
+            });
+            if (minLon < Infinity) {
+                map.fitBounds([[minLon, minLat], [maxLon, maxLat]], { padding: 48, duration: 800 });
+            }
+        }
+
+        function selectRoute(id, shouldFit) {
+            selectedRouteId = id;
+            window.location.hash = id;
+
+            document.querySelectorAll('.route-item').forEach((el) => {
+                el.classList.toggle('active', el.dataset.id === id);
+            });
+
+            const statsTitle = document.getElementById('statsTitle');
+            const statDist = document.getElementById('statDist');
+            const statEle = document.getElementById('statEle');
+            const statWpt = document.getElementById('statWpt');
+            const statsLinks = document.getElementById('statsLinks');
+
+            if (id === 'all') {
+                let totalKm = 0, totalEle = 0, totalWpt = 0;
+                routeData.forEach((d) => {
+                    totalKm += d.distanceKm;
+                    totalEle += d.elevationGain;
+                    totalWpt += d.waypoints.length;
+                });
+                statsTitle.textContent = 'All Routes Overview';
+                statDist.textContent = totalKm.toFixed(0);
+                statEle.textContent = Math.round(totalEle).toLocaleString();
+                statWpt.textContent = totalWpt;
+                statsLinks.style.display = 'none';
+                clearMarkers();
+                if (shouldFit) fitAllRoutes();
+            } else {
+                const data = routeData.get(id);
+                if (!data) return;
+                statsTitle.textContent = data.name;
+                statDist.textContent = data.distanceKm.toFixed(1);
+                statEle.textContent = Math.round(data.elevationGain).toLocaleString();
+                statWpt.textContent = data.waypoints.length;
+                document.getElementById('legacyLink').href = data.legacy;
+                document.getElementById('gpxLink').href = data.gpx;
+                statsLinks.style.display = 'flex';
+                renderWaypoints(data);
+                if (shouldFit && data.bounds) {
+                    map.fitBounds(data.bounds, { padding: 56, duration: 800 });
+                }
+            }
+
+            syncMapLayers();
+        }
+
+        function initMap(token) {
+            mapboxgl.accessToken = token;
+            map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/outdoors-v12',
+                center: [-95, 52],
+                zoom: 3.5
+            });
+
+            map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+            map.addControl(new mapboxgl.ScaleControl({ unit: 'metric' }), 'bottom-right');
+
+            map.on('style.load', () => {
+                styleReady = true;
+                syncMapLayers();
+            });
+
+            map.on('load', () => {
+                styleReady = true;
+                syncMapLayers();
+                if (selectedRouteId !== 'all' && routeData.has(selectedRouteId)) {
+                    selectRoute(selectedRouteId, true);
+                } else if (routeData.size > 0) {
+                    selectRoute('all', true);
+                }
+            });
+
+            loadAllRoutes();
+        }
+
+        document.getElementById('collapseBtn').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+            const icon = document.querySelector('#collapseBtn i');
+            icon.className = sidebar.classList.contains('collapsed')
+                ? 'fa-solid fa-chevron-down'
+                : 'fa-solid fa-chevron-up';
+        });
+
+        document.querySelectorAll('#styleControls .pill-btn[data-style]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                if (!map) return;
+                document.querySelectorAll('#styleControls .pill-btn[data-style]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                styleReady = false;
+                map.setStyle(btn.dataset.style);
+            });
+        });
+
+        document.getElementById('terrainBtn').addEventListener('click', (e) => {
+            if (!map) return;
+            terrainEnabled = !terrainEnabled;
+            e.currentTarget.classList.toggle('terrain-on', terrainEnabled);
+            map.easeTo({ pitch: terrainEnabled ? 50 : 0, duration: 600 });
+            syncMapLayers();
+        });
+
+        document.getElementById('fitAllBtn').addEventListener('click', () => {
+            selectRoute('all', true);
+        });
+
+        const token = resolveToken();
+        if (token) {
+            initMap(token);
+        } else {
+            document.getElementById('tokenModal').classList.remove('hidden');
+            document.getElementById('tokenForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const val = document.getElementById('tokenInput').value.trim();
+                if (!val.startsWith('pk.')) {
+                    alert('Please enter a valid Mapbox public token starting with pk.');
+                    return;
+                }
+                localStorage.setItem('mapbox_token', val);
+                document.getElementById('tokenModal').classList.add('hidden');
+                initMap(val);
+            });
+        }
+    </script>
 </body>
 </html>
