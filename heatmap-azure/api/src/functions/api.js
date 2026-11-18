@@ -1,16 +1,30 @@
 const crypto = require('node:crypto');
 const { app } = require('@azure/functions');
-const { principal, json, enqueue, getProfile, mergeProfile, blobs, encryptForVault } = require('../lib');
+const { authConfig, principal, json, enqueue, getProfile, mergeProfile, blobs, encryptForVault } = require('../lib');
 
 const REFRESH_COOLDOWN_MS = 10 * 60 * 1000;
 const BUSY = new Set(['pending', 'syncing', 'deleting']);
 
+// GET: public Auth0 client configuration (non-secret IDs from SWA app settings).
+app.http('config', {
+  methods: ['GET'],
+  authLevel: 'anonymous',
+  route: 'config',
+  handler: async () => {
+    const { domain, clientId, audience } = authConfig();
+    if (!domain || !clientId || !audience) {
+      return json(503, { error: 'Auth0 is not configured.' });
+    }
+    return json(200, { domain, clientId, audience });
+  },
+});
+
 function guard(handler) {
   return async (request, context) => {
-    const user = principal(request);
-    if (!user) return json(403, { error: 'An invitation is required to use the heatmap.' });
+    const auth = await principal(request);
+    if (!auth.user) return json(auth.status, { error: auth.error });
     try {
-      return await handler(request, user, context);
+      return await handler(request, auth.user, context);
     } catch (e) {
       context.error(e);
       return json(500, { error: 'Something went wrong. Try again in a minute.' });

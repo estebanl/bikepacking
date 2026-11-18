@@ -1,7 +1,7 @@
 // Ride Heatmap on Azure — near-zero cost, no secrets in the repo.
 //
-//   Static Web App (Free)  : page + managed API (Node), built-in Microsoft login,
-//                            invite-only "rider" role.
+//   Static Web App (Free)  : page + managed API (Node), Auth0 SPA login +
+//                            JWT verification, invite-only "rider" role.
 //   Function App (Flex)    : Python worker, managed identity. Queue trigger for
 //                            key changes / refreshes, timer every morning.
 //   Storage (private)      : queue "jobs", table "profiles", blobs for tracks,
@@ -23,6 +23,18 @@ param githubRepo string
 
 @description('Branch allowed to deploy via OIDC.')
 param githubBranch string = 'main'
+
+@description('Auth0 tenant domain, e.g. dev-xxxx.us.auth0.com.')
+param auth0Domain string = ''
+
+@description('Auth0 SPA Application Client ID.')
+param auth0ClientId string = ''
+
+@description('Auth0 API Audience identifier.')
+param auth0Audience string = ''
+
+@description('Custom JWT claim name for roles (must match the Auth0 Post-Login Action).')
+param auth0RolesClaim string = 'https://ride-heatmap/roles'
 
 param prefix string = 'heatmap'
 
@@ -191,6 +203,10 @@ resource swaSettings 'Microsoft.Web/staticSites/config@2023-12-01' = {
     STORAGE_CONNECTION: 'DefaultEndpointsProtocol=https;AccountName=${storage.name};AccountKey=${storage.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
     // Managed API telemetry (requests, failures, exceptions) into the same App Insights.
     APPLICATIONINSIGHTS_CONNECTION_STRING: insights.properties.ConnectionString
+    AUTH0_DOMAIN: auth0Domain
+    AUTH0_CLIENT_ID: auth0ClientId
+    AUTH0_AUDIENCE: auth0Audience
+    AUTH0_ROLES_CLAIM: auth0RolesClaim
   }
 }
 

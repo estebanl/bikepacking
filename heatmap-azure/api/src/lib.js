@@ -1,10 +1,11 @@
 // Shared helpers for the managed API.
 //
-// Identity comes only from the x-ms-client-principal header, which Static Web
-// Apps injects after its own login; clients cannot forge it on managed APIs.
-// staticwebapp.config.json already limits /api/* to the "rider" role; we check
-// again here so a config mistake can't open the API.
+// Identity comes from an Auth0 JWT access token in the Authorization header,
+// verified against the tenant's JWKS endpoint. An Auth0 Post-Login Action
+// injects the user's roles into a custom claim; only users with the "rider"
+// role are allowed.
 const crypto = require('node:crypto');
+const { createRemoteJWKSet, jwtVerify } = require('jose');
 const { TableClient } = require('@azure/data-tables');
 const { BlobServiceClient } = require('@azure/storage-blob');
 const { QueueClient } = require('@azure/storage-queue');
@@ -19,18 +20,52 @@ const profiles = () => TableClient.fromConnectionString(conn(), 'profiles');
 const blobs = () => BlobServiceClient.fromConnectionString(conn());
 const jobs = () => new QueueClient(conn(), 'jobs');
 
-function principal(request) {
-  const raw = request.headers.get('x-ms-client-principal');
-  if (!raw) return null;
-  try {
-    const p = JSON.parse(Buffer.from(raw, 'base64').toString('utf8'));
-    if (!p.userId || !(p.userRoles || []).includes('rider')) return null;
-    // Opaque, stable id for storage keys; the raw provider id is never stored.
-    const uid = crypto.createHash('sha256').update(`${p.identityProvider}:${p.userId}`).digest('hex').slice(0, 32);
-    return { uid, name: p.userDetails || '' };
-  } catch {
-    return null;
+function authConfig() {
+  const rawDomain = (process.env.AUTH0_DOMAIN || '').trim();
+  const domain = rawDomain.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+  const clientId = (process.env.AUTH0_CLIENT_ID || '').trim();
+  const audience = (process.env.AUTH0_AUDIENCE || '').trim();
+  const rolesClaim = (process.env.AUTH0_ROLES_CLAIM || 'https://ride-heatmap/roles').trim();
+  return { domain, clientId, audience, rolesClaim };
+}
+
+let jwksCache = { domain: '', fn: null };
+function getJwks(domain) {
+  if (jwksCache.domain !== domain || !jwksCache.fn) {
+    jwksCache = {
+      domain,
+      fn: createRemoteJWKSet(new URL(`https://${domain}/.well-known/jwks.json`)),
+    };
   }
+  return jwksCache.fn;
+}
+
+async function principal(request) {
+  const { domain, audience, rolesClaim } = authConfig();
+  if (!domain || !audience) {
+    return { status: 503, error: 'Auth0 is not configured.' };
+  }
+  const auth = request.headers.get('authorization') || '';
+  const m = auth.match(/^Bearer\s+(.+)$/i);
+  if (!m) return { status: 401, error: 'Sign in required.' };
+  let payload;
+  try {
+    ({ payload } = await jwtVerify(m[1], getJwks(domain), {
+      issuer: `https://${domain}/`,
+      audience,
+    }));
+  } catch {
+    return { status: 401, error: 'Invalid or expired session.' };
+  }
+  if (!payload.sub) return { status: 401, error: 'Invalid token.' };
+  const roles = Array.isArray(payload[rolesClaim]) ? payload[rolesClaim] : [];
+  if (!roles.includes('rider')) {
+    return { status: 403, error: 'An invitation is required to use the heatmap.' };
+  }
+  // Opaque, stable id for storage keys; the raw provider id is never stored.
+  const uid = crypto.createHash('sha256').update(`auth0:${payload.sub}`).digest('hex').slice(0, 32);
+  const name = payload.email || payload.name || '';
+  return { user: { uid, name } };
 }
 
 const json = (status, body) => ({
@@ -83,4 +118,4 @@ async function encryptForVault(text) {
   return ['v2', ...[wrapped, iv, sealed, cipher.getAuthTag()].map((b) => b.toString('base64'))].join('.');
 }
 
-module.exports = { principal, json, enqueue, getProfile, mergeProfile, blobs, encryptForVault };
+module.exports = { authConfig, principal, json, enqueue, getProfile, mergeProfile, blobs, encryptForVault };

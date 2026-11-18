@@ -4,11 +4,14 @@
   "private": true,
   "description": "Static Web Apps managed API for the ride heatmap",
   "main": "src/functions/*.js",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "@azure/data-tables": "^13.3.0",
     "@azure/functions": "^4.6.0",
     "@azure/storage-blob": "^12.26.0",
-    "@azure/storage-queue": "^12.25.0"
+    "@azure/storage-queue": "^12.25.0",
+    "jose": "^6.2.18"
   }
 }

@@ -9,9 +9,9 @@ Built to cost close to nothing for a handful of users, with no secrets in
 this (public) repository.
 
 ```
-Browser ──Microsoft sign-in (built-in, Entra)──> Static Web App (Free)
-  web/  page                                     /api/* needs role "rider"
-  api/  managed functions (Node 22)              (invite-only, max 25 on Free)
+Browser ──Auth0 SPA SDK (PKCE + refresh tokens)──> Static Web App (Free)
+  web/  page                                       GET /api/config (public IDs)
+  api/  managed functions (Node 22)                /api/* verifies Auth0 JWT + role "rider"
      │ PUT /api/key: key encrypted with a Key Vault RSA public key, then queued
      │ GET /api/heatmap: the rider's own blob
      ▼
@@ -25,15 +25,18 @@ Key Vault (RBAC): secret garmin-<uid> per rider + RSA key garmin-wrap
 
 ## Security model
 
-- **Sign-in:** Static Web Apps' built-in Microsoft login. Anyone can sign
-  in, but `/api/*` requires the `rider` role, which is granted only through
-  invitation links (`invite.sh`). The API re-checks the role itself.
-- **Rider identity:** an opaque id (`sha256(provider:userId)`, 32 hex chars).
-  The raw provider id is never stored; the display name sits in the profile
+- **Sign-in:** Auth0 Universal Login via `@auth0/auth0-spa-js` (Authorization
+  Code + PKCE). Anyone who signs in still needs the `rider` role in their
+  Auth0 access token; the API verifies the JWT signature against Auth0's JWKS
+  endpoint and requires the `rider` role on every `/api/*` call (except
+  `GET /api/config`, which returns the non-secret `domain`, `clientId`, and
+  `audience`).
+- **Rider identity:** an opaque id (`sha256("auth0:" + sub)`, 32 hex chars).
+  The raw provider `sub` is never stored; the display name sits in the profile
   row only.
 - **Garmin keys:** the API never stores them. It encrypts each submitted key
   with a one-time AES-256-GCM key, wraps that with the public half of the
-  Key Vault RSA key (RSA-OAEP-256), and queues it. The worker has Key Vault
+  Key Vault RSA key (RSA-OAEP-2048), and queues it. The worker has Key Vault
   unwrap the AES key, decrypts the Garmin key, validates it with Garmin, and
   saves it as a Key Vault secret. Keys are never returned to the browser.
   "Remove Garmin key" deletes the secret; "Delete my data" also removes the
@@ -54,7 +57,7 @@ Key Vault (RBAC): secret garmin-<uid> per rider + RSA key garmin-wrap
   Static Web Apps deployment token is fetched and masked at run time.
   Repository variables hold only IDs.
 - **Headers:** a strict Content-Security-Policy (no inline scripts), with
-  Leaflet loaded with Subresource Integrity (SRI) hashes.
+  Leaflet and `@auth0/auth0-spa-js` loaded with Subresource Integrity (SRI) hashes.
 
 ## Cost (a few riders)
 
@@ -65,6 +68,28 @@ Key Vault (RBAC): secret garmin-<uid> per rider + RSA key garmin-wrap
 | Storage | Standard LRS | cents (a few MB, low transactions) |
 | Key Vault | Standard, RSA 2048 software key | cents ($0.03 / 10k operations) |
 | Log Analytics / App Insights | pay-as-you-go, 0.1 GB/day cap | $0, inside the 5 GB free tier |
+| Auth0 | Free | $0 (up to 25,000 MAU) |
+
+## Auth0 setup (one-time)
+
+You can run `./setup-auth0.sh https://<your-swa-hostname>` (requires `auth0 login` with the [Auth0 CLI](https://auth0.github.io/auth0-cli/)), or configure it manually in the Auth0 Dashboard:
+
+1. **Create an API** in Auth0 Dashboard → *Applications → APIs* (e.g. identifier `https://ride-heatmap-api`, signing algorithm `RS256`).
+2. **Create a Single Page Application** in *Applications → Applications*:
+   - Allowed Callback URLs, Allowed Logout URLs, Allowed Web Origins: `https://<your-swa-hostname>` (and `http://localhost:4280` if testing locally).
+   - Enable **Refresh Token Rotation** (required when third-party cookies are blocked).
+3. **Create the `rider` role** in *User Management → Roles* (`rider`).
+4. **Add a Post-Login Action** (*Actions → Triggers → post-login*) to include roles in the access token:
+   ```js
+   exports.onExecutePostLogin = async (event, api) => {
+     const roles = event.authorization ? event.authorization.roles : [];
+     api.accessToken.setCustomClaim('https://ride-heatmap/roles', roles);
+     if (event.user.email) {
+       api.accessToken.setCustomClaim('email', event.user.email);
+     }
+   };
+   ```
+5. *(Recommended)* Disable public sign-ups on your Database connection (*Authentication → Database → Settings → Disable Sign Ups*) so only invited users can log in.
 
 ## Deploy
 
@@ -73,17 +98,31 @@ One time, from a machine with `az` (Owner on the subscription), `func`,
 
 ```bash
 cd heatmap-azure
-OWNER_EMAIL=you@outlook.com ./deploy.sh      # infra, GitHub variables, first deploy, your invite
+AUTH0_DOMAIN=dev-xxxx.us.auth0.com \
+AUTH0_CLIENT_ID=<spa-client-id> \
+AUTH0_AUDIENCE=https://ride-heatmap-api \
+./deploy.sh
 ```
 
 After that, pushing changes under `heatmap-azure/` to `main` deploys through
 `.github/workflows/heatmap-azure.yml`. Re-run `deploy.sh` only when
-`infra/main.bicep` changes.
+`infra/main.bicep` changes (existing `AUTH0_*` app settings are preserved if omitted).
 
-Invite a rider (they must sign in with that Microsoft account):
+Invite a rider (creates the Auth0 user if needed, assigns `rider`, and prints a one-time setup link):
 
 ```bash
-./invite.sh friend@example.com        # prints a one-time invitation link (7 days)
+AUTH0_MGMT_TOKEN=<mgmt-api-token> ./invite.sh friend@example.com
+# or using an Auth0 Machine-to-Machine app:
+AUTH0_M2M_CLIENT_ID=... AUTH0_M2M_CLIENT_SECRET=... ./invite.sh friend@example.com
+```
+
+### Migrating existing Entra riders
+
+If you have existing riders from the previous Microsoft Entra setup, list their old `uid`s and copy each rider's profile, tracks, heatmaps, and Key Vault secret to their Auth0 `sub` (from Auth0 Dashboard → *User Management → Users*):
+
+```bash
+./migrate-uid.sh --list
+./migrate-uid.sh <old-uid> "<auth0-user-id>"
 ```
 
 ## Notes

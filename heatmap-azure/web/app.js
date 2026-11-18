@@ -1,6 +1,6 @@
 // Ride Heatmap — Static Web App front end.
-// Sign-in is Static Web Apps' built-in Microsoft (Entra) login; the API only
-// answers riders who were invited. The Garmin key is write-only from here.
+// Sign-in is Auth0 SPA SDK; the API verifies JWTs and only answers riders
+// with the "rider" role. The Garmin key is write-only from here.
 'use strict';
 
 // ---------------------------------------------------------------- map
@@ -164,11 +164,31 @@ function el(tag, props = {}, ...kids) {
   return e;
 }
 
+let auth0Client = null;
+
+function signOutBtn(text = 'Sign out') {
+  return el('button', {
+    textContent: text,
+    onclick: () => auth0Client && auth0Client.logout({ logoutParams: { returnTo: window.location.origin } }),
+  });
+}
+
 async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (auth0Client) {
+    try {
+      const token = await auth0Client.getTokenSilently();
+      headers.Authorization = `Bearer ${token}`;
+    } catch (e) {
+      if (e && (e.error === 'login_required' || e.error === 'consent_required' || e.error === 'missing_refresh_token')) {
+        return { status: 401, body: { error: 'Session expired.' } };
+      }
+      return { status: 0, body: null };
+    }
+  }
   let r;
   try {
-    r = await fetch(`/api/${path}`, { cache: 'no-store', ...opts,
-      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
+    r = await fetch(`/api/${path}`, { cache: 'no-store', ...opts, headers });
   } catch {
     return { status: 0, body: null };   // network error
   }
@@ -181,16 +201,20 @@ function signedOut() {
   $('updated').textContent = 'Your rides as a heatmap, from Garmin Connect.';
   $('account').replaceChildren(
     el('p', { textContent: 'Sign in to see your heatmap. Access is by invitation.' }),
-    el('a', { className: 'btn', href: '/.auth/login/aad?post_login_redirect_uri=/', textContent: 'Sign in with Microsoft' }),
+    el('button', {
+      className: 'btn',
+      textContent: 'Sign in',
+      onclick: () => auth0Client && auth0Client.loginWithRedirect(),
+    }),
   );
 }
 
-function notInvited(me) {
+function notInvited(me, msg) {
   $('updated').textContent = 'Your rides as a heatmap, from Garmin Connect.';
   $('account').replaceChildren(
     el('p', { className: 'who', textContent: `Signed in as ${me.userDetails}` }),
-    el('p', { textContent: 'This app is invite-only. Ask the owner for an invitation, then open the invitation link.' }),
-    el('div', { className: 'links' }, el('a', { href: '/.auth/logout?post_logout_redirect_uri=/', textContent: 'Sign out' })),
+    el('p', { textContent: msg || 'This app is invite-only. Ask the owner for an invitation, then sign in again.' }),
+    el('div', { className: 'links' }, signOutBtn()),
   );
 }
 
@@ -251,11 +275,11 @@ function renderProfile(p, me) {
       el('p', { className: 'status', textContent: 'Your Garmin key, rides and heatmap are being deleted.' }),
       el('div', { className: 'links' },
         el('button', { textContent: 'Start over', onclick: () => loadProfile() }),
-        el('a', { href: '/.auth/logout?post_logout_redirect_uri=/', textContent: 'Sign out' }),
+        signOutBtn(),
       ),
     );
   };
-  links.append(wipe, el('a', { href: '/.auth/logout?post_logout_redirect_uri=/', textContent: 'Sign out' }));
+  links.append(wipe, signOutBtn());
   const parts = [el('p', { className: 'who', textContent: `Signed in as ${me.userDetails}` }), status];
   // A saved key Garmin rejected (expired or revoked) can be replaced in place.
   // keyRejected outlives the status, so the form is still there when checking
@@ -324,9 +348,8 @@ async function loadProfile() {
   clearTimeout(pollTimer);
   const r = await api('profile');
   if (r.status === 401) return signedOut();          // session expired
-  if (r.status === 403 && r.body && r.body.error) {  // not (or no longer) invited
-    $('account').replaceChildren(el('p', { className: 'status bad', textContent: r.body.error }));
-    return;
+  if (r.status === 403) {                            // not (or no longer) invited
+    return notInvited(me, r.body && r.body.error);
   }
   if (r.status !== 200) {
     // Transient (cold start, platform 5xx, network): keep retrying with backoff.
@@ -357,11 +380,39 @@ async function loadProfile() {
 }
 
 (async function start() {
+  let cfg;
   try {
-    const r = await fetch('/.auth/me', { cache: 'no-store' });
-    me = (await r.json()).clientPrincipal;
-  } catch { me = null; }
-  if (!me) return signedOut();
-  if (!(me.userRoles || []).includes('rider')) return notInvited(me);
+    const r = await fetch('/api/config', { cache: 'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    cfg = await r.json();
+  } catch {
+    $('updated').textContent = 'Your rides as a heatmap, from Garmin Connect.';
+    $('account').replaceChildren(el('p', { className: 'status bad', textContent: 'Could not load sign-in configuration. Try again in a minute.' }));
+    return;
+  }
+  auth0Client = await window.auth0.createAuth0Client({
+    domain: cfg.domain,
+    clientId: cfg.clientId,
+    authorizationParams: {
+      redirect_uri: window.location.origin,
+      audience: cfg.audience,
+    },
+    useRefreshTokens: true,
+    cacheLocation: 'localstorage',
+  });
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('code') && params.has('state')) {
+    try {
+      await auth0Client.handleRedirectCallback();
+    } catch (e) {
+      $('updated').textContent = 'Your rides as a heatmap, from Garmin Connect.';
+      $('account').replaceChildren(el('p', { className: 'status bad', textContent: e.message || 'Sign-in failed.' }));
+      return;
+    }
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+  if (!(await auth0Client.isAuthenticated())) return signedOut();
+  const user = await auth0Client.getUser();
+  me = { userDetails: (user && (user.email || user.name || user.sub)) || 'rider' };
   loadProfile();
 }());
