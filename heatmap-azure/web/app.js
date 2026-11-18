@@ -220,7 +220,8 @@ function renderProfile(p, me) {
   if (p.hasKey && !BUSY.has(p.status)) {
     const refresh = el('button', { textContent: 'Refresh now' });
     refresh.onclick = async () => {
-      const r = await api('refresh', { method: 'POST' });
+      const body = selectedYear && selectedYear !== 'all' ? { year: Number(selectedYear) } : {};
+      const r = await api('refresh', { method: 'POST', body: JSON.stringify(body) });
       if (r.status === 202) loadProfile(); else alert((r.body && r.body.error) || 'Could not refresh.');
     };
     const remove = el('button', { textContent: 'Remove Garmin key' });
@@ -272,24 +273,27 @@ let hasFitBounds = false;
 let selectedYear = store.get('heat-year') || null;
 let failures = 0;
 
-function renderYearSelect(years, backfilling) {
+function renderYearSelect(syncedYears) {
   const row = $('year-row');
   const sel = $('year-select');
-  const note = $('backfill-note');
-  note.classList.toggle('hidden', !backfilling);
-  if (!years.length && !backfilling) {
-    row.classList.add('hidden');
-    return;
-  }
+  $('backfill-note').classList.add('hidden');
   row.classList.remove('hidden');
-  const opts = years.map((y) => el('option', { value: String(y), textContent: String(y) }));
-  if (years.length > 1) opts.push(el('option', { value: 'all', textContent: 'All years' }));
+  const curYear = new Date().getUTCFullYear();
+  const syncedSet = new Set(syncedYears.map(Number));
+  if (!syncedSet.size) syncedSet.add(curYear);
+  const minYear = Math.min(2015, ...syncedSet);
+  const opts = [];
+  for (let y = curYear; y >= minYear; y -= 1) {
+    const label = syncedSet.has(y) ? String(y) : `${y} (load)`;
+    opts.push(el('option', { value: String(y), textContent: label }));
+  }
+  if (syncedSet.size > 1) opts.push(el('option', { value: 'all', textContent: 'All years' }));
   sel.replaceChildren(...opts);
   const valid = new Set(opts.map((o) => o.value));
   if (!selectedYear || !valid.has(selectedYear)) {
-    selectedYear = opts.length ? opts[0].value : null;
+    selectedYear = String(curYear);
   }
-  if (selectedYear) sel.value = selectedYear;
+  sel.value = selectedYear;
 }
 
 async function loadHeatmap(year) {
@@ -305,7 +309,15 @@ async function loadHeatmap(year) {
 $('year-select').addEventListener('change', async (e) => {
   selectedYear = e.target.value;
   store.set('heat-year', selectedYear);
-  if (await loadHeatmap(selectedYear)) shownYear = selectedYear;
+  if (await loadHeatmap(selectedYear)) {
+    shownYear = selectedYear;
+    return;
+  }
+  if (selectedYear !== 'all') {
+    const r = await api('refresh', { method: 'POST', body: JSON.stringify({ year: Number(selectedYear) }) });
+    if (r.status === 202) loadProfile();
+    else alert((r.body && r.body.error) || `Could not load ${selectedYear}.`);
+  }
 });
 
 async function loadProfile() {
@@ -330,7 +342,8 @@ async function loadProfile() {
   const p = r.body;
   renderProfile(p, me);
   if (p.lastRun) {
-    renderYearSelect(p.years || [], p.backfilling);
+    const synced = (p.syncedYears && p.syncedYears.length) ? p.syncedYears : (p.years || []);
+    renderYearSelect(synced);
     if (p.lastRun !== shownRun || selectedYear !== shownYear) {
       if (await loadHeatmap(selectedYear)) {
         shownRun = p.lastRun;
@@ -340,7 +353,7 @@ async function loadProfile() {
   } else {
     $('updated').textContent = p.hasKey ? 'Your first heatmap is on its way.' : 'Add your Garmin key to build your heatmap.';
   }
-  if (BUSY.has(p.status) || p.backfilling) pollTimer = setTimeout(loadProfile, 5000);
+  if (BUSY.has(p.status)) pollTimer = setTimeout(loadProfile, 5000);
 }
 
 (async function start() {

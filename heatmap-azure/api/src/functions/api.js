@@ -40,7 +40,7 @@ async function submit(uid, before, busy, job) {
   }
 }
 
-const STALE_JOB_MS = 35 * 60 * 1000;
+const STALE_JOB_MS = 10 * 60 * 1000;
 
 function isStaleBusy(p) {
   if (!p || !['pending', 'syncing'].includes(p.status)) return false;
@@ -58,7 +58,7 @@ function view(p) {
     lastRun: p.lastRun || null,
     stats: p.stats ? JSON.parse(p.stats) : null,
     years: p.years ? JSON.parse(p.years) : [],
-    backfilling: stale ? false : !!p.backfilling,
+    syncedYears: p.syncedYears ? JSON.parse(p.syncedYears) : [],
   };
 }
 
@@ -115,7 +115,7 @@ app.http('key', {
   }),
 });
 
-// POST: rebuild now (rate limited).
+// POST: rebuild now (optional { year } to sync a specific year).
 app.http('refresh', {
   methods: ['POST'],
   authLevel: 'anonymous',
@@ -125,12 +125,26 @@ app.http('refresh', {
     if (p && p.purge) return deleting();
     if (!p || !p.hasKey) return json(409, { error: 'Add your Garmin API key first.' });
     if (BUSY.has(p.status) && !isStaleBusy(p)) return json(202, { status: p.status });
+    let body = {};
+    try { body = await request.json(); } catch { /* optional body */ }
+    const rawYear = body.year ?? request.query.get('year');
+    let year = null;
+    if (rawYear !== undefined && rawYear !== null && rawYear !== '') {
+      const y = Number(rawYear);
+      const maxYear = new Date().getUTCFullYear();
+      if (!Number.isInteger(y) || y < 2010 || y > maxYear) {
+        return json(400, { error: 'Invalid year.' });
+      }
+      year = y;
+    }
+    const synced = p.syncedYears ? JSON.parse(p.syncedYears) : [];
+    const unsyncedPastYear = year !== null && !synced.includes(year);
     const last = p.lastRequested ? Date.parse(p.lastRequested) : 0;
-    if (Date.now() - last < REFRESH_COOLDOWN_MS) {
+    if (!unsyncedPastYear && Date.now() - last < REFRESH_COOLDOWN_MS) {
       return json(429, { error: 'Refreshed recently. Try again in a few minutes.' });
     }
     await submit(user.uid, p, { status: 'pending', message: '', lastRequested: new Date().toISOString() },
-      { op: 'refresh', full: true });
+      { op: 'refresh', ...(year !== null ? { year } : {}) });
     return json(202, { status: 'pending' });
   }),
 });

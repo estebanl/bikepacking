@@ -27,7 +27,6 @@ from azure.keyvault.keys import KeyClient
 from azure.keyvault.keys.crypto import CryptographyClient, EncryptionAlgorithm
 from azure.keyvault.secrets import SecretClient
 from azure.storage.blob import BlobServiceClient, ContentSettings
-from azure.storage.queue import QueueClient
 from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -51,14 +50,9 @@ with open(heatmap_core.__file__, "rb") as _f:   # algorithm changes force a rebu
 
 _cred = DefaultAzureCredential()
 _blobs = BlobServiceClient(f"https://{ACCOUNT}.blob.core.windows.net", credential=_cred)
-_queue = QueueClient(f"https://{ACCOUNT}.queue.core.windows.net", "jobs", credential=_cred)
 _profiles = TableClient(f"https://{ACCOUNT}.table.core.windows.net", "profiles", credential=_cred)
 _secrets = SecretClient(VAULT, _cred)
 _keys = KeyClient(VAULT, _cred)
-
-
-def _enqueue(msg):
-    _queue.send_message(base64.b64encode(json.dumps(msg).encode()).decode())
 
 
 def _now():
@@ -303,30 +297,28 @@ def _build_heatmap_doc(uid, year_key, year_rides, prev_hashes, touch_updated=Fal
     return fingerprint, stats
 
 
-def _rebuild_years(uid, all_rides, cur_year, touch_all=False):
-    """Rebuild changed year heatmaps and 'all', returning (years, hashes, cur_stats)."""
+def _rebuild_years(uid, all_rides, target_year, cur_year, synced_years):
+    """Rebuild target_year and 'all' heatmaps, returning (years, synced_years, hashes, cur_stats)."""
     entity = _live(uid)
     prev_hashes = json.loads(entity["yearHashes"]) if entity.get("yearHashes") else {}
     by_year = {}
     for r in all_rides:
         by_year.setdefault(r["date"][:4], []).append(r)
-    by_year.setdefault(cur_year, [])
-    years = sorted((int(y) for y in by_year), reverse=True)
-    new_hashes = {}
-    cur_stats = None
-    for y in years:
-        yk = str(y)
-        fp, st = _build_heatmap_doc(uid, yk, by_year[yk], prev_hashes, touch_updated=(yk == cur_year))
-        new_hashes[yk] = fp
-        if yk == cur_year:
-            cur_stats = st
-    all_fp, _ = _build_heatmap_doc(uid, "all", all_rides, prev_hashes, touch_updated=touch_all)
+    by_year.setdefault(target_year, [])
+    synced_set = set(synced_years)
+    synced_set.add(int(target_year))
+    years = sorted(synced_set | {int(y) for y in by_year}, reverse=True)
+    new_hashes = dict(prev_hashes)
+    fp, target_stats = _build_heatmap_doc(uid, target_year, by_year[target_year], prev_hashes, touch_updated=True)
+    new_hashes[target_year] = fp
+    all_fp, _ = _build_heatmap_doc(uid, "all", all_rides, prev_hashes, touch_updated=True)
     new_hashes["all"] = all_fp
-    return years, new_hashes, cur_stats
+    cur_stats = target_stats if target_year == cur_year else (json.loads(entity["stats"]) if entity.get("stats") else target_stats)
+    return years, sorted(synced_set, reverse=True), new_hashes, cur_stats
 
 
-def refresh(uid, full=False):
-    """Rebuild one rider's heatmap from Garmin."""
+def refresh(uid, year=None):
+    """Rebuild one rider's heatmap for a single year (default: current UTC year)."""
     try:
         api_key = _secrets.get_secret(_secret_name(uid)).value
     except ResourceNotFoundError:
@@ -334,7 +326,7 @@ def refresh(uid, full=False):
         return
     _set_profile(uid, status="syncing", message="")
     try:
-        _refresh(uid, api_key, full=full)
+        _refresh(uid, api_key, year=year)
     except HttpError as e:
         if e.status_code in (401, 403):
             _set_profile(uid, status="invalid-key", keyRejected=True,
@@ -349,76 +341,23 @@ def refresh(uid, full=False):
         _set_profile(uid, status="error", message="Refresh failed. Will retry tomorrow.")
 
 
-def _refresh(uid, api_key, full=False):
+def _refresh(uid, api_key, year=None):
     cur_year = datetime.now(timezone.utc).strftime("%Y")
+    target_year = str(year) if year else cur_year
     token = _token(api_key)
-    yr_rides, new, _ = _sync_tracks(uid, token, start_date=f"{cur_year}-01-01", end_date=f"{cur_year}-12-31")
-    all_rides = _merge_rides(_load_rides_cache(uid), yr_rides, replace_year=cur_year)
+    yr_rides, new, _ = _sync_tracks(uid, token, start_date=f"{target_year}-01-01", end_date=f"{target_year}-12-31")
+    all_rides = _merge_rides(_load_rides_cache(uid), yr_rides, replace_year=target_year)
     _put_blob(uid, "tracks", f"{uid}/rides.json", json.dumps(all_rides),
               content_settings=ContentSettings(content_type="application/json"))
-    years, new_hashes, cur_stats = _rebuild_years(uid, all_rides, cur_year, touch_all=full)
     entity = _live(uid)
-    need_backfill = full or (not entity.get("historySynced") and not entity.get("backfilling"))
-    fields = {"status": "ok", "message": "", "lastRun": _now(),
-              "stats": json.dumps(cur_stats), "years": json.dumps(years),
-              "yearHashes": json.dumps(new_hashes)}
-    if need_backfill:
-        fields["backfilling"] = True
-    _set_profile(uid, **fields)
-    if need_backfill:
-        _enqueue({"op": "backfill", "uid": uid, "year": int(cur_year) - 1,
-                  "empty_streak": 0, "gen": entity.get("gen")})
-    log.info("refreshed %s (full=%s): %d rides, %d new, years=%s", uid, full, len(all_rides), new, years)
-
-
-MIN_BACKFILL_YEAR = 2010
-MAX_EMPTY_YEARS = 3
-
-
-def backfill(uid, year=None, empty_streak=0):
-    """Sync one historical year at a time in the background without blocking the UI."""
-    cur_year = datetime.now(timezone.utc).strftime("%Y")
-    if year is None:
-        year = int(cur_year) - 1
-    if year < MIN_BACKFILL_YEAR or empty_streak >= MAX_EMPTY_YEARS:
-        _set_profile(uid, backfilling=False, historySynced=True)
-        return
-    try:
-        api_key = _secrets.get_secret(_secret_name(uid)).value
-    except ResourceNotFoundError:
-        _set_profile(uid, backfilling=False)
-        return
-    _set_profile(uid, backfilling=True)
-    try:
-        yr_rides, new, total_acts = _sync_tracks(
-            uid, _token(api_key), start_date=f"{year}-01-01", end_date=f"{year}-12-31")
-        all_rides = _merge_rides(_load_rides_cache(uid), yr_rides, replace_year=str(year))
-        _put_blob(uid, "tracks", f"{uid}/rides.json", json.dumps(all_rides),
-                  content_settings=ContentSettings(content_type="application/json"))
-        years, new_hashes, cur_stats = _rebuild_years(uid, all_rides, cur_year, touch_all=True)
-        next_empty = 0 if total_acts > 0 else empty_streak + 1
-        done = (year - 1 < MIN_BACKFILL_YEAR) or (next_empty >= MAX_EMPTY_YEARS)
-        _set_profile(uid, backfilling=not done, historySynced=done or bool(_live(uid).get("historySynced")),
-                     lastRun=_now(), stats=json.dumps(cur_stats), years=json.dumps(years),
-                     yearHashes=json.dumps(new_hashes))
-        log.info("backfilled %s year=%d: %d rides (%d acts), %d new, years=%s",
-                 uid, year, len(yr_rides), total_acts, new, years)
-        if not done:
-            job = _job_gen.get()
-            _enqueue({"op": "backfill", "uid": uid, "year": year - 1,
-                      "empty_streak": next_empty, "gen": job[1] if job else None})
-    except HttpError as e:
-        if e.status_code in (401, 403):
-            _set_profile(uid, status="invalid-key", keyRejected=True, backfilling=False,
-                         message="Garmin rejected the API key. It may have expired; add a new one.")
-        else:
-            _set_profile(uid, backfilling=False)
-        log.warning("backfill garmin http %s for %s (year=%d)", e.status_code, uid, year)
-    except Gone:
-        raise
-    except Exception:
-        log.exception("backfill failed for %s (year=%d)", uid, year)
-        _set_profile(uid, backfilling=False)
+    prev_synced = json.loads(entity["syncedYears"]) if entity.get("syncedYears") else []
+    years, synced_years, new_hashes, cur_stats = _rebuild_years(
+        uid, all_rides, target_year, cur_year, prev_synced)
+    _set_profile(uid, status="ok", message="", backfilling=False, lastRun=_now(),
+                 stats=json.dumps(cur_stats), years=json.dumps(years),
+                 syncedYears=json.dumps(synced_years), yearHashes=json.dumps(new_hashes))
+    log.info("refreshed %s year=%s: %d year rides (%d total), %d new",
+             uid, target_year, len(yr_rides), len(all_rides), new)
 
 
 # ---------------------------------------------------------------- key lifecycle
@@ -531,9 +470,7 @@ def handle(msg):
         elif op == "delete-key":
             delete_key(uid)
         elif op == "refresh":
-            refresh(uid, full=bool(msg.get("full")))
-        elif op == "backfill":
-            backfill(uid, year=msg.get("year"), empty_streak=msg.get("empty_streak", 0))
+            refresh(uid, year=msg.get("year"))
         else:
             log.error("unknown op %r", op)
     except Gone:
@@ -545,8 +482,6 @@ def handle(msg):
                 # Keep the purge mark (other jobs stay fenced off) but leave "deleting",
                 # so the page stops polling and the rider can ask again.
                 _merge(uid, status="error", message="Could not delete your data. Please try again.")
-            elif op == "backfill":
-                _set_profile(uid, backfilling=False)
             elif _live(uid).get("status") != "error":  # keep a more specific message if the job set one
                 _set_profile(uid, status="error", message="Something went wrong. Please try again.")
         except (Gone, ResourceNotFoundError):
