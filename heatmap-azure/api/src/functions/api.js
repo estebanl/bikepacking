@@ -40,16 +40,25 @@ async function submit(uid, before, busy, job) {
   }
 }
 
+const STALE_JOB_MS = 35 * 60 * 1000;
+
+function isStaleBusy(p) {
+  if (!p || !['pending', 'syncing'].includes(p.status)) return false;
+  const started = Date.parse(p.lastRequested || p.keySetAt || '');
+  return !started || Date.now() - started > STALE_JOB_MS;
+}
+
 function view(p) {
+  const stale = isStaleBusy(p);
   return {
     hasKey: !!p.hasKey,
     keyRejected: !!p.keyRejected || p.status === 'invalid-key',
-    status: p.status || 'no-key',
-    message: p.message || '',
+    status: stale ? 'error' : (p.status || 'no-key'),
+    message: stale ? 'The last update timed out. Try refreshing again.' : (p.message || ''),
     lastRun: p.lastRun || null,
     stats: p.stats ? JSON.parse(p.stats) : null,
     years: p.years ? JSON.parse(p.years) : [],
-    backfilling: !!p.backfilling,
+    backfilling: stale ? false : !!p.backfilling,
   };
 }
 
@@ -115,7 +124,7 @@ app.http('refresh', {
     const p = await getProfile(user.uid);
     if (p && p.purge) return deleting();
     if (!p || !p.hasKey) return json(409, { error: 'Add your Garmin API key first.' });
-    if (BUSY.has(p.status)) return json(202, { status: p.status });
+    if (BUSY.has(p.status) && !isStaleBusy(p)) return json(202, { status: p.status });
     const last = p.lastRequested ? Date.parse(p.lastRequested) : 0;
     if (Date.now() - last < REFRESH_COOLDOWN_MS) {
       return json(429, { error: 'Refreshed recently. Try again in a few minutes.' });

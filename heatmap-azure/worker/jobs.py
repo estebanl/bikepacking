@@ -213,17 +213,17 @@ def _token(api_key):
             return _garmin("token", auth.obtain_token, api_key).access_token
 
 
-def _sync_tracks(uid, access_token, start_date=None, end_date=None):
-    """Download FIT tracks for rides not cached yet. Returns (rides, new_count)."""
+def _sync_tracks(uid, access_token, start_date, end_date):
+    """Download FIT tracks for rides in [start_date, end_date] not cached yet. Returns (rides, new_count, total_acts)."""
     tracks = _blobs.get_container_client("tracks")
     cached = {b.name.rsplit("/", 1)[-1][:-5] for b in tracks.list_blobs(name_starts_with=f"{uid}/")
               if b.name.endswith(".json") and not b.name.endswith("/rides.json")}
     acts = []
-    search_kwargs = {"start_date": start_date, "end_date": end_date} if start_date and end_date else {}
     with GarminPersonalApiClient(access_token) as client:
         start = 0
         while True:
-            page = _garmin("search", client.search_activities, start=start, limit=100, **search_kwargs) or []
+            page = _garmin("search", client.search_activities, start=start, limit=100,
+                           start_date=start_date, end_date=end_date) or []
             acts += page
             start += len(page)
             if len(page) < 100:
@@ -254,7 +254,7 @@ def _sync_tracks(uid, access_token, start_date=None, end_date=None):
               "date": a["startTimeLocal"][:10], "km": round((a.get("distance") or 0) / 1000, 1)}
              for a in rides]
     rides.sort(key=lambda r: r["date"], reverse=True)
-    return rides, new
+    return rides, new, len(acts)
 
 
 def _load_rides_cache(uid):
@@ -303,7 +303,7 @@ def _build_heatmap_doc(uid, year_key, year_rides, prev_hashes, touch_updated=Fal
     return fingerprint, stats
 
 
-def _rebuild_years(uid, all_rides, cur_year, full):
+def _rebuild_years(uid, all_rides, cur_year, touch_all=False):
     """Rebuild changed year heatmaps and 'all', returning (years, hashes, cur_stats)."""
     entity = _live(uid)
     prev_hashes = json.loads(entity["yearHashes"]) if entity.get("yearHashes") else {}
@@ -320,7 +320,7 @@ def _rebuild_years(uid, all_rides, cur_year, full):
         new_hashes[yk] = fp
         if yk == cur_year:
             cur_stats = st
-    all_fp, _ = _build_heatmap_doc(uid, "all", all_rides, prev_hashes, touch_updated=full)
+    all_fp, _ = _build_heatmap_doc(uid, "all", all_rides, prev_hashes, touch_updated=touch_all)
     new_hashes["all"] = all_fp
     return years, new_hashes, cur_stats
 
@@ -352,61 +352,72 @@ def refresh(uid, full=False):
 def _refresh(uid, api_key, full=False):
     cur_year = datetime.now(timezone.utc).strftime("%Y")
     token = _token(api_key)
-    if full:
-        all_rides, new = _sync_tracks(uid, token)
-    else:
-        yr_rides, new = _sync_tracks(uid, token, start_date=f"{cur_year}-01-01", end_date=f"{cur_year}-12-31")
-        all_rides = _merge_rides(_load_rides_cache(uid), yr_rides, replace_year=cur_year)
+    yr_rides, new, _ = _sync_tracks(uid, token, start_date=f"{cur_year}-01-01", end_date=f"{cur_year}-12-31")
+    all_rides = _merge_rides(_load_rides_cache(uid), yr_rides, replace_year=cur_year)
     _put_blob(uid, "tracks", f"{uid}/rides.json", json.dumps(all_rides),
               content_settings=ContentSettings(content_type="application/json"))
-    years, new_hashes, cur_stats = _rebuild_years(uid, all_rides, cur_year, full=full)
+    years, new_hashes, cur_stats = _rebuild_years(uid, all_rides, cur_year, touch_all=full)
     entity = _live(uid)
+    need_backfill = full or (not entity.get("historySynced") and not entity.get("backfilling"))
     fields = {"status": "ok", "message": "", "lastRun": _now(),
               "stats": json.dumps(cur_stats), "years": json.dumps(years),
               "yearHashes": json.dumps(new_hashes)}
-    if full:
-        fields["historySynced"] = True
-        fields["backfilling"] = False
-        _set_profile(uid, **fields)
-    else:
-        need_backfill = not entity.get("historySynced") and not entity.get("backfilling")
-        if need_backfill:
-            fields["backfilling"] = True
-        _set_profile(uid, **fields)
-        if need_backfill:
-            _enqueue({"op": "backfill", "uid": uid, "gen": entity.get("gen")})
+    if need_backfill:
+        fields["backfilling"] = True
+    _set_profile(uid, **fields)
+    if need_backfill:
+        _enqueue({"op": "backfill", "uid": uid, "year": int(cur_year) - 1,
+                  "empty_streak": 0, "gen": entity.get("gen")})
     log.info("refreshed %s (full=%s): %d rides, %d new, years=%s", uid, full, len(all_rides), new, years)
 
 
-def backfill(uid):
-    """Sync all historical years from Garmin in the background without blocking the UI."""
+MIN_BACKFILL_YEAR = 2010
+MAX_EMPTY_YEARS = 3
+
+
+def backfill(uid, year=None, empty_streak=0):
+    """Sync one historical year at a time in the background without blocking the UI."""
+    cur_year = datetime.now(timezone.utc).strftime("%Y")
+    if year is None:
+        year = int(cur_year) - 1
+    if year < MIN_BACKFILL_YEAR or empty_streak >= MAX_EMPTY_YEARS:
+        _set_profile(uid, backfilling=False, historySynced=True)
+        return
     try:
         api_key = _secrets.get_secret(_secret_name(uid)).value
     except ResourceNotFoundError:
         _set_profile(uid, backfilling=False)
         return
     _set_profile(uid, backfilling=True)
-    cur_year = datetime.now(timezone.utc).strftime("%Y")
     try:
-        all_rides, new = _sync_tracks(uid, _token(api_key))
+        yr_rides, new, total_acts = _sync_tracks(
+            uid, _token(api_key), start_date=f"{year}-01-01", end_date=f"{year}-12-31")
+        all_rides = _merge_rides(_load_rides_cache(uid), yr_rides, replace_year=str(year))
         _put_blob(uid, "tracks", f"{uid}/rides.json", json.dumps(all_rides),
                   content_settings=ContentSettings(content_type="application/json"))
-        years, new_hashes, cur_stats = _rebuild_years(uid, all_rides, cur_year, full=True)
-        _set_profile(uid, backfilling=False, historySynced=True, lastRun=_now(),
-                     stats=json.dumps(cur_stats), years=json.dumps(years),
+        years, new_hashes, cur_stats = _rebuild_years(uid, all_rides, cur_year, touch_all=True)
+        next_empty = 0 if total_acts > 0 else empty_streak + 1
+        done = (year - 1 < MIN_BACKFILL_YEAR) or (next_empty >= MAX_EMPTY_YEARS)
+        _set_profile(uid, backfilling=not done, historySynced=done or bool(_live(uid).get("historySynced")),
+                     lastRun=_now(), stats=json.dumps(cur_stats), years=json.dumps(years),
                      yearHashes=json.dumps(new_hashes))
-        log.info("backfilled %s: %d rides, %d new, years=%s", uid, len(all_rides), new, years)
+        log.info("backfilled %s year=%d: %d rides (%d acts), %d new, years=%s",
+                 uid, year, len(yr_rides), total_acts, new, years)
+        if not done:
+            job = _job_gen.get()
+            _enqueue({"op": "backfill", "uid": uid, "year": year - 1,
+                      "empty_streak": next_empty, "gen": job[1] if job else None})
     except HttpError as e:
         if e.status_code in (401, 403):
             _set_profile(uid, status="invalid-key", keyRejected=True, backfilling=False,
                          message="Garmin rejected the API key. It may have expired; add a new one.")
         else:
             _set_profile(uid, backfilling=False)
-        log.warning("backfill garmin http %s for %s", e.status_code, uid)
+        log.warning("backfill garmin http %s for %s (year=%d)", e.status_code, uid, year)
     except Gone:
         raise
     except Exception:
-        log.exception("backfill failed for %s", uid)
+        log.exception("backfill failed for %s (year=%d)", uid, year)
         _set_profile(uid, backfilling=False)
 
 
@@ -522,7 +533,7 @@ def handle(msg):
         elif op == "refresh":
             refresh(uid, full=bool(msg.get("full")))
         elif op == "backfill":
-            backfill(uid)
+            backfill(uid, year=msg.get("year"), empty_streak=msg.get("empty_streak", 0))
         else:
             log.error("unknown op %r", op)
     except Gone:
